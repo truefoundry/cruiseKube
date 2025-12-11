@@ -1,0 +1,17 @@
+{{- if and .Values.autopilotWebhook.enabled .Values.autopilotWebhook.certGen.enabled .Values.autopilotWebhook.certGen.rbac.create -}}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "autopilotWebhook.fullname" . }}-certgen-create
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "autopilotWebhook.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade,post-install,post-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+    "helm.sh/hook-weight": "-110"
+rules:
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["create", "get", "list", "patch", "delete", "update"]
+{{- end }}

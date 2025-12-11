@@ -1,0 +1,122 @@
+autopilotController:
+  enabled: true
+  replicas: 1
+  image:
+    repository: tfy.jfrog.io/tfy-images/autopilot-oss
+    imagePullPolicy: IfNotPresent
+    tag: ""
+  imagePullSecrets: []
+  nameOverride: ""
+  fullnameOverride: ""
+  controller:
+    mode: "inCluster"
+  serviceAccount:
+    create: true
+    name: ""
+  rbac:
+    create: true
+  persistence:
+    enabled: true
+    size: 5Gi
+    storageClass: ""
+    accessMode: ReadWriteOnce
+    mountPath: /app/stats-data
+    annotations: {}
+  podAnnotations: {}
+  podLabels: {}
+  service:
+    type: ClusterIP
+    httpPort: 8080
+    metricsPort: 8081
+    annotations: {}
+  serviceMonitor:
+    enabled: true
+    jobLabel: autopilot-controller
+    additionalLabels: {}
+    additionalAnnotations: {}
+    endpoints:
+      - port: metrics
+        path: /metrics
+        interval: 30s
+        scrapeTimeout: 10s
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  volumeMounts: []
+  env: {}
+
+autopilotWebhook:
+  enabled: true
+  replicas: 1
+  image:
+    repository: tfy.jfrog.io/tfy-images/autopilot-oss
+    imagePullPolicy: IfNotPresent
+    tag: ""
+  imagePullSecrets: []
+  nameOverride: ""
+  fullnameOverride: ""
+  webhook:
+    certsDir: "/certs"
+    statsURL:
+      host: ""
+  mutatingWebhookConfiguration:
+    clusterID: "default"
+    timeoutSeconds: 10
+    failurePolicy: "Ignore"
+    namespaceSelector:
+      excludeNamespaces:
+        - "kube-public"
+        - "kube-node-lease"
+        - "local-path-storage"
+  certGen:
+    enabled: true
+    image:
+      repository: registry.k8s.io/ingress-nginx/kube-webhook-certgen
+      imagePullPolicy: IfNotPresent
+      tag: v1.5.2
+    resources:
+      limits:
+        cpu: 100m
+        memory: 128Mi
+      requests:
+        cpu: 10m
+        memory: 32Mi
+    rbac:
+      create: true
+    serviceAccount:
+      create: true
+      name: ""
+  rbac:
+    create: true
+  podAnnotations: {}
+  podLabels: {}
+  serviceAccount:
+    create: true
+    name: ""
+  service:
+    type: ClusterIP
+    httpsPort: 8443
+    metricsPort: 8081
+    annotations: {}
+  serviceMonitor:
+    enabled: true
+    jobLabel: autopilot-webhook
+    additionalLabels: {}
+    additionalAnnotations: {}
+    endpoints:
+      - port: metrics
+        path: /metrics
+        interval: 30s
+        scrapeTimeout: 10s
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  env: {}

@@ -1,0 +1,66 @@
+{{- if .Values.autopilotController.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "autopilotController.fullname" . }}
+  labels:
+    {{- include "autopilotController.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.autopilotController.replicas }}
+  selector:
+    matchLabels:
+      {{- include "autopilotController.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        {{- with .Values.autopilotController.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "autopilotController.labels" . | nindent 8 }}
+        {{- with .Values.autopilotController.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.autopilotController.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "autopilotController.serviceAccountName" . }}
+      containers:
+        - name: {{ .Chart.Name }}-controller
+          image: "{{ .Values.autopilotController.image.repository }}:{{ include "autopilotController.imageTag" . }}"
+          imagePullPolicy: {{ .Values.autopilotController.image.pullPolicy }}
+          command: ["./autopilot"]
+          args:
+            - "--execution-mode=controller"
+            - "--controller-mode={{ .Values.autopilotController.controller.mode }}"
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+            - name: metrics
+              containerPort: 8081
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.autopilotController.resources | nindent 12 }}
+          env:
+            {{- range $key, $value := .Values.autopilotController.env }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+          volumeMounts:
+            {{- if .Values.autopilotController.persistence.enabled }}
+            - name: data
+              mountPath: {{ .Values.autopilotController.persistence.mountPath }}
+            {{- end }}
+            {{- with .Values.autopilotController.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+      volumes:
+        {{- if .Values.autopilotController.persistence.enabled }}
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ include "autopilotController.fullname" . }}-data
+        {{- end }}
+{{- end }}

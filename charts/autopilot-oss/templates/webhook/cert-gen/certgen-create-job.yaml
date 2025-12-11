@@ -1,0 +1,46 @@
+{{- if and .Values.autopilotWebhook.enabled .Values.autopilotWebhook.certGen.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "autopilotWebhook.fullname" . }}-certgen-create
+  labels:
+    {{- include "autopilotWebhook.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  ttlSecondsAfterFinished: 300
+  template:
+    metadata:
+      name: {{ include "autopilotWebhook.fullname" . }}-certgen-create
+      labels:
+        {{- include "autopilotWebhook.labels" . | nindent 8 }}
+    spec:
+      restartPolicy: OnFailure
+      serviceAccountName: {{ include "autopilotWebhook.certGenServiceAccountName" . }}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 2000
+        fsGroup: 2000
+      containers:
+      - name: cert-gen
+        image: {{ .Values.autopilotWebhook.certGen.image.repository }}:{{ .Values.autopilotWebhook.certGen.image.tag }}
+        imagePullPolicy: {{ .Values.autopilotWebhook.certGen.image.imagePullPolicy }}
+        args:
+        - create
+        - --host={{ include "autopilotWebhook.webhookServiceName" . }},{{ include "autopilotWebhook.webhookServiceName" . }}.{{ .Release.Namespace }}.svc,127.0.0.1,localhost
+        - --namespace={{ .Release.Namespace }}
+        - --secret-name={{ include "autopilotWebhook.tlsSecretName" . }}
+        - --cert-name=tls.crt
+        - --key-name=tls.key
+        - --log-level=debug
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+        resources:
+          {{- toYaml .Values.autopilotWebhook.certGen.resources | nindent 10 }}
+{{- end }}

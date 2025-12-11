@@ -1,6 +1,0 @@
-apiVersion: v2
-name: autopilot-webhook
-description: A Helm chart for Kubernetes resource autopilot webhook service
-type: application
-version: 0.1.5
-appVersion: "1.0.0"

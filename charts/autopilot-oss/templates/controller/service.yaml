@@ -1,0 +1,25 @@
+{{- if .Values.autopilotController.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "autopilotController.fullname" . }}
+  labels:
+    {{- include "autopilotController.labels" . | nindent 4 }}
+  {{- with .Values.autopilotController.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.autopilotController.service.type }}
+  ports:
+    - port: {{ .Values.autopilotController.service.httpPort }}
+      targetPort: http
+      protocol: TCP
+      name: http
+    - port: {{ .Values.autopilotController.service.metricsPort }}
+      targetPort: metrics
+      protocol: TCP
+      name: metrics
+  selector:
+    {{- include "autopilotController.selectorLabels" . | nindent 4 }}
+{{- end }}
