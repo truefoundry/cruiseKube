@@ -1,0 +1,13 @@
+apiVersion: v2
+name: autopilot
+description: A Helm chart for TrueFoundry Autopilot controller and webhook
+type: application
+version: 0.1.0
+appVersion: "1.16.0"
+dependencies:
+  - name: autopilot-controller
+    version: "0.1.5"
+    repository: "file://../autopilot-controller"
+  - name: autopilot-webhook
+    version: "0.1.5"
+    repository: "file://../autopilot-webhook"
