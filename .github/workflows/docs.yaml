@@ -1,8 +1,8 @@
 name: deploy-docs
 "on":
   push:
-    branches:
-#      - main
+    # branches:
+    #   - main
 
 concurrency:
   group: docs-${{ github.ref }}
@@ -36,4 +36,3 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: mkdocs gh-deploy --force
-
