@@ -1,6 +1,6 @@
 apiVersion: v2
-name: autopilot
-description: A Helm chart for TrueFoundry Autopilot controller and webhook
+name: autopilot-oss
+description: A Helm chart for TrueFoundry Autopilot OSS controller and webhook
 type: application
 version: 0.1.0
 appVersion: "1.16.0"

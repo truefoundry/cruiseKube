@@ -55,7 +55,7 @@ func SetupServerEngine(mgr cluster.Manager, authAPI gin.HandlerFunc, authWebhook
 
 func SetupWebhookServerEngine(middleware ...gin.HandlerFunc) *gin.Engine {
 	r := gin.New()
-	r.Use(otelgin.Middleware("autopilot-webhook"))
+	r.Use(otelgin.Middleware("autopilotWebhook"))
 	r.Use(middleware...)
 
 	clusterGroup := r.Group("/clusters/:clusterID")

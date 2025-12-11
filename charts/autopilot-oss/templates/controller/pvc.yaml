@@ -1,25 +1,25 @@
-{{- if and .Values.autopilot-controller.enabled .Values.autopilot-controller.persistence.enabled }}
+{{- if and .Values.autopilotController.enabled .Values.autopilotController.persistence.enabled }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ include "autopilot-controller.fullname" . }}-data
+  name: {{ include "autopilotController.fullname" . }}-data
   labels:
-    {{- include "autopilot-controller.labels" . | nindent 4 }}
-  {{- with .Values.autopilot-controller.persistence.annotations }}
+    {{- include "autopilotController.labels" . | nindent 4 }}
+  {{- with .Values.autopilotController.persistence.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
   accessModes:
-    - {{ .Values.autopilot-controller.persistence.accessMode }}
+    - {{ .Values.autopilotController.persistence.accessMode }}
   resources:
     requests:
-      storage: {{ .Values.autopilot-controller.persistence.size }}
-  {{- if .Values.autopilot-controller.persistence.storageClass }}
-  {{- if eq "-" .Values.autopilot-controller.persistence.storageClass }}
+      storage: {{ .Values.autopilotController.persistence.size }}
+  {{- if .Values.autopilotController.persistence.storageClass }}
+  {{- if eq "-" .Values.autopilotController.persistence.storageClass }}
   storageClassName: ""
   {{- else }}
-  storageClassName: {{ .Values.autopilot-controller.persistence.storageClass }}
+  storageClassName: {{ .Values.autopilotController.persistence.storageClass }}
   {{- end }}
   {{- end }}
 {{- end }}

@@ -1,25 +1,25 @@
-{{- if .Values.autopilot-webhook.enabled }}
+{{- if .Values.autopilotWebhook.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "autopilot-webhook.webhookServiceName" . }}
+  name: {{ include "autopilotWebhook.webhookServiceName" . }}
   labels:
-    {{- include "autopilot-webhook.labels" . | nindent 4 }}
-  {{- with .Values.autopilot-webhook.service.annotations }}
+    {{- include "autopilotWebhook.labels" . | nindent 4 }}
+  {{- with .Values.autopilotWebhook.service.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  type: {{ .Values.autopilot-webhook.service.type }}
+  type: {{ .Values.autopilotWebhook.service.type }}
   ports:
-    - port: {{ .Values.autopilot-webhook.service.httpsPort }}
+    - port: {{ .Values.autopilotWebhook.service.httpsPort }}
       targetPort: https
       protocol: TCP
       name: https
-    - port: {{ .Values.autopilot-webhook.service.metricsPort }}
+    - port: {{ .Values.autopilotWebhook.service.metricsPort }}
       targetPort: metrics
       protocol: TCP
       name: metrics
   selector:
-    {{- include "autopilot-webhook.selectorLabels" . | nindent 4 }}
+    {{- include "autopilotWebhook.selectorLabels" . | nindent 4 }}
 {{- end }}

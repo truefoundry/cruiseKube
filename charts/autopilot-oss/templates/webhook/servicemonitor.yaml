@@ -1,22 +1,22 @@
-{{- if and .Values.autopilot-webhook.enabled .Values.autopilot-webhook.serviceMonitor.enabled }}
+{{- if and .Values.autopilotWebhook.enabled .Values.autopilotWebhook.serviceMonitor.enabled }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: {{ include "autopilot-webhook.fullname" . }}-service-monitor
+  name: {{ include "autopilotWebhook.fullname" . }}-service-monitor
   labels:
-    {{- include "autopilot-webhook.serviceMonitorLabels" . | nindent 4 }}
-  {{- if .Values.autopilot-webhook.serviceMonitor.additionalAnnotations }}
+    {{- include "autopilotWebhook.serviceMonitorLabels" . | nindent 4 }}
+  {{- if .Values.autopilotWebhook.serviceMonitor.additionalAnnotations }}
   annotations:
-    {{- toYaml .Values.autopilot-webhook.serviceMonitor.additionalAnnotations | nindent 4 }}
+    {{- toYaml .Values.autopilotWebhook.serviceMonitor.additionalAnnotations | nindent 4 }}
   {{- end }}
 spec:
-  jobLabel: {{ .Values.autopilot-webhook.serviceMonitor.jobLabel }}
+  jobLabel: {{ .Values.autopilotWebhook.serviceMonitor.jobLabel }}
   selector:
     matchLabels:
-      {{ include "autopilot-webhook.selectorLabels" . | nindent 6 }}
+      {{ include "autopilotWebhook.selectorLabels" . | nindent 6 }}
   namespaceSelector:
     matchNames:
     - {{ .Release.Namespace }}
   endpoints:
-  {{- toYaml .Values.autopilot-webhook.serviceMonitor.endpoints | nindent 2 }}
+  {{- toYaml .Values.autopilotWebhook.serviceMonitor.endpoints | nindent 2 }}
 {{- end -}}

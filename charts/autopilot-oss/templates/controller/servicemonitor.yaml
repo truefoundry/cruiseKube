@@ -1,22 +1,22 @@
-{{- if and .Values.autopilot-controller.enabled .Values.autopilot-controller.serviceMonitor.enabled }}
+{{- if and .Values.autopilotController.enabled .Values.autopilotController.serviceMonitor.enabled }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: {{ include "autopilot-controller.fullname" . }}-service-monitor
+  name: {{ include "autopilotController.fullname" . }}-service-monitor
   labels:
-    {{- include "autopilot-controller.serviceMonitorLabels" . | nindent 4 }}
-  {{- if .Values.autopilot-controller.serviceMonitor.additionalAnnotations }}
+    {{- include "autopilotController.serviceMonitorLabels" . | nindent 4 }}
+  {{- if .Values.autopilotController.serviceMonitor.additionalAnnotations }}
   annotations:
-    {{- toYaml .Values.autopilot-controller.serviceMonitor.additionalAnnotations | nindent 4 }}
+    {{- toYaml .Values.autopilotController.serviceMonitor.additionalAnnotations | nindent 4 }}
   {{- end }}
 spec:
-  jobLabel: {{ .Values.autopilot-controller.serviceMonitor.jobLabel }}
+  jobLabel: {{ .Values.autopilotController.serviceMonitor.jobLabel }}
   selector:
     matchLabels:
-      {{ include "autopilot-controller.selectorLabels" . | nindent 6 }}
+      {{ include "autopilotController.selectorLabels" . | nindent 6 }}
   namespaceSelector:
     matchNames:
     - {{ .Release.Namespace }}
   endpoints:
-  {{- toYaml .Values.autopilot-controller.serviceMonitor.endpoints | nindent 2 }}
+  {{- toYaml .Values.autopilotController.serviceMonitor.endpoints | nindent 2 }}
 {{- end -}}

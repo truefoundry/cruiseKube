@@ -1,10 +1,10 @@
-{{- if and .Values.autopilot-webhook.enabled .Values.autopilot-webhook.certGen.enabled }}
+{{- if and .Values.autopilotWebhook.enabled .Values.autopilotWebhook.certGen.enabled }}
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ include "autopilot-webhook.fullname" . }}-certgen-patch
+  name: {{ include "autopilotWebhook.fullname" . }}-certgen-patch
   labels:
-    {{- include "autopilot-webhook.labels" . | nindent 4 }}
+    {{- include "autopilotWebhook.labels" . | nindent 4 }}
   annotations:
     "helm.sh/hook": post-install,post-upgrade
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
@@ -12,25 +12,25 @@ spec:
   ttlSecondsAfterFinished: 300
   template:
     metadata:
-      name: {{ include "autopilot-webhook.fullname" . }}-certgen-patch
+      name: {{ include "autopilotWebhook.fullname" . }}-certgen-patch
       labels:
-        {{- include "autopilot-webhook.labels" . | nindent 8 }}
+        {{- include "autopilotWebhook.labels" . | nindent 8 }}
     spec:
       restartPolicy: OnFailure
-      serviceAccountName: {{ include "autopilot-webhook.certGenServiceAccountName" . }}
+      serviceAccountName: {{ include "autopilotWebhook.certGenServiceAccountName" . }}
       securityContext:
         runAsNonRoot: true
         runAsUser: 2000
         fsGroup: 2000
       containers:
       - name: cert-gen
-        image: {{ .Values.autopilot-webhook.certGen.image.repository }}:{{ .Values.autopilot-webhook.certGen.image.tag }}
-        imagePullPolicy: {{ .Values.autopilot-webhook.certGen.image.imagePullPolicy }}
+        image: {{ .Values.autopilotWebhook.certGen.image.repository }}:{{ .Values.autopilotWebhook.certGen.image.tag }}
+        imagePullPolicy: {{ .Values.autopilotWebhook.certGen.image.imagePullPolicy }}
         args:
         - patch
-        - --webhook-name={{ include "autopilot-webhook.fullname" . }}-webhook-config
+        - --webhook-name={{ include "autopilotWebhook.fullname" . }}-webhook-config
         - --namespace={{ .Release.Namespace }}
-        - --secret-name={{ include "autopilot-webhook.tlsSecretName" . }}
+        - --secret-name={{ include "autopilotWebhook.tlsSecretName" . }}
         - --patch-validating=false
         - --log-level=debug
         securityContext:
@@ -40,5 +40,5 @@ spec:
             - ALL
           readOnlyRootFilesystem: true
         resources:
-          {{- toYaml .Values.autopilot-webhook.certGen.resources | nindent 10 }}
+          {{- toYaml .Values.autopilotWebhook.certGen.resources | nindent 10 }}
 {{- end }}

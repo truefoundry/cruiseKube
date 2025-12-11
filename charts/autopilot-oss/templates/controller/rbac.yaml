@@ -1,10 +1,10 @@
-{{- if and .Values.autopilot-controller.enabled .Values.autopilot-controller.rbac.create -}}
+{{- if and .Values.autopilotController.enabled .Values.autopilotController.rbac.create -}}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: {{ include "autopilot-controller.fullname" . }}
+  name: {{ include "autopilotController.fullname" . }}
   labels:
-    {{- include "autopilot-controller.labels" . | nindent 4 }}
+    {{- include "autopilotController.labels" . | nindent 4 }}
 rules:
 - apiGroups: ["*"]
   resources: ["*"]
@@ -13,15 +13,15 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: {{ include "autopilot-controller.fullname" . }}
+  name: {{ include "autopilotController.fullname" . }}
   labels:
-    {{- include "autopilot-controller.labels" . | nindent 4 }}
+    {{- include "autopilotController.labels" . | nindent 4 }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: {{ include "autopilot-controller.fullname" . }}
+  name: {{ include "autopilotController.fullname" . }}
 subjects:
 - kind: ServiceAccount
-  name: {{ include "autopilot-controller.serviceAccountName" . }}
+  name: {{ include "autopilotController.serviceAccountName" . }}
   namespace: {{ .Release.Namespace }}
 {{- end }}

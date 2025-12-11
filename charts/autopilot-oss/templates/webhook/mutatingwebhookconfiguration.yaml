@@ -1,18 +1,18 @@
-{{- if .Values.autopilot-webhook.enabled }}
+{{- if .Values.autopilotWebhook.enabled }}
 apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration
 metadata:
-  name: {{ include "autopilot-webhook.fullname" . }}-webhook-config
+  name: {{ include "autopilotWebhook.fullname" . }}-webhook-config
   labels:
-    {{- include "autopilot-webhook.labels" . | nindent 4 }}
+    {{- include "autopilotWebhook.labels" . | nindent 4 }}
 webhooks:
-- name: {{ printf "%s.%s.autopilot.truefoundry.com" (include "autopilot-webhook.fullname" .) .Release.Namespace }}
+- name: {{ printf "%s.%s.autopilot.truefoundry.com" (include "autopilotWebhook.fullname" .) .Release.Namespace }}
   clientConfig:
     service:
-      name: {{ include "autopilot-webhook.webhookServiceName" . }}
+      name: {{ include "autopilotWebhook.webhookServiceName" . }}
       namespace: {{ .Release.Namespace }}
-      path: {{ printf "/clusters/%s/webhook/mutate" .Values.autopilot-webhook.mutatingWebhookConfiguration.clusterID }}
-      port: {{ .Values.autopilot-webhook.service.httpsPort }}
+      path: {{ printf "/clusters/%s/webhook/mutate" .Values.autopilotWebhook.mutatingWebhookConfiguration.clusterID }}
+      port: {{ .Values.autopilotWebhook.service.httpsPort }}
     caBundle: Cg==
   rules:
   - operations: ["CREATE"]
@@ -22,11 +22,11 @@ webhooks:
     scope: "*"
   admissionReviewVersions: ["v1"]
   sideEffects: None
-  failurePolicy: {{ .Values.autopilot-webhook.mutatingWebhookConfiguration.failurePolicy }}
+  failurePolicy: {{ .Values.autopilotWebhook.mutatingWebhookConfiguration.failurePolicy }}
   reinvocationPolicy: Never
   matchPolicy: Equivalent
-  timeoutSeconds: {{ .Values.autopilot-webhook.mutatingWebhookConfiguration.timeoutSeconds }}
+  timeoutSeconds: {{ .Values.autopilotWebhook.mutatingWebhookConfiguration.timeoutSeconds }}
   namespaceSelector:
-    {{- include "autopilot-webhook.mutatingWebhookConfigurationNamespaceSelector" . | nindent 4 }}
+    {{- include "autopilotWebhook.mutatingWebhookConfigurationNamespaceSelector" . | nindent 4 }}
   objectSelector: {}
 {{- end }}

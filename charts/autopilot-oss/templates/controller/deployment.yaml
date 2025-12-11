@@ -1,40 +1,40 @@
-{{- if .Values.autopilot-controller.enabled }}
+{{- if .Values.autopilotController.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "autopilot-controller.fullname" . }}
+  name: {{ include "autopilotController.fullname" . }}
   labels:
-    {{- include "autopilot-controller.labels" . | nindent 4 }}
+    {{- include "autopilotController.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.autopilot-controller.replicas }}
+  replicas: {{ .Values.autopilotController.replicas }}
   selector:
     matchLabels:
-      {{- include "autopilot-controller.selectorLabels" . | nindent 6 }}
+      {{- include "autopilotController.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       annotations:
-        {{- with .Values.autopilot-controller.podAnnotations }}
+        {{- with .Values.autopilotController.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
       labels:
-        {{- include "autopilot-controller.labels" . | nindent 8 }}
-        {{- with .Values.autopilot-controller.podLabels }}
+        {{- include "autopilotController.labels" . | nindent 8 }}
+        {{- with .Values.autopilotController.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
-      {{- with .Values.autopilot-controller.imagePullSecrets }}
+      {{- with .Values.autopilotController.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "autopilot-controller.serviceAccountName" . }}
+      serviceAccountName: {{ include "autopilotController.serviceAccountName" . }}
       containers:
         - name: {{ .Chart.Name }}-controller
-          image: "{{ .Values.autopilot-controller.image.repository }}:{{ include "autopilot-controller.imageTag" . }}"
-          imagePullPolicy: {{ .Values.autopilot-controller.image.pullPolicy }}
+          image: "{{ .Values.autopilotController.image.repository }}:{{ include "autopilotController.imageTag" . }}"
+          imagePullPolicy: {{ .Values.autopilotController.image.pullPolicy }}
           command: ["./autopilot"]
           args:
             - "--execution-mode=controller"
-            - "--controller-mode={{ .Values.autopilot-controller.controller.mode }}"
+            - "--controller-mode={{ .Values.autopilotController.controller.mode }}"
           ports:
             - name: http
               containerPort: 8080
@@ -43,24 +43,24 @@ spec:
               containerPort: 8081
               protocol: TCP
           resources:
-            {{- toYaml .Values.autopilot-controller.resources | nindent 12 }}
+            {{- toYaml .Values.autopilotController.resources | nindent 12 }}
           env:
-            {{- range $key, $value := .Values.autopilot-controller.env }}
+            {{- range $key, $value := .Values.autopilotController.env }}
             - name: {{ $key }}
               value: {{ $value | quote }}
             {{- end }}
           volumeMounts:
-            {{- if .Values.autopilot-controller.persistence.enabled }}
+            {{- if .Values.autopilotController.persistence.enabled }}
             - name: data
-              mountPath: {{ .Values.autopilot-controller.persistence.mountPath }}
+              mountPath: {{ .Values.autopilotController.persistence.mountPath }}
             {{- end }}
-            {{- with .Values.autopilot-controller.volumeMounts }}
+            {{- with .Values.autopilotController.volumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
       volumes:
-        {{- if .Values.autopilot-controller.persistence.enabled }}
+        {{- if .Values.autopilotController.persistence.enabled }}
         - name: data
           persistentVolumeClaim:
-            claimName: {{ include "autopilot-controller.fullname" . }}-data
+            claimName: {{ include "autopilotController.fullname" . }}-data
         {{- end }}
 {{- end }}

@@ -8,8 +8,8 @@ NAMESPACE="autopilot-system"
 PROMETHEUS_NAMESPACE="monitoring"
 IMAGE_NAME="autopilot"
 IMAGE_TAG="test"
-CONTROLLER_RELEASE_NAME="autopilot-controller"
-WEBHOOK_RELEASE_NAME="autopilot-webhook"
+CONTROLLER_RELEASE_NAME="autopilotController"
+WEBHOOK_RELEASE_NAME="autopilotWebhook"
 RELEASE_NAME="autopilot-oss"
 PROMETHEUS_RELEASE_NAME="prometheus"
 
@@ -164,21 +164,21 @@ install_prometheus() {
     log_info "Prometheus is accessible at: http://localhost:9090"
 }
 
-install_global_chart() {
+install_autopilot_chart() {
     log_info "Installing global autopilot chart"
 
     helm upgrade --install $RELEASE_NAME \
-        ./charts/autopilot \
+        ./charts/autopilot-oss \
         --namespace $NAMESPACE \
-        --set autopilot-controller.image.repository=$IMAGE_NAME \
-        --set autopilot-controller.image.tag=$IMAGE_TAG \
-        --set autopilot-controller.image.pullPolicy=IfNotPresent \
-        --set autopilot-controller.persistence.storageClass=standard \
-        --set autopilot-controller.env.AUTOPILOT_DEPENDENCIES_INCLUSTER_PROMETHEUSURL="http://prometheus-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090" \
-        --set autopilot-webhook.image.repository=$IMAGE_NAME \
-        --set autopilot-webhook.image.tag=$IMAGE_TAG \
-        --set autopilot-webhook.image.pullPolicy=IfNotPresent \
-        --set autopilot-webhook.webhook.statsURL.host="$RELEASE_NAME-autopilot-webhook.autopilot-system.svc.cluster.local:8080" \
+        --set autopilotController.image.repository=$IMAGE_NAME \
+        --set autopilotController.image.tag=$IMAGE_TAG \
+        --set autopilotController.image.pullPolicy=IfNotPresent \
+        --set autopilotController.persistence.storageClass=standard \
+        --set autopilotController.env.AUTOPILOT_DEPENDENCIES_INCLUSTER_PROMETHEUSURL="http://prometheus-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090" \
+        --set autopilotWebhook.image.repository=$IMAGE_NAME \
+        --set autopilotWebhook.image.tag=$IMAGE_TAG \
+        --set autopilotWebhook.image.pullPolicy=IfNotPresent \
+        --set autopilotWebhook.webhook.statsURL.host="$RELEASE_NAME-autopilotWebhook.autopilot-system.svc.cluster.local:8080" \
         --wait --timeout=300s
 
     log_success "Global autopilot chart installed successfully"
@@ -265,11 +265,11 @@ verify_installation() {
     
     echo ""
     log_info "Checking controller logs (last 20 lines):"
-    kubectl logs -n $NAMESPACE -l app.kubernetes.io/name=autopilot-controller --tail=20 || log_warning "Controller logs not available yet"
+    kubectl logs -n $NAMESPACE -l app.kubernetes.io/name=autopilotController --tail=20 || log_warning "Controller logs not available yet"
     
     echo ""
     log_info "Checking webhook logs (last 20 lines):"
-    kubectl logs -n $NAMESPACE -l app.kubernetes.io/name=autopilot-webhook --tail=20 || log_warning "Webhook logs not available yet"
+    kubectl logs -n $NAMESPACE -l app.kubernetes.io/name=autopilotWebhook --tail=20 || log_warning "Webhook logs not available yet"
 }
 
 cleanup() {
@@ -301,7 +301,7 @@ show_usage() {
     echo "  2. Create a Kind cluster named '$CLUSTER_NAME'"
     echo "  3. Build and load the autopilot Docker image"
     echo "  4. Install Prometheus (without Grafana/AlertManager) for metrics collection"
-    echo "  5. Install both autopilot-controller and autopilot-webhook charts"
+    echo "  5. Install both autopilotController and autopilotWebhook charts"
     echo "  6. Create ServiceMonitors for Prometheus scraping"
     echo "  7. Verify the installation"
 }
@@ -334,7 +334,7 @@ main() {
     setup_namespaces
     add_helm_repos
     install_prometheus
-    install_global_chart
+    install_autopilot_chart
     create_service_monitors
     verify_installation
     
@@ -347,8 +347,8 @@ main() {
     log_info "Useful commands:"
     echo "  kubectl get pods -n $NAMESPACE"
     echo "  kubectl get pods -n $PROMETHEUS_NAMESPACE"
-    echo "  kubectl logs -n $NAMESPACE -f deployment/autopilot-controller"
-    echo "  kubectl logs -n $NAMESPACE -f deployment/autopilot-webhook"
+    echo "  kubectl logs -n $NAMESPACE -f deployment/autopilotController"
+    echo "  kubectl logs -n $NAMESPACE -f deployment/autopilotWebhook"
     echo "  helm list -n $NAMESPACE"
     echo "  helm list -n $PROMETHEUS_NAMESPACE"
     echo ""
