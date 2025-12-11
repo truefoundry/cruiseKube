@@ -1,7 +1,7 @@
 replicas: 1
 
 image:
-  repository: tfy.jfrog.io/tfy-images/autopilot-standalone
+  repository: tfy.jfrog.io/tfy-images/autopilot-oss
   imagePullPolicy: IfNotPresent
   tag: ""
 
