@@ -201,7 +201,7 @@ spec:
     matchLabels:
       app.kubernetes.io/name: autopilot-controller
   endpoints:
-  - port: http
+  - port: metrics
     path: /metrics
     interval: 30s
 EOF
@@ -220,7 +220,7 @@ spec:
     matchLabels:
       app.kubernetes.io/name: autopilot-webhook
   endpoints:
-  - port: https
+  - port: metrics
     path: /metrics
     interval: 30s
     scheme: https
