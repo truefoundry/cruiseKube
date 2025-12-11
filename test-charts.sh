@@ -10,6 +10,7 @@ IMAGE_NAME="autopilot"
 IMAGE_TAG="test"
 CONTROLLER_RELEASE_NAME="autopilot-controller"
 WEBHOOK_RELEASE_NAME="autopilot-webhook"
+RELEASE_NAME="autopilot-oss"
 PROMETHEUS_RELEASE_NAME="prometheus"
 
 # Colors for output
@@ -163,37 +164,24 @@ install_prometheus() {
     log_info "Prometheus is accessible at: http://localhost:9090"
 }
 
-install_controller_chart() {
-    log_info "Installing autopilot-controller chart"
-    
-    # Install the controller chart with Prometheus endpoint
-    helm upgrade --install $CONTROLLER_RELEASE_NAME \
-        ./charts/autopilot-controller \
-        --namespace $NAMESPACE \
-        --set image.repository=$IMAGE_NAME \
-        --set image.tag=$IMAGE_TAG \
-        --set image.pullPolicy=IfNotPresent \
-        --set persistence.storageClass=standard \
-        --set env.AUTOPILOT_DEPENDENCIES_INCLUSTER_PROMETHEUSURL="http://prometheus-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090" \
-        --wait --timeout=300s
-    
-    log_success "Controller chart installed successfully"
-}
+install_global_chart() {
+    log_info "Installing global autopilot chart"
 
-install_webhook_chart() {
-    log_info "Installing autopilot-webhook chart"
-    
-    # Install the webhook chart
-    helm upgrade --install $WEBHOOK_RELEASE_NAME \
-        ./charts/autopilot-webhook \
+    helm upgrade --install $RELEASE_NAME \
+        ./charts/autopilot \
         --namespace $NAMESPACE \
-        --set image.repository=$IMAGE_NAME \
-        --set image.tag=$IMAGE_TAG \
-        --set image.pullPolicy=IfNotPresent \
-        --set webhook.statsURL.host="autopilot-controller.autopilot-system.svc.cluster.local:8080" \
+        --set autopilot-controller.image.repository=$IMAGE_NAME \
+        --set autopilot-controller.image.tag=$IMAGE_TAG \
+        --set autopilot-controller.image.pullPolicy=IfNotPresent \
+        --set autopilot-controller.persistence.storageClass=standard \
+        --set autopilot-controller.env.AUTOPILOT_DEPENDENCIES_INCLUSTER_PROMETHEUSURL="http://prometheus-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090" \
+        --set autopilot-webhook.image.repository=$IMAGE_NAME \
+        --set autopilot-webhook.image.tag=$IMAGE_TAG \
+        --set autopilot-webhook.image.pullPolicy=IfNotPresent \
+        --set autopilot-webhook.webhook.statsURL.host="$RELEASE_NAME-autopilot-webhook.autopilot-system.svc.cluster.local:8080" \
         --wait --timeout=300s
-    
-    log_success "Webhook chart installed successfully"
+
+    log_success "Global autopilot chart installed successfully"
 }
 
 create_service_monitors() {
@@ -346,8 +334,7 @@ main() {
     setup_namespaces
     add_helm_repos
     install_prometheus
-    install_controller_chart
-    install_webhook_chart
+    install_global_chart
     create_service_monitors
     verify_installation
     

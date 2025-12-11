@@ -1,0 +1,61 @@
+{{- if .Values.autopilot-webhook.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "autopilot-webhook.fullname" . }}
+  labels:
+    {{- include "autopilot-webhook.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.autopilot-webhook.replicas }}
+  selector:
+    matchLabels:
+      {{- include "autopilot-webhook.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        {{- with .Values.autopilot-webhook.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "autopilot-webhook.labels" . | nindent 8 }}
+        {{- with .Values.autopilot-webhook.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.autopilot-webhook.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "autopilot-webhook.serviceAccountName" . }}
+      containers:
+        - name: {{ .Chart.Name }}-webhook
+          image: "{{ .Values.autopilot-webhook.image.repository }}:{{ include "autopilot-webhook.imageTag" . }}"
+          imagePullPolicy: {{ .Values.autopilot-webhook.image.pullPolicy }}
+          command: ["./autopilot"]
+          args:
+            - "--execution-mode=webhook"
+            - "--webhook-certs-dir={{ .Values.autopilot-webhook.webhook.certsDir }}"
+            - "--webhook-stats-url-host={{ .Values.autopilot-webhook.webhook.statsURL.host }}"
+          ports:
+            - name: https
+              containerPort: 8443
+              protocol: TCP
+            - name: metrics
+              containerPort: 8081
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.autopilot-webhook.resources | nindent 12 }}
+          env:
+            {{- range $key, $value := .Values.autopilot-webhook.env }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+          volumeMounts:
+            - name: webhook-certs
+              mountPath: {{ .Values.autopilot-webhook.webhook.certsDir }}
+              readOnly: true
+      volumes:
+        - name: webhook-certs
+          secret:
+            secretName: {{ include "autopilot-webhook.tlsSecretName" . }}
+{{- end }}

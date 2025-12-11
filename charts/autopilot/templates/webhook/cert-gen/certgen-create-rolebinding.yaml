@@ -1,0 +1,21 @@
+{{- if and .Values.autopilot-webhook.enabled .Values.autopilot-webhook.certGen.enabled .Values.autopilot-webhook.certGen.rbac.create -}}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "autopilot-webhook.fullname" . }}-certgen-create
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "autopilot-webhook.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade,post-install,post-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+    "helm.sh/hook-weight": "-110"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "autopilot-webhook.fullname" . }}-certgen-create
+subjects:
+- kind: ServiceAccount
+  name: {{ include "autopilot-webhook.certGenServiceAccountName" . }}
+  namespace: {{ .Release.Namespace }}
+{{- end }}
