@@ -49,7 +49,7 @@ func callTimeSeriesModel(ctx context.Context, timeseriesData []map[string][]floa
 	}
 
 	// Make HTTP POST request
-	url := "https://autopilot-prediction-service-autopilot-test-8000.tfy-usea1-ctl.devtest.truefoundry.tech/predict/timeseries"
+	url := ""
 	resp, err := client.Post(url, "application/json", bytes.NewBuffer(payloadBytes))
 	if err != nil {
 		return PredictionStatsResponse{}, fmt.Errorf("failed to make HTTP request to time series model: %w", err)

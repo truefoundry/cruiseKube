@@ -40,13 +40,11 @@ func main() {
 	// Core flags
 	rootCmd.PersistentFlags().StringVar(&configFilePath, "config-file-path", "config.yaml", "Path to configuration file")
 	rootCmd.PersistentFlags().String("execution-mode", "", "Execution mode: controller|webhook|both")
-	rootCmd.PersistentFlags().String("controller-mode", "", "Controller mode: local|inCluster|tfyMultiCluster")
+	rootCmd.PersistentFlags().String("controller-mode", "", "Controller mode: local|inCluster")
 
 	// Dependencies flags
 	rootCmd.PersistentFlags().String("kubeconfig-path", "", "Path to kubeconfig file (local mode)")
 	rootCmd.PersistentFlags().String("prometheus-url", "", "Prometheus URL")
-	rootCmd.PersistentFlags().String("sfy-server-url", "", "SFY Server URL (tfyMultiCluster mode)")
-	rootCmd.PersistentFlags().String("sfy-server-api-key", "", "SFY Server API Key (tfyMultiCluster mode)")
 
 	// Server/Webhook flags
 	rootCmd.PersistentFlags().String("server-port", "", "Server port")
@@ -66,8 +64,6 @@ func main() {
 	v.BindPFlag("dependencies.local.kubeconfigPath", rootCmd.PersistentFlags().Lookup("kubeconfig-path"))
 	v.BindPFlag("dependencies.local.prometheusURL", rootCmd.PersistentFlags().Lookup("prometheus-url"))
 	v.BindPFlag("dependencies.inCluster.prometheusURL", rootCmd.PersistentFlags().Lookup("prometheus-url"))
-	v.BindPFlag("dependencies.tfyMultiCluster.sfyServerURL", rootCmd.PersistentFlags().Lookup("sfy-server-url"))
-	v.BindPFlag("dependencies.tfyMultiCluster.sfyServerAPIKey", rootCmd.PersistentFlags().Lookup("sfy-server-api-key"))
 	v.BindPFlag("server.port", rootCmd.PersistentFlags().Lookup("server-port"))
 	v.BindPFlag("webhook.port", rootCmd.PersistentFlags().Lookup("webhook-port"))
 	v.BindPFlag("webhook.certsDir", rootCmd.PersistentFlags().Lookup("webhook-certs-dir"))

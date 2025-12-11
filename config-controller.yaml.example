@@ -5,13 +5,10 @@ dependencies:
     prometheusURL: "http://localhost:9090"
   inCluster:
     prometheusURL: ""
-  tfyMultiCluster:
-    sfyServerURL: "https://internal.devtest.truefoundry.tech/api"
-    sfyServerAPIKey: "<YOUR_SFY_SERVER_API_KEY>"
 executionMode: both
 controller:
   targetNamespace: "prometheus"
-  targetClusterID: "tfy-usea1-devtest"
+  targetClusterID: "dev
   writeAuthorizedClusters: []
   tasks:
     createStats:

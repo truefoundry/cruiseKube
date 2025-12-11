@@ -12,7 +12,6 @@ const (
 	CreateStatsKey             = "createstats"
 	ModifyEqualCPUResourcesKey = "modifyequalcpuresources"
 	NodeLoadMonitoringKey      = "nodeloadmonitoring"
-	EvictionForceKey           = "evictionforce"
 )
 
 type Config struct {
@@ -26,6 +25,7 @@ type Config struct {
 	RecommendationSettings RecommendationSettings `yaml:"recommendationSettings" mapstructure:"recommendationSettings"`
 	Telemetry              TelemetryConfig        `yaml:"telemetry" mapstructure:"telemetry"`
 	Metrics                MetricsConfig          `yaml:"metrics" mapstructure:"metrics"`
+	Custom                 map[string]interface{} `yaml:",inline" mapstructure:",remain"`
 }
 
 func (c *Config) GetTaskConfig(taskName string) *TaskConfig {
@@ -33,9 +33,8 @@ func (c *Config) GetTaskConfig(taskName string) *TaskConfig {
 }
 
 type Dependencies struct {
-	Local           LocalDeps           `yaml:"local" mapstructure:"local"`
-	InCluster       InClusterDeps       `yaml:"inCluster" mapstructure:"inCluster"`
-	TfyMultiCluster TfyMultiClusterDeps `yaml:"tfyMultiCluster" mapstructure:"tfyMultiCluster"`
+	Local     LocalDeps     `yaml:"local" mapstructure:"local"`
+	InCluster InClusterDeps `yaml:"inCluster" mapstructure:"inCluster"`
 }
 
 type LocalDeps struct {
@@ -45,11 +44,6 @@ type LocalDeps struct {
 
 type InClusterDeps struct {
 	PrometheusURL string `yaml:"prometheusURL" mapstructure:"prometheusURL"`
-}
-
-type TfyMultiClusterDeps struct {
-	SfyServerURL    string `yaml:"sfyServerURL" mapstructure:"sfyServerURL"`
-	SfyServerAPIKey string `yaml:"sfyServerAPIKey" mapstructure:"sfyServerAPIKey"`
 }
 
 type ControllerConfig struct {
@@ -108,9 +102,8 @@ type MetricsConfig struct {
 type ControllerMode string
 
 const (
-	ClusterModeLocal           ControllerMode = "local"
-	ClusterModeInCluster       ControllerMode = "inCluster"
-	ClusterModeTfyMultiCluster ControllerMode = "tfyMultiCluster"
+	ClusterModeLocal     ControllerMode = "local"
+	ClusterModeInCluster ControllerMode = "inCluster"
 )
 
 type ExecutionMode string

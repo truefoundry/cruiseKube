@@ -5,9 +5,6 @@ dependencies:
     prometheusURL: "http://localhost:9090"
   inCluster:
     prometheusURL: ""
-  tfyMultiCluster:
-    sfyServerURL: ""
-    sfyServerAPIKey: ""
 executionMode: both
 controller:
   targetNamespace: ""
