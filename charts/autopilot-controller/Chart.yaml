@@ -1,6 +1,0 @@
-apiVersion: v2
-name: autopilot-controller
-description: A Helm chart for Kubernetes resource autopilot controller service
-type: application
-version: 0.1.5
-appVersion: "1.0.0"
