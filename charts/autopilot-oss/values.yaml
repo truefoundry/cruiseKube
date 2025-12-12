@@ -4,7 +4,7 @@ autopilotController:
   image:
     repository: tfy.jfrog.io/tfy-images/autopilot-oss
     imagePullPolicy: IfNotPresent
-    tag: ""
+    tag: "0.0.1"
   imagePullSecrets: []
   nameOverride: ""
   fullnameOverride: ""
@@ -55,7 +55,7 @@ autopilotWebhook:
   image:
     repository: tfy.jfrog.io/tfy-images/autopilot-oss
     imagePullPolicy: IfNotPresent
-    tag: ""
+    tag: "0.0.1"
   imagePullSecrets: []
   nameOverride: ""
   fullnameOverride: ""
