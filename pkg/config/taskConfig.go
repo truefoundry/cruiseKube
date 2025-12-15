@@ -1,8 +1,9 @@
 package config
 
 import (
-	"encoding/json"
 	"fmt"
+
+	"github.com/go-viper/mapstructure/v2"
 )
 
 type TaskConfig struct {
@@ -13,18 +14,19 @@ type TaskConfig struct {
 
 func (tc *TaskConfig) ConvertMetadataToStruct(target interface{}) error {
 	if tc.Metadata == nil {
-		return nil // No metadata to convert, target remains with zero values
+		return nil
 	}
 
-	// Convert map to JSON and then to struct
-	// This handles type conversions automatically
-	jsonData, err := json.Marshal(tc.Metadata)
+	decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
+		Result:           target,
+		WeaklyTypedInput: true,
+	})
 	if err != nil {
-		return fmt.Errorf("failed to marshal metadata to JSON: %w", err)
+		return fmt.Errorf("failed to create decoder: %w", err)
 	}
 
-	if err := json.Unmarshal(jsonData, target); err != nil {
-		return fmt.Errorf("failed to unmarshal JSON to struct: %w", err)
+	if err := decoder.Decode(tc.Metadata); err != nil {
+		return fmt.Errorf("failed to decode metadata: %w", err)
 	}
 
 	return nil
