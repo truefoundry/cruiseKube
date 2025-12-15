@@ -2,7 +2,7 @@ cruiseKubeController:
   enabled: true
   replicas: 1
   image:
-    repository: tfy.jfrog.io/tfy-images/cruiseKube
+    repository: tfy.jfrog.io/tfy-images/cruisekube
     imagePullPolicy: IfNotPresent
     tag: "0.1.4"
   imagePullSecrets: []
@@ -53,7 +53,7 @@ cruiseKubeWebhook:
   enabled: true
   replicas: 1
   image:
-    repository: tfy.jfrog.io/tfy-images/cruiseKube
+    repository: tfy.jfrog.io/tfy-images/cruisekube
     imagePullPolicy: IfNotPresent
     tag: "0.1.4"
   imagePullSecrets: []
