@@ -3,14 +3,14 @@
 set -e
 
 # Configuration
-CLUSTER_NAME="autopilot-test"
-NAMESPACE="autopilot-system"
+CLUSTER_NAME="cruiseKube-test"
+NAMESPACE="cruiseKube-system"
 PROMETHEUS_NAMESPACE="monitoring"
-IMAGE_NAME="autopilot"
+IMAGE_NAME="cruiseKube"
 IMAGE_TAG="test"
-CONTROLLER_RELEASE_NAME="autopilotController"
-WEBHOOK_RELEASE_NAME="autopilotWebhook"
-RELEASE_NAME="autopilot-oss"
+CONTROLLER_RELEASE_NAME="cruiseKubeController"
+WEBHOOK_RELEASE_NAME="cruiseKubeWebhook"
+RELEASE_NAME="cruiseKube"
 PROMETHEUS_RELEASE_NAME="prometheus"
 
 # Colors for output
@@ -117,7 +117,7 @@ setup_namespaces() {
     # Set kubectl context to the Kind cluster
     kubectl cluster-info --context kind-$CLUSTER_NAME
     
-    # Create autopilot namespace if it doesn't exist
+    # Create cruiseKube namespace if it doesn't exist
     kubectl create namespace $NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
     
     # Create monitoring namespace if it doesn't exist
@@ -164,24 +164,24 @@ install_prometheus() {
     log_info "Prometheus is accessible at: http://localhost:9090"
 }
 
-install_autopilot_chart() {
-    log_info "Installing global autopilot chart"
+install_cruiseKube_chart() {
+    log_info "Installing global cruiseKube chart"
 
     helm upgrade --install $RELEASE_NAME \
-        ./charts/autopilot-oss \
+        ./charts/cruiseKube \
         --namespace $NAMESPACE \
-        --set autopilotController.image.repository=$IMAGE_NAME \
-        --set autopilotController.image.tag=$IMAGE_TAG \
-        --set autopilotController.image.pullPolicy=IfNotPresent \
-        --set autopilotController.persistence.storageClass=standard \
-        --set autopilotController.env.AUTOPILOT_DEPENDENCIES_INCLUSTER_PROMETHEUSURL="http://prometheus-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090" \
-        --set autopilotWebhook.image.repository=$IMAGE_NAME \
-        --set autopilotWebhook.image.tag=$IMAGE_TAG \
-        --set autopilotWebhook.image.pullPolicy=IfNotPresent \
-        --set autopilotWebhook.webhook.statsURL.host="$RELEASE_NAME-autopilotWebhook.autopilot-system.svc.cluster.local:8080" \
+        --set cruiseKubeController.image.repository=$IMAGE_NAME \
+        --set cruiseKubeController.image.tag=$IMAGE_TAG \
+        --set cruiseKubeController.image.pullPolicy=IfNotPresent \
+        --set cruiseKubeController.persistence.storageClass=standard \
+        --set cruiseKubeController.env.cruiseKube_DEPENDENCIES_INCLUSTER_PROMETHEUSURL="http://prometheus-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090" \
+        --set cruiseKubeWebhook.image.repository=$IMAGE_NAME \
+        --set cruiseKubeWebhook.image.tag=$IMAGE_TAG \
+        --set cruiseKubeWebhook.image.pullPolicy=IfNotPresent \
+        --set cruiseKubeWebhook.webhook.statsURL.host="$RELEASE_NAME-cruiseKubeWebhook.cruiseKube-system.svc.cluster.local:8080" \
         --wait --timeout=300s
 
-    log_success "Global autopilot chart installed successfully"
+    log_success "Global cruiseKube chart installed successfully"
 }
 
 create_service_monitors() {
@@ -192,14 +192,14 @@ create_service_monitors() {
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: autopilot-controller
+  name: cruiseKube-controller
   namespace: $NAMESPACE
   labels:
-    app.kubernetes.io/name: autopilot-controller
+    app.kubernetes.io/name: cruiseKube-controller
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/name: autopilot-controller
+      app.kubernetes.io/name: cruiseKube-controller
   endpoints:
   - port: metrics
     path: /metrics
@@ -211,14 +211,14 @@ EOF
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: autopilot-webhook
+  name: cruiseKube-webhook
   namespace: $NAMESPACE
   labels:
-    app.kubernetes.io/name: autopilot-webhook
+    app.kubernetes.io/name: cruiseKube-webhook
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/name: autopilot-webhook
+      app.kubernetes.io/name: cruiseKube-webhook
   endpoints:
   - port: metrics
     path: /metrics
@@ -243,7 +243,7 @@ verify_installation() {
     helm list -n $PROMETHEUS_NAMESPACE
     
     echo ""
-    log_info "Checking autopilot pods:"
+    log_info "Checking cruiseKube pods:"
     kubectl get pods -n $NAMESPACE
     
     echo ""
@@ -257,7 +257,7 @@ verify_installation() {
     
     echo ""
     log_info "Checking webhook configuration:"
-    kubectl get mutatingwebhookconfigurations | grep autopilot || log_warning "No webhook configuration found"
+    kubectl get mutatingwebhookconfigurations | grep cruiseKube || log_warning "No webhook configuration found"
     
     echo ""
     log_info "Checking ServiceMonitors:"
@@ -265,11 +265,11 @@ verify_installation() {
     
     echo ""
     log_info "Checking controller logs (last 20 lines):"
-    kubectl logs -n $NAMESPACE -l app.kubernetes.io/name=autopilot-controller --tail=20 || log_warning "Controller logs not available yet"
+    kubectl logs -n $NAMESPACE -l app.kubernetes.io/name=cruiseKube-controller --tail=20 || log_warning "Controller logs not available yet"
     
     echo ""
     log_info "Checking webhook logs (last 20 lines):"
-    kubectl logs -n $NAMESPACE -l app.kubernetes.io/name=autopilot-webhook --tail=20 || log_warning "Webhook logs not available yet"
+    kubectl logs -n $NAMESPACE -l app.kubernetes.io/name=cruiseKube-webhook --tail=20 || log_warning "Webhook logs not available yet"
 }
 
 cleanup() {
@@ -299,9 +299,9 @@ show_usage() {
     echo "This script will:"
     echo "  1. Check prerequisites (kind, docker, helm, kubectl)"
     echo "  2. Create a Kind cluster named '$CLUSTER_NAME'"
-    echo "  3. Build and load the autopilot Docker image"
+    echo "  3. Build and load the cruiseKube Docker image"
     echo "  4. Install Prometheus (without Grafana/AlertManager) for metrics collection"
-    echo "  5. Install both autopilotController and autopilotWebhook charts"
+    echo "  5. Install both cruiseKubeController and cruiseKubeWebhook charts"
     echo "  6. Create ServiceMonitors for Prometheus scraping"
     echo "  7. Verify the installation"
 }
@@ -326,7 +326,7 @@ main() {
             ;;
     esac
     
-    log_info "Starting autopilot charts testing with Prometheus..."
+    log_info "Starting cruiseKube charts testing with Prometheus..."
     
     check_prerequisites
     create_kind_cluster
@@ -334,11 +334,11 @@ main() {
     setup_namespaces
     add_helm_repos
     install_prometheus
-    install_autopilot_chart
+    install_cruiseKube_chart
     create_service_monitors
     verify_installation
     
-    log_success "All done! Your autopilot charts with Prometheus are now running in Kind cluster '$CLUSTER_NAME'"
+    log_success "All done! Your cruiseKube charts with Prometheus are now running in Kind cluster '$CLUSTER_NAME'"
     
     echo ""
     log_info "Access URLs:"
@@ -347,8 +347,8 @@ main() {
     log_info "Useful commands:"
     echo "  kubectl get pods -n $NAMESPACE"
     echo "  kubectl get pods -n $PROMETHEUS_NAMESPACE"
-    echo "  kubectl logs -n $NAMESPACE -f deployment/autopilotController"
-    echo "  kubectl logs -n $NAMESPACE -f deployment/autopilotWebhook"
+    echo "  kubectl logs -n $NAMESPACE -f deployment/cruiseKubeController"
+    echo "  kubectl logs -n $NAMESPACE -f deployment/cruiseKubeWebhook"
     echo "  helm list -n $NAMESPACE"
     echo "  helm list -n $PROMETHEUS_NAMESPACE"
     echo ""

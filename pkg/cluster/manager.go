@@ -4,7 +4,7 @@ import (
 	"context"
 
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
-	"github.com/truefoundry/autopilot-oss/pkg/task"
+	"github.com/truefoundry/cruiseKube/pkg/task"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
 )

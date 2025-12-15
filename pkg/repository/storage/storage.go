@@ -5,8 +5,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/truefoundry/autopilot-oss/pkg/ports"
-	"github.com/truefoundry/autopilot-oss/pkg/types"
+	"github.com/truefoundry/cruiseKube/pkg/ports"
+	"github.com/truefoundry/cruiseKube/pkg/types"
 )
 
 var Stg *Storage

@@ -10,10 +10,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/truefoundry/autopilot-oss/pkg/client"
-	"github.com/truefoundry/autopilot-oss/pkg/config"
-	"github.com/truefoundry/autopilot-oss/pkg/logging"
-	"github.com/truefoundry/autopilot-oss/pkg/task/utils"
+	"github.com/truefoundry/cruiseKube/pkg/client"
+	"github.com/truefoundry/cruiseKube/pkg/config"
+	"github.com/truefoundry/cruiseKube/pkg/logging"
+	"github.com/truefoundry/cruiseKube/pkg/task/utils"
 
 	"github.com/gin-gonic/gin"
 	admissionv1 "k8s.io/api/admission/v1"

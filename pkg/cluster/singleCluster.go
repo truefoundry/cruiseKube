@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/truefoundry/autopilot-oss/pkg/contextutils"
-	"github.com/truefoundry/autopilot-oss/pkg/task"
+	"github.com/truefoundry/cruiseKube/pkg/contextutils"
+	"github.com/truefoundry/cruiseKube/pkg/task"
 
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"k8s.io/client-go/dynamic"

@@ -1,8 +1,8 @@
 package utils
 
 import (
-	"github.com/truefoundry/autopilot-oss/pkg/repository/storage"
-	"github.com/truefoundry/autopilot-oss/pkg/types"
+	"github.com/truefoundry/cruiseKube/pkg/repository/storage"
+	"github.com/truefoundry/cruiseKube/pkg/types"
 )
 
 type WorkloadConstraints = types.WorkloadConstraints

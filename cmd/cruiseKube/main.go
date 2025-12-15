@@ -6,19 +6,19 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/truefoundry/autopilot-oss/pkg/adapters/database/sqlite"
-	"github.com/truefoundry/autopilot-oss/pkg/adapters/kube"
-	"github.com/truefoundry/autopilot-oss/pkg/adapters/metricsProvider/prometheus"
-	"github.com/truefoundry/autopilot-oss/pkg/cluster"
-	"github.com/truefoundry/autopilot-oss/pkg/config"
-	"github.com/truefoundry/autopilot-oss/pkg/contextutils"
-	"github.com/truefoundry/autopilot-oss/pkg/middleware"
-	"github.com/truefoundry/autopilot-oss/pkg/repository/storage"
-	"github.com/truefoundry/autopilot-oss/pkg/server"
-	"github.com/truefoundry/autopilot-oss/pkg/task"
-	"github.com/truefoundry/autopilot-oss/pkg/telemetry"
+	"github.com/truefoundry/cruiseKube/pkg/adapters/database/sqlite"
+	"github.com/truefoundry/cruiseKube/pkg/adapters/kube"
+	"github.com/truefoundry/cruiseKube/pkg/adapters/metricsProvider/prometheus"
+	"github.com/truefoundry/cruiseKube/pkg/cluster"
+	"github.com/truefoundry/cruiseKube/pkg/config"
+	"github.com/truefoundry/cruiseKube/pkg/contextutils"
+	"github.com/truefoundry/cruiseKube/pkg/middleware"
+	"github.com/truefoundry/cruiseKube/pkg/repository/storage"
+	"github.com/truefoundry/cruiseKube/pkg/server"
+	"github.com/truefoundry/cruiseKube/pkg/task"
+	"github.com/truefoundry/cruiseKube/pkg/telemetry"
 
-	"github.com/truefoundry/autopilot-oss/pkg/logging"
+	"github.com/truefoundry/cruiseKube/pkg/logging"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -32,9 +32,9 @@ var (
 
 func main() {
 	var rootCmd = &cobra.Command{
-		Use:   "autopilot",
-		Short: "Kubernetes resource autopilot",
-		Run:   runAutopilot,
+		Use:   "cruiseKube",
+		Short: "Kubernetes resource cruiseKube",
+		Run:   runcruiseKube,
 	}
 
 	// Core flags
@@ -76,7 +76,7 @@ func main() {
 	}
 }
 
-func runAutopilot(cmd *cobra.Command, args []string) {
+func runcruiseKube(cmd *cobra.Command, args []string) {
 	ctx := context.Background()
 
 	cfg, err := config.LoadWithViperInstance(ctx, v, configFilePath)

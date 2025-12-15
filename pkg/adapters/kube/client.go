@@ -7,8 +7,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/truefoundry/autopilot-oss/pkg/contextutils"
-	"github.com/truefoundry/autopilot-oss/pkg/logging"
+	"github.com/truefoundry/cruiseKube/pkg/contextutils"
+	"github.com/truefoundry/cruiseKube/pkg/logging"
 
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"k8s.io/client-go/dynamic"

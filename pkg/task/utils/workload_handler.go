@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/truefoundry/autopilot-oss/pkg/logging"
+	"github.com/truefoundry/cruiseKube/pkg/logging"
 
 	appsv1 "k8s.io/api/apps/v1"
 	autoscalingv2 "k8s.io/api/autoscaling/v2"
@@ -558,8 +558,8 @@ func checkDoNotDisruptAnnotation(podTemplate *corev1.PodTemplateSpec) bool {
 		}
 	}
 
-	// Check autopilot.truefoundry.com/do-not-disrupt=true (prevents disruption)
-	if value, exists := podTemplate.Annotations["autopilot.truefoundry.com/do-not-disrupt"]; exists {
+	// Check cruiseKube.truefoundry.com/do-not-disrupt=true (prevents disruption)
+	if value, exists := podTemplate.Annotations["cruiseKube.truefoundry.com/do-not-disrupt"]; exists {
 		if strings.ToLower(value) == "true" {
 			return true
 		}

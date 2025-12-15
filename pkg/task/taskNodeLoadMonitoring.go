@@ -5,10 +5,10 @@ import (
 	"fmt"
 
 	"github.com/prometheus/common/model"
-	"github.com/truefoundry/autopilot-oss/pkg/adapters/metricsProvider/prometheus"
-	"github.com/truefoundry/autopilot-oss/pkg/contextutils"
-	"github.com/truefoundry/autopilot-oss/pkg/logging"
-	"github.com/truefoundry/autopilot-oss/pkg/task/utils"
+	"github.com/truefoundry/cruiseKube/pkg/adapters/metricsProvider/prometheus"
+	"github.com/truefoundry/cruiseKube/pkg/contextutils"
+	"github.com/truefoundry/cruiseKube/pkg/logging"
+	"github.com/truefoundry/cruiseKube/pkg/task/utils"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/dynamic"
@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	NodeOverloadTaintKey    = "autopilot.truefoundry.com/overloaded"
+	NodeOverloadTaintKey    = "cruiseKube.truefoundry.com/overloaded"
 	NodeOverloadTaintValue  = "true"
 	NodeOverloadTaintEffect = corev1.TaintEffectNoSchedule
 	LoadThreshold           = 1.0

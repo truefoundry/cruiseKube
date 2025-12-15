@@ -1,0 +1,66 @@
+{{- if .Values.cruiseKubeController.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "cruiseKubeController.fullname" . }}
+  labels:
+    {{- include "cruiseKubeController.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.cruiseKubeController.replicas }}
+  selector:
+    matchLabels:
+      {{- include "cruiseKubeController.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        {{- with .Values.cruiseKubeController.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "cruiseKubeController.labels" . | nindent 8 }}
+        {{- with .Values.cruiseKubeController.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.cruiseKubeController.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "cruiseKubeController.serviceAccountName" . }}
+      containers:
+        - name: {{ .Chart.Name }}-controller
+          image: "{{ .Values.cruiseKubeController.image.repository }}:{{ include "cruiseKubeController.imageTag" . }}"
+          imagePullPolicy: {{ .Values.cruiseKubeController.image.pullPolicy }}
+          command: ["./cruiseKube"]
+          args:
+            - "--execution-mode=controller"
+            - "--controller-mode={{ .Values.cruiseKubeController.controller.mode }}"
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+            - name: metrics
+              containerPort: 8081
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.cruiseKubeController.resources | nindent 12 }}
+          env:
+            {{- range $key, $value := .Values.cruiseKubeController.env }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+          volumeMounts:
+            {{- if .Values.cruiseKubeController.persistence.enabled }}
+            - name: data
+              mountPath: {{ .Values.cruiseKubeController.persistence.mountPath }}
+            {{- end }}
+            {{- with .Values.cruiseKubeController.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+      volumes:
+        {{- if .Values.cruiseKubeController.persistence.enabled }}
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ include "cruiseKubeController.fullname" . }}-data
+        {{- end }}
+{{- end }}

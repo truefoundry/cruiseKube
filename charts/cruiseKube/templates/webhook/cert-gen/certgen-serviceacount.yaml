@@ -1,11 +1,11 @@
 
-{{- if and .Values.autopilotWebhook.enabled .Values.autopilotWebhook.certGen.enabled .Values.autopilotWebhook.certGen.serviceAccount.create }}
+{{- if and .Values.cruiseKubeWebhook.enabled .Values.cruiseKubeWebhook.certGen.enabled .Values.cruiseKubeWebhook.certGen.serviceAccount.create }}
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: {{ include "autopilotWebhook.certGenServiceAccountName" . }}
+  name: {{ include "cruiseKubeWebhook.certGenServiceAccountName" . }}
   labels:
-    {{- include "autopilotWebhook.labels" . | nindent 4 }}
+    {{- include "cruiseKubeWebhook.labels" . | nindent 4 }}
   annotations:
     "helm.sh/hook": pre-install,pre-upgrade,post-install,post-upgrade
     "helm.sh/hook-weight": "-5"

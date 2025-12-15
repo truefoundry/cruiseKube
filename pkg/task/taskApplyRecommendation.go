@@ -8,15 +8,15 @@ import (
 	"slices"
 	"time"
 
-	"github.com/truefoundry/autopilot-oss/pkg/adapters/metricsProvider/prometheus"
-	"github.com/truefoundry/autopilot-oss/pkg/client"
-	"github.com/truefoundry/autopilot-oss/pkg/config"
-	"github.com/truefoundry/autopilot-oss/pkg/contextutils"
-	"github.com/truefoundry/autopilot-oss/pkg/logging"
-	"github.com/truefoundry/autopilot-oss/pkg/metrics"
-	"github.com/truefoundry/autopilot-oss/pkg/task/applystrategies"
-	"github.com/truefoundry/autopilot-oss/pkg/task/utils"
-	"github.com/truefoundry/autopilot-oss/pkg/types"
+	"github.com/truefoundry/cruiseKube/pkg/adapters/metricsProvider/prometheus"
+	"github.com/truefoundry/cruiseKube/pkg/client"
+	"github.com/truefoundry/cruiseKube/pkg/config"
+	"github.com/truefoundry/cruiseKube/pkg/contextutils"
+	"github.com/truefoundry/cruiseKube/pkg/logging"
+	"github.com/truefoundry/cruiseKube/pkg/metrics"
+	"github.com/truefoundry/cruiseKube/pkg/task/applystrategies"
+	"github.com/truefoundry/cruiseKube/pkg/task/utils"
+	"github.com/truefoundry/cruiseKube/pkg/types"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/dynamic"
@@ -24,10 +24,10 @@ import (
 )
 
 const (
-	AutopilotPausePodNamespace     = "autopilot-test"
-	AutopilotPausePodDaemonSet     = "autopilot-pause-daemonset"
-	DefaultCPUForAutopilotPausePod = 0.001
-	CPUClampValue                  = 10
+	cruiseKubePausePodNamespace     = "cruiseKube-test"
+	cruiseKubePausePodDaemonSet     = "cruiseKube-pause-daemonset"
+	DefaultCPUForcruiseKubePausePod = 0.001
+	CPUClampValue                   = 10
 )
 
 type RecommendationResult struct {
@@ -199,10 +199,10 @@ func (a *ApplyRecommendationTask) ApplyRecommendationsWithStrategy(
 			availableMemory -= nonOptimizablePod.CurrentMemory
 		}
 
-		// adding back the autopilot pause pod resources because we will recalculate the spec for it
+		// adding back the cruiseKube pause pod resources because we will recalculate the spec for it
 		for _, pod := range nodeInfo.Pods {
-			if pod.Namespace == AutopilotPausePodNamespace && pod.WorkloadName == AutopilotPausePodDaemonSet && pod.WorkloadKind == utils.DaemonSetKind {
-				availableCPU += pod.RequestedCPU - DefaultCPUForAutopilotPausePod
+			if pod.Namespace == cruiseKubePausePodNamespace && pod.WorkloadName == cruiseKubePausePodDaemonSet && pod.WorkloadKind == utils.DaemonSetKind {
+				availableCPU += pod.RequestedCPU - DefaultCPUForcruiseKubePausePod
 				availableMemory += pod.RequestedMemory
 				break
 			}
@@ -286,27 +286,27 @@ func (a *ApplyRecommendationTask) ApplyRecommendationsWithStrategy(
 
 		pausePodName := ""
 		for _, pod := range nodeInfo.Pods {
-			if pod.Namespace == AutopilotPausePodNamespace && pod.WorkloadName == AutopilotPausePodDaemonSet && pod.WorkloadKind == utils.DaemonSetKind {
+			if pod.Namespace == cruiseKubePausePodNamespace && pod.WorkloadName == cruiseKubePausePodDaemonSet && pod.WorkloadKind == utils.DaemonSetKind {
 				pausePodName = pod.Name
 				break
 			}
 		}
 		if pausePodName != "" {
 			if applyChanges {
-				freshPod, found := podsOnNode[utils.GetPodKey(AutopilotPausePodNamespace, pausePodName)]
+				freshPod, found := podsOnNode[utils.GetPodKey(cruiseKubePausePodNamespace, pausePodName)]
 				if !found {
-					logging.Errorf(ctx, "Pod %s/%s not found on node %s", AutopilotPausePodNamespace, pausePodName, nodeName)
+					logging.Errorf(ctx, "Pod %s/%s not found on node %s", cruiseKubePausePodNamespace, pausePodName, nodeName)
 					continue
 				}
 
 				utils.UpdatePodCPUResources(ctx, a.kubeClient, freshPod, "pause", 0.0, result.MaxRestCPU)
 				// TODO: cannot decrease memory limit. will be possible from 1.34
 				// contextutils.UpdatePodMemoryResources(ctx, kubeClient, freshPod, "pause", 0.0, result.MaxRestMemory)
-				logging.Infof(ctx, "pause pod %v/%v cpu limit updated: %v -> %v", AutopilotPausePodNamespace, pausePodName, 0.0, result.MaxRestCPU)
-				logging.Infof(ctx, "pause pod %v/%v memory limit updated: %v -> %v", AutopilotPausePodNamespace, pausePodName, 0.0, result.MaxRestMemory)
+				logging.Infof(ctx, "pause pod %v/%v cpu limit updated: %v -> %v", cruiseKubePausePodNamespace, pausePodName, 0.0, result.MaxRestCPU)
+				logging.Infof(ctx, "pause pod %v/%v memory limit updated: %v -> %v", cruiseKubePausePodNamespace, pausePodName, 0.0, result.MaxRestMemory)
 			} else {
-				logging.Infof(ctx, "[dry run] pause pod %v/%v cpu limit updated: %v -> %v", AutopilotPausePodNamespace, pausePodName, 0.0, result.MaxRestCPU)
-				logging.Infof(ctx, "[dry run] pause pod %v/%v memory limit updated: %v -> %v", AutopilotPausePodNamespace, pausePodName, 0.0, result.MaxRestMemory)
+				logging.Infof(ctx, "[dry run] pause pod %v/%v cpu limit updated: %v -> %v", cruiseKubePausePodNamespace, pausePodName, 0.0, result.MaxRestCPU)
+				logging.Infof(ctx, "[dry run] pause pod %v/%v memory limit updated: %v -> %v", cruiseKubePausePodNamespace, pausePodName, 0.0, result.MaxRestMemory)
 			}
 		}
 		logging.Infof(ctx, "Successfully applied %d recommendations and evicted %d pods", len(appliedRecommendations), len(podsToEvict))
@@ -526,7 +526,7 @@ func (a *ApplyRecommendationTask) segregateOptimizableNonOptimizablePods(ctx con
 		}
 		overrides, ok := overridesMap[podInfo.Stats.WorkloadIdentifier]
 		if ok && !overrides.Enabled {
-			logging.Infof(ctx, "autopilot disabled for workload %s, skipping", podInfo.Stats.WorkloadIdentifier)
+			logging.Infof(ctx, "cruiseKube disabled for workload %s, skipping", podInfo.Stats.WorkloadIdentifier)
 			nonOptimizablePods = append(nonOptimizablePods, utils.NonOptimizablePodInfo{
 				PodInfo:       podInfo,
 				PodName:       podInfo.Name,
@@ -561,8 +561,8 @@ func (a *ApplyRecommendationTask) segregateOptimizableNonOptimizablePods(ctx con
 			continue
 		}
 
-		if podInfo.Namespace == AutopilotPausePodNamespace && podInfo.WorkloadName == AutopilotPausePodDaemonSet && podInfo.WorkloadKind == utils.DaemonSetKind {
-			// Not adding autopilot pause pod to either of optimizable or non-optimizable
+		if podInfo.Namespace == cruiseKubePausePodNamespace && podInfo.WorkloadName == cruiseKubePausePodDaemonSet && podInfo.WorkloadKind == utils.DaemonSetKind {
+			// Not adding cruiseKube pause pod to either of optimizable or non-optimizable
 			continue
 		}
 
