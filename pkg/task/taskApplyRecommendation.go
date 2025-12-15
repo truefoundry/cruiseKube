@@ -11,6 +11,7 @@ import (
 	"github.com/truefoundry/autopilot-oss/pkg/adapters/metricsProvider/prometheus"
 	"github.com/truefoundry/autopilot-oss/pkg/client"
 	"github.com/truefoundry/autopilot-oss/pkg/config"
+	"github.com/truefoundry/autopilot-oss/pkg/contextutils"
 	"github.com/truefoundry/autopilot-oss/pkg/logging"
 	"github.com/truefoundry/autopilot-oss/pkg/metrics"
 	"github.com/truefoundry/autopilot-oss/pkg/task/applystrategies"
@@ -98,6 +99,9 @@ func (a *ApplyRecommendationTask) IsEnabled() bool {
 }
 
 func (a *ApplyRecommendationTask) Run(ctx context.Context) error {
+	ctx = contextutils.WithTask(ctx, a.config.Name)
+	ctx = contextutils.WithCluster(ctx, a.config.ClusterID)
+
 	applyChanges := true
 	if a.config.Metadata.DryRun {
 		applyChanges = false

@@ -8,6 +8,7 @@ import (
 	"github.com/prometheus/common/model"
 	"github.com/truefoundry/autopilot-oss/pkg/adapters/metricsProvider/prometheus"
 	"github.com/truefoundry/autopilot-oss/pkg/config"
+	"github.com/truefoundry/autopilot-oss/pkg/contextutils"
 	"github.com/truefoundry/autopilot-oss/pkg/logging"
 	"github.com/truefoundry/autopilot-oss/pkg/repository/storage"
 	"github.com/truefoundry/autopilot-oss/pkg/task/utils"
@@ -77,6 +78,9 @@ func (c *CreateStatsTask) IsEnabled() bool {
 }
 
 func (c *CreateStatsTask) Run(ctx context.Context) error {
+	ctx = contextutils.WithTask(ctx, c.config.Name)
+	ctx = contextutils.WithCluster(ctx, c.config.ClusterID)
+
 	targetNamespace := c.config.TargetNamespace
 
 	startTime := time.Now().UTC()

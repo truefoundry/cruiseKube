@@ -10,6 +10,7 @@ import (
 
 	"github.com/prometheus/common/model"
 	"github.com/truefoundry/autopilot-oss/pkg/adapters/metricsProvider/prometheus"
+	"github.com/truefoundry/autopilot-oss/pkg/contextutils"
 	"github.com/truefoundry/autopilot-oss/pkg/logging"
 	"github.com/truefoundry/autopilot-oss/pkg/metrics"
 	"github.com/truefoundry/autopilot-oss/pkg/repository/storage"
@@ -57,6 +58,8 @@ func (f *FetchMetricsTask) IsEnabled() bool {
 }
 
 func (f *FetchMetricsTask) Run(ctx context.Context) error {
+	ctx = contextutils.WithTask(ctx, f.config.Name)
+	ctx = contextutils.WithCluster(ctx, f.config.ClusterID)
 	f.fetchClusterCPUUtilization(ctx)
 	f.fetchClusterCPURequest(ctx)
 	f.fetchClusterCPUAllocated(ctx)
