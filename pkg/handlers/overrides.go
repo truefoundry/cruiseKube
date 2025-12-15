@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/truefoundry/autopilot-oss/pkg/logging"
-	"github.com/truefoundry/autopilot-oss/pkg/repository/storage"
-	"github.com/truefoundry/autopilot-oss/pkg/task/utils"
-	"github.com/truefoundry/autopilot-oss/pkg/types"
+	"github.com/truefoundry/cruiseKube/pkg/logging"
+	"github.com/truefoundry/cruiseKube/pkg/repository/storage"
+	"github.com/truefoundry/cruiseKube/pkg/task/utils"
+	"github.com/truefoundry/cruiseKube/pkg/types"
 
 	"github.com/gin-gonic/gin"
 )

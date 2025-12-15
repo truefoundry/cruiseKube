@@ -7,13 +7,13 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/truefoundry/autopilot-oss/pkg/cluster"
-	"github.com/truefoundry/autopilot-oss/pkg/config"
-	"github.com/truefoundry/autopilot-oss/pkg/logging"
-	"github.com/truefoundry/autopilot-oss/pkg/task"
-	"github.com/truefoundry/autopilot-oss/pkg/task/applystrategies"
-	"github.com/truefoundry/autopilot-oss/pkg/task/utils"
-	"github.com/truefoundry/autopilot-oss/pkg/types"
+	"github.com/truefoundry/cruiseKube/pkg/cluster"
+	"github.com/truefoundry/cruiseKube/pkg/config"
+	"github.com/truefoundry/cruiseKube/pkg/logging"
+	"github.com/truefoundry/cruiseKube/pkg/task"
+	"github.com/truefoundry/cruiseKube/pkg/task/applystrategies"
+	"github.com/truefoundry/cruiseKube/pkg/task/utils"
+	"github.com/truefoundry/cruiseKube/pkg/types"
 )
 
 func RecommendationAnalysisHandlerForCluster(c *gin.Context) {

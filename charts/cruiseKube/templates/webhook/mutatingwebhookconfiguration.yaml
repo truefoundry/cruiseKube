@@ -1,0 +1,32 @@
+{{- if .Values.cruiseKubeWebhook.enabled }}
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: {{ include "cruiseKubeWebhook.fullname" . }}-webhook-config
+  labels:
+    {{- include "cruiseKubeWebhook.labels" . | nindent 4 }}
+webhooks:
+- name: {{ printf "%s.%s.cruiseKube.truefoundry.com" (include "cruiseKubeWebhook.fullname" .) .Release.Namespace }}
+  clientConfig:
+    service:
+      name: {{ include "cruiseKubeWebhook.webhookServiceName" . }}
+      namespace: {{ .Release.Namespace }}
+      path: {{ printf "/clusters/%s/webhook/mutate" .Values.cruiseKubeWebhook.mutatingWebhookConfiguration.clusterID }}
+      port: {{ .Values.cruiseKubeWebhook.service.httpsPort }}
+    caBundle: Cg==
+  rules:
+  - operations: ["CREATE"]
+    apiGroups: [""]
+    apiVersions: ["v1"]
+    resources: ["pods"]
+    scope: "*"
+  admissionReviewVersions: ["v1"]
+  sideEffects: None
+  failurePolicy: {{ .Values.cruiseKubeWebhook.mutatingWebhookConfiguration.failurePolicy }}
+  reinvocationPolicy: Never
+  matchPolicy: Equivalent
+  timeoutSeconds: {{ .Values.cruiseKubeWebhook.mutatingWebhookConfiguration.timeoutSeconds }}
+  namespaceSelector:
+    {{- include "cruiseKubeWebhook.mutatingWebhookConfigurationNamespaceSelector" . | nindent 4 }}
+  objectSelector: {}
+{{- end }}

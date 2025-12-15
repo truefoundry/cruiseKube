@@ -1,10 +1,10 @@
-{{- if and .Values.autopilotWebhook.enabled .Values.autopilotWebhook.certGen.enabled .Values.autopilotWebhook.certGen.rbac.create -}}
+{{- if and .Values.cruiseKubeWebhook.enabled .Values.cruiseKubeWebhook.certGen.enabled .Values.cruiseKubeWebhook.certGen.rbac.create -}}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: {{ include "autopilotWebhook.fullname" . }}-certgen-patch
+  name: {{ include "cruiseKubeWebhook.fullname" . }}-certgen-patch
   labels:
-    {{- include "autopilotWebhook.labels" . | nindent 4 }}
+    {{- include "cruiseKubeWebhook.labels" . | nindent 4 }}
   annotations:
     "helm.sh/hook": pre-install,pre-upgrade,post-install,post-upgrade
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
@@ -12,9 +12,9 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: {{ include "autopilotWebhook.fullname" . }}-certgen-patch
+  name: {{ include "cruiseKubeWebhook.fullname" . }}-certgen-patch
 subjects:
 - kind: ServiceAccount
-  name: {{ include "autopilotWebhook.certGenServiceAccountName" . }}
+  name: {{ include "cruiseKubeWebhook.certGenServiceAccountName" . }}
   namespace: {{ .Release.Namespace }}
 {{- end }}

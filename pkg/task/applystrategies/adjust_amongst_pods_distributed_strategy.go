@@ -8,9 +8,9 @@ import (
 	"sort"
 	"time"
 
-	"github.com/truefoundry/autopilot-oss/pkg/logging"
-	"github.com/truefoundry/autopilot-oss/pkg/task/utils"
-	"github.com/truefoundry/autopilot-oss/pkg/types"
+	"github.com/truefoundry/cruiseKube/pkg/logging"
+	"github.com/truefoundry/cruiseKube/pkg/task/utils"
+	"github.com/truefoundry/cruiseKube/pkg/types"
 
 	"k8s.io/client-go/kubernetes"
 )

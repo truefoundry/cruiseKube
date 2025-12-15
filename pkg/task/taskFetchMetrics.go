@@ -9,10 +9,10 @@ import (
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/prometheus/common/model"
-	"github.com/truefoundry/autopilot-oss/pkg/adapters/metricsProvider/prometheus"
-	"github.com/truefoundry/autopilot-oss/pkg/logging"
-	"github.com/truefoundry/autopilot-oss/pkg/metrics"
-	"github.com/truefoundry/autopilot-oss/pkg/repository/storage"
+	"github.com/truefoundry/cruiseKube/pkg/adapters/metricsProvider/prometheus"
+	"github.com/truefoundry/cruiseKube/pkg/logging"
+	"github.com/truefoundry/cruiseKube/pkg/metrics"
+	"github.com/truefoundry/cruiseKube/pkg/repository/storage"
 )
 
 type FetchMetricsTaskConfig struct {

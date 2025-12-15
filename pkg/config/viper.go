@@ -6,11 +6,11 @@ import (
 	"strings"
 
 	"github.com/spf13/viper"
-	"github.com/truefoundry/autopilot-oss/pkg/logging"
+	"github.com/truefoundry/cruiseKube/pkg/logging"
 )
 
 // LoadWithViper loads configuration using Viper from a single config file.
-// Overridden by env vars (prefix AUTOPILOT_) and flags bound by caller.
+// Overridden by env vars (prefix cruiseKube_) and flags bound by caller.
 func LoadWithViper(ctx context.Context, configFilePath string) (*Config, error) {
 	return LoadWithViperInstance(ctx, viper.New(), configFilePath)
 }
@@ -32,7 +32,7 @@ func LoadWithViperInstance(ctx context.Context, v *viper.Viper, configFilePath s
 	v.SetDefault("server.port", "8080")
 	v.SetDefault("webhook.port", "8443")
 	v.SetDefault("webhook.certsDir", "/certs")
-	v.SetDefault("db.filePath", "autopilot.db")
+	v.SetDefault("db.filePath", "cruiseKube.db")
 	v.SetDefault("telemetry.enabled", false)
 	v.SetDefault("telemetry.traceRatio", 0.1)
 
@@ -43,7 +43,7 @@ func LoadWithViperInstance(ctx context.Context, v *viper.Viper, configFilePath s
 		return nil, fmt.Errorf("failed to read config file %s: %w", configFilePath, err)
 	}
 
-	v.SetEnvPrefix("AUTOPILOT")
+	v.SetEnvPrefix("cruiseKube")
 	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_", "-", "_"))
 	v.AutomaticEnv()
 

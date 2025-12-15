@@ -1,8 +1,8 @@
 package applystrategies
 
 import (
-	"github.com/truefoundry/autopilot-oss/pkg/task/utils"
-	"github.com/truefoundry/autopilot-oss/pkg/types"
+	"github.com/truefoundry/cruiseKube/pkg/task/utils"
+	"github.com/truefoundry/cruiseKube/pkg/types"
 )
 
 func isEvictionExcludedPod(podInfo *utils.PodInfo, evictionRanking types.EvictionRanking) bool {

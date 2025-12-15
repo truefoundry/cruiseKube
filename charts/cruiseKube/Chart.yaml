@@ -1,0 +1,6 @@
+apiVersion: v2
+name: cruiseKube
+description: A Helm chart for TrueFoundry cruiseKube OSS controller and webhook
+type: application
+version: 0.1.3
+appVersion: "1.16.0"

@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/truefoundry/autopilot-oss/pkg/cluster"
-	"github.com/truefoundry/autopilot-oss/pkg/config"
-	"github.com/truefoundry/autopilot-oss/pkg/contextutils"
-	"github.com/truefoundry/autopilot-oss/pkg/logging"
+	"github.com/truefoundry/cruiseKube/pkg/cluster"
+	"github.com/truefoundry/cruiseKube/pkg/config"
+	"github.com/truefoundry/cruiseKube/pkg/contextutils"
+	"github.com/truefoundry/cruiseKube/pkg/logging"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"

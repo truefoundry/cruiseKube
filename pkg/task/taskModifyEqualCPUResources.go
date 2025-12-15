@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/truefoundry/autopilot-oss/pkg/adapters/metricsProvider/prometheus"
-	"github.com/truefoundry/autopilot-oss/pkg/logging"
-	"github.com/truefoundry/autopilot-oss/pkg/task/utils"
+	"github.com/truefoundry/cruiseKube/pkg/adapters/metricsProvider/prometheus"
+	"github.com/truefoundry/cruiseKube/pkg/logging"
+	"github.com/truefoundry/cruiseKube/pkg/task/utils"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"

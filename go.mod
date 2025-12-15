@@ -1,4 +1,4 @@
-module github.com/truefoundry/autopilot-oss
+module github.com/truefoundry/cruiseKube
 
 go 1.24.0
 

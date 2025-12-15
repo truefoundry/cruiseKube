@@ -13,7 +13,7 @@
 Thumbs.db
 
 # Build artifacts
-autopilot
+cruiseKube
 *.exe
 
 # Temporary files

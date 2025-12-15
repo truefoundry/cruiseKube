@@ -1,0 +1,25 @@
+{{- if and .Values.cruiseKubeController.enabled .Values.cruiseKubeController.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "cruiseKubeController.fullname" . }}-data
+  labels:
+    {{- include "cruiseKubeController.labels" . | nindent 4 }}
+  {{- with .Values.cruiseKubeController.persistence.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  accessModes:
+    - {{ .Values.cruiseKubeController.persistence.accessMode }}
+  resources:
+    requests:
+      storage: {{ .Values.cruiseKubeController.persistence.size }}
+  {{- if .Values.cruiseKubeController.persistence.storageClass }}
+  {{- if eq "-" .Values.cruiseKubeController.persistence.storageClass }}
+  storageClassName: ""
+  {{- else }}
+  storageClassName: {{ .Values.cruiseKubeController.persistence.storageClass }}
+  {{- end }}
+  {{- end }}
+{{- end }}

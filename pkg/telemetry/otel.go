@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/truefoundry/autopilot-oss/pkg/config"
+	"github.com/truefoundry/cruiseKube/pkg/config"
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"

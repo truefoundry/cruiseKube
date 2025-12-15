@@ -9,7 +9,7 @@ import (
 
 	"github.com/prometheus/client_golang/api"
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
-	"github.com/truefoundry/autopilot-oss/pkg/logging"
+	"github.com/truefoundry/cruiseKube/pkg/logging"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
