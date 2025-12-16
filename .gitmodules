@@ -1,0 +1,3 @@
+[submodule "k8s-sizer"]
+	path = k8s-sizer
+	url = https://github.com/truefoundry/k8s-sizer.git
