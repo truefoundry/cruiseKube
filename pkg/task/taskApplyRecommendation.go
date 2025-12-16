@@ -172,7 +172,7 @@ func (a *ApplyRecommendationTask) ApplyRecommendationsWithStrategy(
 
 	recommendationResults := []*RecommendationResult{}
 	for nodeName, nodeInfo := range nodeStatsMap {
-		// if nodeName != "ip-10-99-45-40.ec2.internal" {
+		// if nodeName != "ip-10-99-47-228.ec2.internal" {
 		// 	continue
 		// }
 		logging.Infof(ctx, "Processing node: %s", nodeName)
