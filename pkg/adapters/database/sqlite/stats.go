@@ -66,7 +66,7 @@ func (db *SQLiteStorage) GetStatsForCluster(clusterID string) ([]types.WorkloadS
 	if err != nil {
 		return nil, fmt.Errorf("failed to query cluster stats: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var stats []types.WorkloadStat
 	for rows.Next() {
@@ -100,7 +100,7 @@ func (db *SQLiteStorage) GetStatForWorkload(clusterID, workloadID string) (*type
 	err := db.conn.QueryRow(query, clusterID, workloadID).Scan(&statsJSON, &updatedAt)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, nil
+			return nil, fmt.Errorf("workload stat not found for cluster %s, workload %s", clusterID, workloadID)
 		}
 		return nil, fmt.Errorf("failed to query workload stat: %w", err)
 	}
@@ -145,7 +145,7 @@ func (db *SQLiteStorage) GetStatOverridesForWorkload(clusterID, workloadID strin
 	err := db.conn.QueryRow(query, clusterID, workloadID).Scan(&overridesJSON)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, nil
+			return nil, fmt.Errorf("workload overrides not found for cluster %s, workload %s", clusterID, workloadID)
 		}
 		return nil, fmt.Errorf("failed to query workload overrides: %w", err)
 	}

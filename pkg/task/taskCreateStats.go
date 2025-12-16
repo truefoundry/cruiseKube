@@ -273,11 +273,7 @@ func (c *CreateStatsTask) prepareStatsFromMetrics(
 	containerSpecs := workloadObj.GetContainerSpecs(ctx, kubeClient)
 	initContainerSpecs := workloadObj.GetInitContainerSpecs(ctx, kubeClient)
 
-	containerResources, err := c.getAllContainerResourcesFromContainerSpecs(ctx, containerSpecs, initContainerSpecs)
-	if err != nil {
-		logging.Errorf(ctx, "Could not get container resources for %s: %v", workloadKey, err)
-		return nil
-	}
+	containerResources := c.getAllContainerResourcesFromContainerSpecs(ctx, containerSpecs, initContainerSpecs)
 
 	workloadStat := utils.BuildContainerStatFromCache(ctx, workloadInfo, workloadKeyVsContainerMetrics, containerResources)
 	if workloadStat == nil {
@@ -358,7 +354,6 @@ func (c *CreateStatsTask) prepareStatsFromMetrics(
 		if simpleMemoryPrediction, exists := workloadContainerKeyVsSimpleMemoryPrediction[workloadContainerKey]; exists {
 			containerStat.SimplePredictionsMemory = &simpleMemoryPrediction
 		}
-
 	}
 
 	workloadMetrics, exists := nsVsWorkloadMetrics[workloadInfo.Namespace][workloadKey]
@@ -379,7 +374,7 @@ func (c *CreateStatsTask) prepareStatsFromMetrics(
 	return workloadStat
 }
 
-func (c *CreateStatsTask) getAllContainerResourcesFromContainerSpecs(_ context.Context, containerSpecs []corev1.Container, initContainerSpecs []corev1.Container) ([]utils.OriginalContainerResources, error) {
+func (c *CreateStatsTask) getAllContainerResourcesFromContainerSpecs(_ context.Context, containerSpecs []corev1.Container, initContainerSpecs []corev1.Container) []utils.OriginalContainerResources {
 	containerResources := make([]utils.OriginalContainerResources, 0, len(containerSpecs)+len(initContainerSpecs))
 
 	for _, container := range containerSpecs {
@@ -410,7 +405,7 @@ func (c *CreateStatsTask) getAllContainerResourcesFromContainerSpecs(_ context.C
 		}
 	}
 
-	return containerResources, nil
+	return containerResources
 }
 
 func (c *CreateStatsTask) setResourceRequestAndLimit(container *corev1.Container, containerRes *utils.OriginalContainerResources) {

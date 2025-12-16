@@ -26,7 +26,7 @@ type Manager interface {
 	GetClusterClients(clusterID string) (*ClusterClients, error)
 	GetPrometheusConnectionInfo(clusterID string) (*PrometheusConnectionInfo, error)
 	GetClusterMode() ClusterMode
-	AddTask(task task.Task) error
+	AddTask(task task.Task)
 	GetTask(taskName string) (task.Task, error)
 	ScheduleAllTasks() error
 	StartTasks() error
@@ -41,7 +41,6 @@ type ClusterClients struct {
 }
 
 type PrometheusConnectionInfo struct {
-	CTX         context.Context
 	URL         string
 	BearerToken string
 }

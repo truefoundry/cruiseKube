@@ -10,6 +10,10 @@ const (
 )
 
 const (
+	TrueValue = "true"
+)
+
+const (
 	DeploymentKind  = "Deployment"
 	StatefulSetKind = "StatefulSet"
 	DaemonSetKind   = "DaemonSet"

@@ -22,26 +22,27 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
-func UpdatePodCPUResources(
+func updatePodResources(
 	ctx context.Context,
 	kubeClient *kubernetes.Clientset,
 	pod *corev1.Pod,
 	containerName string,
-	recommendedCPURequest float64,
-	recommendedCPULimit float64,
+	resourceType corev1.ResourceName,
+	requestValue, limitValue float64,
+	requestFormat, limitFormat string,
+	resourceTypeName string,
 ) (bool, string) {
-
 	containerPatch := corev1.Container{
 		Name: containerName,
 		Resources: corev1.ResourceRequirements{
 			Requests: corev1.ResourceList{
-				corev1.ResourceCPU: resource.MustParse(fmt.Sprintf("%.3f", recommendedCPURequest)),
+				resourceType: resource.MustParse(fmt.Sprintf(requestFormat, requestValue)),
 			},
 		},
 	}
-	if recommendedCPULimit != 0.0 {
+	if limitValue != 0.0 {
 		containerPatch.Resources.Limits = corev1.ResourceList{
-			corev1.ResourceCPU: resource.MustParse(fmt.Sprintf("%.3f", recommendedCPULimit)),
+			resourceType: resource.MustParse(fmt.Sprintf(limitFormat, limitValue)),
 		}
 	}
 	patch := &corev1.Pod{
@@ -51,7 +52,7 @@ func UpdatePodCPUResources(
 	}
 	patchBytes, err := json.Marshal(patch)
 	if err != nil {
-		return false, fmt.Sprintf("failed to marshal CPU patch: %v", err)
+		return false, fmt.Sprintf("failed to marshal %s patch: %v", resourceTypeName, err)
 	}
 
 	_, err = kubeClient.CoreV1().Pods(pod.Namespace).Patch(
@@ -64,10 +65,25 @@ func UpdatePodCPUResources(
 	)
 
 	if err != nil {
-		logging.Errorf(ctx, "Strategic merge patch failed for pod %s container %s CPU update: %v", pod.Name, containerName, err)
-		return false, fmt.Sprintf("failed to update container %s CPU resources: %v", containerName, err)
+		logging.Errorf(ctx, "Strategic merge patch failed for pod %s container %s %s update: %v", pod.Name, containerName, resourceTypeName, err)
+		return false, fmt.Sprintf("failed to update container %s %s resources: %v", containerName, resourceTypeName, err)
 	}
 	return true, ""
+}
+
+func UpdatePodCPUResources(
+	ctx context.Context,
+	kubeClient *kubernetes.Clientset,
+	pod *corev1.Pod,
+	containerName string,
+	recommendedCPURequest float64,
+	recommendedCPULimit float64,
+) (bool, string) {
+	return updatePodResources(
+		ctx, kubeClient, pod, containerName,
+		corev1.ResourceCPU, recommendedCPURequest, recommendedCPULimit,
+		"%.3f", "%.3f", "CPU",
+	)
 }
 
 func UpdatePodMemoryResources(
@@ -78,49 +94,14 @@ func UpdatePodMemoryResources(
 	recommendedMemoryRequest float64,
 	recommendedMemoryLimit float64,
 ) (bool, string) {
-
-	containerPatch := corev1.Container{
-		Name: containerName,
-		Resources: corev1.ResourceRequirements{
-			Requests: corev1.ResourceList{
-				corev1.ResourceMemory: resource.MustParse(fmt.Sprintf("%.0fM", recommendedMemoryRequest)),
-			},
-		},
-	}
-
-	if recommendedMemoryLimit != 0.0 {
-		containerPatch.Resources.Limits = corev1.ResourceList{
-			corev1.ResourceMemory: resource.MustParse(fmt.Sprintf("%.0fM", recommendedMemoryLimit)),
-		}
-	}
-
-	patch := &corev1.Pod{
-		Spec: corev1.PodSpec{
-			Containers: []corev1.Container{containerPatch},
-		},
-	}
-	patchBytes, err := json.Marshal(patch)
-	if err != nil {
-		return false, fmt.Sprintf("failed to marshal memory patch: %v", err)
-	}
-	_, err = kubeClient.CoreV1().Pods(pod.Namespace).Patch(
-		ctx,
-		pod.Name,
-		k8stypes.StrategicMergePatchType,
-		patchBytes,
-		metav1.PatchOptions{},
-		"resize",
+	return updatePodResources(
+		ctx, kubeClient, pod, containerName,
+		corev1.ResourceMemory, recommendedMemoryRequest, recommendedMemoryLimit,
+		"%.0fM", "%.0fM", "memory",
 	)
-
-	if err != nil {
-		logging.Errorf(ctx, "Strategic merge patch failed for pod %s container %s memory update: %v", pod.Name, containerName, err)
-		return false, fmt.Sprintf("failed to update container %s memory resources: %v", containerName, err)
-	}
-	return true, ""
 }
 
 func EvictPod(ctx context.Context, kubeClient *kubernetes.Clientset, pod *corev1.Pod) (bool, string) {
-
 	eviction := &policyv1.Eviction{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      pod.Name,
@@ -164,7 +145,6 @@ func BuildPodToWorkloadMapping(ctx context.Context, kubeClient *kubernetes.Clien
 }
 
 func getScheduledPodsAcrossNamespaces(ctx context.Context, kubeClient *kubernetes.Clientset, targetNamespace string) ([]*corev1.Pod, error) {
-
 	var podList *corev1.PodList
 	var err error
 
@@ -256,161 +236,132 @@ func MergeContainerRawResultsIntoCache(ctx context.Context, cache WorkloadKeyVsC
 }
 
 func updateContainerMetrics(metrics *ContainerMetrics, value float64, metricType string, psiAdjusted bool) {
-	if !psiAdjusted {
-		switch metricType {
-		case "cpu_p50":
-			if value > metrics.CPUP50 {
-				metrics.CPUP50 = value
-			}
-			metrics.HasCPUData = true
-		case "cpu_p75":
-			if value > metrics.CPUP75 {
-				metrics.CPUP75 = value
-			}
-			metrics.HasCPUData = true
-		case "cpu_p90":
-			if value > metrics.CPUP90 {
-				metrics.CPUP90 = value
-			}
-			metrics.HasCPUData = true
-		case "cpu_p95":
-			if value > metrics.CPUP95 {
-				metrics.CPUP95 = value
-			}
-			metrics.HasCPUData = true
-		case "cpu_p99":
-			if value > metrics.CPUP99 {
-				metrics.CPUP99 = value
-			}
-			metrics.HasCPUData = true
-		case "cpu_p999":
-			if value > metrics.CPUP999 {
-				metrics.CPUP999 = value
-			}
-			metrics.HasCPUData = true
-		case "cpu_max":
-			if value > metrics.CPUMax {
-				metrics.CPUMax = value
-			}
-			metrics.HasCPUData = true
-		case "startup_cpu_max":
-			if value > metrics.StartupCPUMax {
-				metrics.StartupCPUMax = value
-			}
-			metrics.HasCPUData = true
-		case "non_startup_cpu_max":
-			if value > metrics.NonStartupCPUMax {
-				metrics.NonStartupCPUMax = value
-			}
-			metrics.HasCPUData = true
-		case "memory_p50":
-			if value > metrics.MemoryP50 {
-				metrics.MemoryP50 = value
-			}
-			metrics.HasMemoryData = true
-		case "memory_p75":
-			if value > metrics.MemoryP75 {
-				metrics.MemoryP75 = value
-			}
-			metrics.HasMemoryData = true
-		case "memory_p90":
-			if value > metrics.MemoryP90 {
-				metrics.MemoryP90 = value
-			}
-			metrics.HasMemoryData = true
-		case "memory_p95":
-			if value > metrics.MemoryP95 {
-				metrics.MemoryP95 = value
-			}
-			metrics.HasMemoryData = true
-		case "memory_p99":
-			if value > metrics.MemoryP99 {
-				metrics.MemoryP99 = value
-			}
-			metrics.HasMemoryData = true
-		case "memory_p999":
-			if value > metrics.MemoryP999 {
-				metrics.MemoryP999 = value
-			}
-			metrics.HasMemoryData = true
-		case "memory_max":
-			if value > metrics.MemoryMax {
-				metrics.MemoryMax = value
-			}
-			metrics.HasMemoryData = true
-		case "oom_memory":
-			if value > metrics.OOMMemory {
-				metrics.OOMMemory = value
-			}
-			metrics.HasMemoryData = true
-		case "memory_max_7day":
-			if value > metrics.Memory7Day.Max {
-				metrics.Memory7Day.Max = value
-			}
-			metrics.HasMemoryData = true
-		case "cpu_p50_cpu_7day":
-			if value > metrics.CPU7Day.P50 {
-				metrics.CPU7Day.P50 = value
-			}
-			metrics.HasCPUData = true
-		case "cpu_p75_cpu_7day":
-			if value > metrics.CPU7Day.P75 {
-				metrics.CPU7Day.P75 = value
-			}
-			metrics.HasCPUData = true
-		case "cpu_p90_cpu_7day":
-			if value > metrics.CPU7Day.P90 {
-				metrics.CPU7Day.P90 = value
-			}
-			metrics.HasCPUData = true
-		case "cpu_p99_cpu_7day":
-			if value > metrics.CPU7Day.P99 {
-				metrics.CPU7Day.P99 = value
-			}
-			metrics.HasCPUData = true
-		case "cpu_max_cpu_7day":
-			if value > metrics.CPU7Day.Max {
-				metrics.CPU7Day.Max = value
-			}
-			metrics.HasCPUData = true
-		case "median_replicas":
-			metrics.MedianReplicas = value
-		}
+	if psiAdjusted {
+		updatePSIAdjustedMetrics(metrics, value, metricType)
 	} else {
-		if metrics.PSIAdjustedUsage == nil {
-			metrics.PSIAdjustedUsage = &PSIAdjustedUsage{}
-		}
+		updateStandardMetrics(metrics, value, metricType)
+	}
+}
 
-		switch metricType {
-		case "cpu_p50":
-			if value > metrics.PSIAdjustedUsage.CPUP50 {
-				metrics.PSIAdjustedUsage.CPUP50 = value
-			}
-		case "cpu_p75":
-			if value > metrics.PSIAdjustedUsage.CPUP75 {
-				metrics.PSIAdjustedUsage.CPUP75 = value
-			}
-		case "cpu_p90":
-			if value > metrics.PSIAdjustedUsage.CPUP90 {
-				metrics.PSIAdjustedUsage.CPUP90 = value
-			}
-		case "cpu_p95":
-			if value > metrics.PSIAdjustedUsage.CPUP95 {
-				metrics.PSIAdjustedUsage.CPUP95 = value
-			}
-		case "cpu_p99":
-			if value > metrics.PSIAdjustedUsage.CPUP99 {
-				metrics.PSIAdjustedUsage.CPUP99 = value
-			}
-		case "cpu_p999":
-			if value > metrics.PSIAdjustedUsage.CPUP999 {
-				metrics.PSIAdjustedUsage.CPUP999 = value
-			}
-		case "cpu_max":
-			if value > metrics.PSIAdjustedUsage.CPUMax {
-				metrics.PSIAdjustedUsage.CPUMax = value
-			}
-		}
+func updateStandardMetrics(metrics *ContainerMetrics, value float64, metricType string) {
+	switch {
+	case updateCPUMetrics(metrics, value, metricType):
+		metrics.HasCPUData = true
+	case updateMemoryMetrics(metrics, value, metricType):
+		metrics.HasMemoryData = true
+	case updateCPU7DayMetrics(metrics, value, metricType):
+		metrics.HasCPUData = true
+	case updateMemory7DayMetrics(metrics, value, metricType):
+		metrics.HasMemoryData = true
+	case metricType == "median_replicas":
+		metrics.MedianReplicas = value
+	}
+}
+
+func updateCPUMetrics(metrics *ContainerMetrics, value float64, metricType string) bool {
+	switch metricType {
+	case "cpu_p50":
+		updateMaxValue(&metrics.CPUP50, value)
+	case "cpu_p75":
+		updateMaxValue(&metrics.CPUP75, value)
+	case "cpu_p90":
+		updateMaxValue(&metrics.CPUP90, value)
+	case "cpu_p95":
+		updateMaxValue(&metrics.CPUP95, value)
+	case "cpu_p99":
+		updateMaxValue(&metrics.CPUP99, value)
+	case "cpu_p999":
+		updateMaxValue(&metrics.CPUP999, value)
+	case "cpu_max":
+		updateMaxValue(&metrics.CPUMax, value)
+	case "startup_cpu_max":
+		updateMaxValue(&metrics.StartupCPUMax, value)
+	case "non_startup_cpu_max":
+		updateMaxValue(&metrics.NonStartupCPUMax, value)
+	default:
+		return false
+	}
+	return true
+}
+
+func updateMemoryMetrics(metrics *ContainerMetrics, value float64, metricType string) bool {
+	switch metricType {
+	case "memory_p50":
+		updateMaxValue(&metrics.MemoryP50, value)
+	case "memory_p75":
+		updateMaxValue(&metrics.MemoryP75, value)
+	case "memory_p90":
+		updateMaxValue(&metrics.MemoryP90, value)
+	case "memory_p95":
+		updateMaxValue(&metrics.MemoryP95, value)
+	case "memory_p99":
+		updateMaxValue(&metrics.MemoryP99, value)
+	case "memory_p999":
+		updateMaxValue(&metrics.MemoryP999, value)
+	case "memory_max":
+		updateMaxValue(&metrics.MemoryMax, value)
+	case "oom_memory":
+		updateMaxValue(&metrics.OOMMemory, value)
+	default:
+		return false
+	}
+	return true
+}
+
+func updateCPU7DayMetrics(metrics *ContainerMetrics, value float64, metricType string) bool {
+	switch metricType {
+	case "cpu_p50_cpu_7day":
+		updateMaxValue(&metrics.CPU7Day.P50, value)
+	case "cpu_p75_cpu_7day":
+		updateMaxValue(&metrics.CPU7Day.P75, value)
+	case "cpu_p90_cpu_7day":
+		updateMaxValue(&metrics.CPU7Day.P90, value)
+	case "cpu_p99_cpu_7day":
+		updateMaxValue(&metrics.CPU7Day.P99, value)
+	case "cpu_max_cpu_7day":
+		updateMaxValue(&metrics.CPU7Day.Max, value)
+	default:
+		return false
+	}
+	return true
+}
+
+func updateMemory7DayMetrics(metrics *ContainerMetrics, value float64, metricType string) bool {
+	switch metricType {
+	case "memory_max_7day":
+		updateMaxValue(&metrics.Memory7Day.Max, value)
+	default:
+		return false
+	}
+	return true
+}
+
+func updatePSIAdjustedMetrics(metrics *ContainerMetrics, value float64, metricType string) {
+	if metrics.PSIAdjustedUsage == nil {
+		metrics.PSIAdjustedUsage = &PSIAdjustedUsage{}
+	}
+
+	switch metricType {
+	case "cpu_p50":
+		updateMaxValue(&metrics.PSIAdjustedUsage.CPUP50, value)
+	case "cpu_p75":
+		updateMaxValue(&metrics.PSIAdjustedUsage.CPUP75, value)
+	case "cpu_p90":
+		updateMaxValue(&metrics.PSIAdjustedUsage.CPUP90, value)
+	case "cpu_p95":
+		updateMaxValue(&metrics.PSIAdjustedUsage.CPUP95, value)
+	case "cpu_p99":
+		updateMaxValue(&metrics.PSIAdjustedUsage.CPUP99, value)
+	case "cpu_p999":
+		updateMaxValue(&metrics.PSIAdjustedUsage.CPUP999, value)
+	case "cpu_max":
+		updateMaxValue(&metrics.PSIAdjustedUsage.CPUMax, value)
+	}
+}
+
+func updateMaxValue(current *float64, newValue float64) {
+	if newValue > *current {
+		*current = newValue
 	}
 }
 

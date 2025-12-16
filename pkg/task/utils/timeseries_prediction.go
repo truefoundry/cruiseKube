@@ -54,7 +54,7 @@ func callTimeSeriesModel(ctx context.Context, timeseriesData []map[string][]floa
 	if err != nil {
 		return PredictionStatsResponse{}, fmt.Errorf("failed to make HTTP request to time series model: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	logging.Infof(ctx, "Response from time series model for query: %d", resp.StatusCode)
 
 	// Check response status
@@ -400,7 +400,7 @@ func EncloseWithinMemoryCleanupFunction(query string, memoryDecimalPlaces int) s
 	return fmt.Sprintf(template, query, float64(BytesPerMB), memoryDecimalPlaces)
 }
 
-func computeSimpleTimeSeriesPredictions(ctx context.Context, timeseriesData []SimpleTimeSeriesData) ([]SimplePredictionResponse, error) {
+func computeSimpleTimeSeriesPredictions(ctx context.Context, timeseriesData []SimpleTimeSeriesData) []SimplePredictionResponse {
 	logging.Infof(ctx, "Computing simple time series predictions for %d entities", len(timeseriesData))
 
 	var results []SimplePredictionResponse
@@ -470,7 +470,7 @@ func computeSimpleTimeSeriesPredictions(ctx context.Context, timeseriesData []Si
 	}
 
 	logging.Infof(ctx, "Generated simple predictions for %d entities", len(results))
-	return results, nil
+	return results
 }
 
 func convertMatrixToSimpleTimeSeriesData(matrix model.Matrix) []SimpleTimeSeriesData {
@@ -561,11 +561,7 @@ func PredictSimpleStatsFromTimeSeriesModel(ctx context.Context, namespaces []str
 			continue
 		}
 
-		predictions, err := computeSimpleTimeSeriesPredictions(ctx, timeseriesData)
-		if err != nil {
-			logging.Errorf(ctx, "Error computing simple %s predictions for namespace %s: %v", resourceType, namespace, err)
-			return nil, err
-		}
+		predictions := computeSimpleTimeSeriesPredictions(ctx, timeseriesData)
 
 		namespaceResult := make(map[string]SimplePrediction)
 		for _, pred := range predictions {
@@ -693,11 +689,12 @@ func mergeSampleStreams(memorySample, oomSample *model.SampleStream) *model.Samp
 		oomVal, oomExists := oomMap[ts]
 
 		var finalValue model.SampleValue
-		if memoryExists && oomExists {
+		switch {
+		case memoryExists && oomExists:
 			finalValue = model.SampleValue(max(float64(memoryVal), float64(oomVal)))
-		} else if memoryExists {
+		case memoryExists:
 			finalValue = memoryVal
-		} else {
+		default:
 			finalValue = oomVal
 		}
 

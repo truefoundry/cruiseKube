@@ -30,7 +30,7 @@ const (
 	RateIntervalMinutes      = 1
 )
 
-var promqlTracer = otel.Tracer("cruiseKube/tasks/promql")
+var _ = otel.Tracer("cruiseKube/tasks/promql") // promqlTracer unused but kept for future use
 
 type QueryResult struct {
 	Result   model.Value
@@ -42,7 +42,6 @@ type QueryResult struct {
 type ParallelQueryRequest struct {
 	QueryID string
 	Query   string
-	Context context.Context
 }
 
 func (p *PrometheusProvider) getOrCreateQuerySemaphore(clusterId string) chan struct{} {
@@ -143,7 +142,7 @@ func (p *PrometheusProvider) executeQueriesInParallel(ctx context.Context, clust
 	for result := range resultsChan {
 		results[result.QueryID] = result
 		if result.Error != nil {
-			return nil, fmt.Errorf("error executing query %s: %v", result.QueryID, result.Error)
+			return nil, fmt.Errorf("error executing query %s: %w", result.QueryID, result.Error)
 		}
 	}
 
@@ -540,7 +539,6 @@ func (p *PrometheusProvider) EncloseWithinQuantileOverTime(query string, quantil
 }
 
 func (p *PrometheusProvider) buildBatchCPURecommendationQuery(namespace string, percentile float64, psiAdjusted bool) string {
-
 	coreCPU := p.BuildBatchCoreCPUExpression(namespace, psiAdjusted)
 
 	template := `ceil(

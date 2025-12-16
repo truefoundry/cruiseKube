@@ -118,7 +118,7 @@ func ListWorkloadsHandler(c *gin.Context) {
 		return
 	}
 
-	var workloads []types.WorkloadOverrideInfo = make([]types.WorkloadOverrideInfo, 0)
+	var workloads = make([]types.WorkloadOverrideInfo, 0)
 	for _, stat := range stats {
 		workloadColumnId := strings.ReplaceAll(stat.WorkloadIdentifier, "/", ":")
 		overrides, err := storage.Stg.GetWorkloadOverrides(clusterID, workloadColumnId)

@@ -158,7 +158,9 @@ func comparePodWithWorkload(ctx context.Context, kubeClient *kubernetes.Clientse
 	workloadContainers := workload.GetContainerSpecs(ctx, kubeClient)
 	workloadInitContainers := workload.GetInitContainerSpecs(ctx, kubeClient)
 
-	allContainers := append(workloadContainers, workloadInitContainers...)
+	allContainers := make([]corev1.Container, 0, len(workloadContainers)+len(workloadInitContainers))
+	allContainers = append(allContainers, workloadContainers...)
+	allContainers = append(allContainers, workloadInitContainers...)
 
 	workloadContainerMap := make(map[string]corev1.Container)
 	for _, container := range allContainers {

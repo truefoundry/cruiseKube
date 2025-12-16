@@ -6,7 +6,7 @@ on:
 permissions:
   contents: read
 jobs:
-  StaleBot for cruiseKube:
+  stale_bot_for_cruisekube:
     runs-on: ubuntu-latest
     permissions:
       issues: write

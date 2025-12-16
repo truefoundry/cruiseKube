@@ -17,7 +17,6 @@ func LoadWithViper(ctx context.Context, configFilePath string) (*Config, error) 
 
 // LoadWithViperInstance loads configuration using a provided Viper instance (for flag binding).
 func LoadWithViperInstance(ctx context.Context, v *viper.Viper, configFilePath string) (*Config, error) {
-
 	// Set defaults matching the new structure
 	v.SetDefault("controllerMode", string(ClusterModeInCluster))
 	v.SetDefault("executionMode", string(ExecutionModeBoth))

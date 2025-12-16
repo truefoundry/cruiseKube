@@ -102,13 +102,9 @@ func (a *ApplyRecommendationTask) Run(ctx context.Context) error {
 	ctx = contextutils.WithTask(ctx, a.config.Name)
 	ctx = contextutils.WithCluster(ctx, a.config.ClusterID)
 
-	applyChanges := true
-	if a.config.Metadata.DryRun {
-		applyChanges = false
-	}
+	applyChanges := !a.config.Metadata.DryRun
 
 	if !a.config.IsClusterWriteAuthorized {
-		applyChanges = false
 		logging.Infof(ctx, "Cluster %s is not write authorized, skipping ApplyRecommendation task", a.config.ClusterID)
 		return nil
 	}
@@ -281,7 +277,6 @@ func (a *ApplyRecommendationTask) ApplyRecommendationsWithStrategy(
 			} else {
 				logging.Infof(ctx, "Skipping memory recommendation application for pod since memory recommendationapplication is disabled: %s/%s", rec.PodInfo.Namespace, rec.PodInfo.Name)
 			}
-
 		}
 
 		pausePodName := ""
@@ -332,17 +327,16 @@ func (a *ApplyRecommendationTask) applyMemoryRecommendation(
 	rec utils.PodContainerRecommendation,
 	applyChanges bool,
 ) (bool, bool, error) {
-
 	containerStat, err := rec.PodInfo.Stats.GetContainerStats(rec.ContainerName)
 	if err != nil {
-		return false, true, fmt.Errorf("error getting container stats for pod %s/%s: %v", rec.PodInfo.Namespace, rec.PodInfo.Name, err)
+		return false, true, fmt.Errorf("error getting container stats for pod %s/%s: %w", rec.PodInfo.Namespace, rec.PodInfo.Name, err)
 	}
 	recommendedMemoryRequest := utils.EnforceMinimumMemory(rec.Memory)
 	recommendedMemoryLimit := utils.EnforceMinimumMemory(max(containerStat.Memory7Day.Max, containerStat.MemoryStats.OOMMemory) * 2)
 
 	containerResource, err := rec.PodInfo.GetContainerResource(rec.ContainerName)
 	if err != nil {
-		return false, true, fmt.Errorf("error getting container resource for pod %s/%s: %v", rec.PodInfo.Namespace, rec.PodInfo.Name, err)
+		return false, true, fmt.Errorf("error getting container resource for pod %s/%s: %w", rec.PodInfo.Namespace, rec.PodInfo.Name, err)
 	}
 
 	currentMemoryRequestQuantity, exists := currentContainerResources.Requests[corev1.ResourceMemory]
@@ -420,7 +414,7 @@ func (a *ApplyRecommendationTask) applyCPURecommendation(
 
 	containerResource, err := rec.PodInfo.GetContainerResource(rec.ContainerName)
 	if err != nil {
-		return false, fmt.Errorf("error getting container resource for pod %s/%s: %v", rec.PodInfo.Namespace, rec.PodInfo.Name, err)
+		return false, fmt.Errorf("error getting container resource for pod %s/%s: %w", rec.PodInfo.Namespace, rec.PodInfo.Name, err)
 	}
 	if math.Abs(currentCPURequest-containerResource.CPURequest) > utils.MinimumCPURecommendation {
 		logging.Infof(ctx, "pod %s/%s cpu has changed too much from %.1f to %.1f, skipping applying cpu recommendation", rec.PodInfo.Namespace, rec.PodInfo.Name, currentCPURequest, containerResource.CPURequest)

@@ -14,7 +14,7 @@ type SQLiteStorage struct {
 }
 
 func NewSQLiteAdapter(dbPath string) (*SQLiteStorage, error) {
-	if err := os.MkdirAll(filepath.Dir(dbPath), 0755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(dbPath), 0750); err != nil {
 		return nil, fmt.Errorf("failed to create database directory: %w", err)
 	}
 
@@ -27,7 +27,7 @@ func NewSQLiteAdapter(dbPath string) (*SQLiteStorage, error) {
 
 	db := &SQLiteStorage{conn: conn}
 	if err := db.createTables(); err != nil {
-		conn.Close()
+		_ = conn.Close()
 		return nil, fmt.Errorf("failed to create tables: %w", err)
 	}
 
@@ -72,7 +72,7 @@ func (db *SQLiteStorage) createTables() error {
 	ALTER TABLE stats ADD COLUMN overrides TEXT DEFAULT '{}';
 	`
 
-	db.conn.Exec(migrationQuery)
+	_, _ = db.conn.Exec(migrationQuery)
 
 	return nil
 }

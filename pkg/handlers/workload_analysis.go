@@ -10,8 +10,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const (
+	YesValue = "Yes"
+	NoValue  = "No"
+)
+
 func WorkloadAnalysisHandlerForCluster(c *gin.Context) {
-	//ctx := c.Request.Context()
+	// ctx := c.Request.Context()
 	clusterID := c.Param("clusterID")
 
 	analysis, err := generateWorkloadAnalysisForCluster(clusterID)
@@ -28,15 +33,15 @@ func analyzeWorkload(stat utils.WorkloadStat) []types.WorkloadAnalysisItem {
 	var analysis []types.WorkloadAnalysisItem
 
 	// Determine if workload is blocking Karpenter
-	blockingKarpenter := "No"
+	blockingKarpenter := NoValue
 	if stat.Constraints != nil && stat.Constraints.Blocking {
-		blockingKarpenter = "Yes"
+		blockingKarpenter = YesValue
 	}
 
 	// Determine autoscaling status
-	autoscalingOnCPU := "No"
+	autoscalingOnCPU := NoValue
 	if stat.IsHorizontallyAutoscaledOnCPU {
-		autoscalingOnCPU = "Yes"
+		autoscalingOnCPU = YesValue
 	}
 
 	for _, container := range stat.ContainerStats {

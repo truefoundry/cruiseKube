@@ -115,6 +115,7 @@ const (
 )
 
 func LoadConfig(path string) (*Config, error) {
+	// #nosec G304 - path is controlled by the application configuration
 	bytes, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err

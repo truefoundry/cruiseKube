@@ -209,9 +209,9 @@ func (n *NodeLoadMonitoringTask) removeOverloadTaint(ctx context.Context, node *
 
 	var newTaints []corev1.Taint
 	for _, taint := range nodeCopy.Spec.Taints {
-		if !(taint.Key == NodeOverloadTaintKey &&
-			taint.Value == NodeOverloadTaintValue &&
-			taint.Effect == NodeOverloadTaintEffect) {
+		if taint.Key != NodeOverloadTaintKey ||
+			taint.Value != NodeOverloadTaintValue ||
+			taint.Effect != NodeOverloadTaintEffect {
 			newTaints = append(newTaints, taint)
 		}
 	}

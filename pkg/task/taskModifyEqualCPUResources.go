@@ -115,7 +115,6 @@ type containerModification struct {
 }
 
 func (m *ModifyEqualCPUResourcesTask) getAllPodsAcrossNamespaces(ctx context.Context, targetNamespace string) ([]corev1.Pod, error) {
-
 	var podList *corev1.PodList
 	var err error
 
@@ -179,7 +178,6 @@ func (m *ModifyEqualCPUResourcesTask) processWorkload(ctx context.Context, workl
 }
 
 func (m *ModifyEqualCPUResourcesTask) updateWorkloadCPULimits(ctx context.Context, workloadInfo utils.WorkloadLabelSelectorList, modifications []containerModification) error {
-
 	switch workloadInfo.Kind {
 	case utils.DeploymentKind:
 		return m.updateDeploymentCPULimits(ctx, workloadInfo, modifications)

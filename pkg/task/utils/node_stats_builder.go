@@ -17,7 +17,6 @@ import (
 type NodeStatMap map[string]NodeResourceInfo
 
 func getLatestKarpenterNodeEvents(ctx context.Context, kubeClient *kubernetes.Clientset) map[string]struct{ NodeType, Reason, Message string } {
-
 	eventList, err := kubeClient.CoreV1().Events("default").List(ctx, metav1.ListOptions{
 		FieldSelector: "source=karpenter",
 	})

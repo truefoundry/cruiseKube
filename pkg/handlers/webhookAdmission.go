@@ -148,8 +148,8 @@ func memoryBytesToMB(memoryBytes int64) string {
 	return fmt.Sprintf("%dM", memoryBytes/(utils.BytesToMBDivisor))
 }
 
+//nolint:unparam // error return is part of the interface contract even though currently always nil
 func adjustResources(ctx context.Context, pod *corev1.Pod, clusterID string, cfg *config.Config) ([]map[string]any, error) {
-
 	workloadInfo := utils.GetWorkloadInfoFromPod(pod)
 	if workloadInfo == nil {
 		logging.Warnf(ctx, "Could not determine workload for pod %s/%s, allowing without adjustment", pod.Namespace, getPodName(pod))
@@ -202,7 +202,9 @@ func adjustResources(ctx context.Context, pod *corev1.Pod, clusterID string, cfg
 		return []map[string]any{}, nil
 	}
 
-	containers := append(pod.Spec.Containers, pod.Spec.InitContainers...)
+	containers := make([]corev1.Container, 0, len(pod.Spec.Containers)+len(pod.Spec.InitContainers))
+	containers = append(containers, pod.Spec.Containers...)
+	containers = append(containers, pod.Spec.InitContainers...)
 	var patches []map[string]any
 	if len(pod.Spec.TopologySpreadConstraints) > 0 {
 		logging.Infof(ctx, "Removing %d topologySpreadConstraints from pod %s/%s", len(pod.Spec.TopologySpreadConstraints), pod.Namespace, getPodName(pod))
@@ -337,13 +339,13 @@ func adjustResources(ctx context.Context, pod *corev1.Pod, clusterID string, cfg
 					patches = append(patches, map[string]any{
 						"op":    "replace",
 						"path":  containerPath + "/resources/requests/memory",
-						"value": memoryBytesToMB(int64(recommendedMemoryBytes)),
+						"value": memoryBytesToMB(recommendedMemoryBytes),
 					})
 				} else {
 					patches = append(patches, map[string]any{
 						"op":    "add",
 						"path":  containerPath + "/resources/requests/memory",
-						"value": memoryBytesToMB(int64(recommendedMemoryBytes)),
+						"value": memoryBytesToMB(recommendedMemoryBytes),
 					})
 				}
 				if currentMemoryLimit.Value() > 0 {
@@ -356,7 +358,7 @@ func adjustResources(ctx context.Context, pod *corev1.Pod, clusterID string, cfg
 					patches = append(patches, map[string]any{
 						"op":    "add",
 						"path":  containerPath + "/resources/limits/memory",
-						"value": memoryBytesToMB(int64(recommendedMemoryLimitBytes)),
+						"value": memoryBytesToMB(recommendedMemoryLimitBytes),
 					})
 				}
 

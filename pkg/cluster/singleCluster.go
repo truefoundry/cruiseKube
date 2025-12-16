@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/truefoundry/cruiseKube/pkg/contextutils"
 	"github.com/truefoundry/cruiseKube/pkg/task"
 
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
@@ -14,7 +13,6 @@ import (
 )
 
 type SingleClusterManager struct {
-	ctx             context.Context
 	clusterClients  map[string]*ClusterClients
 	mu              sync.RWMutex
 	scheduler       *Scheduler
@@ -35,23 +33,21 @@ func NewSingleClusterManager(ctx context.Context, kubeClient *kubernetes.Clients
 	}
 
 	return &SingleClusterManager{
-		ctx:             ctx,
 		clusterClients:  clusterClients,
 		scheduler:       NewScheduler(),
 		registeredTasks: make(map[string]task.Task),
 	}
 }
 
-func (m *SingleClusterManager) AddTask(task task.Task) error {
+func (m *SingleClusterManager) AddTask(task task.Task) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
 	if !task.IsEnabled() {
-		return nil
+		return
 	}
 
 	m.registeredTasks[task.GetName()] = task
-	return nil
 }
 
 func (m *SingleClusterManager) GetTask(taskName string) (task.Task, error) {
@@ -71,14 +67,14 @@ func (m *SingleClusterManager) ScheduleAllTasks() error {
 	defer m.mu.RUnlock()
 
 	for taskName, task := range m.registeredTasks {
-		m.scheduler.Register(m.ctx, taskName, task.GetSchedule(), task.Run)
+		m.scheduler.Register(context.Background(), taskName, task.GetSchedule(), task.Run)
 	}
 
 	return nil
 }
 
 func (m *SingleClusterManager) StartTasks() error {
-	m.scheduler.Start(m.ctx)
+	m.scheduler.Start(context.Background())
 	return nil
 }
 
@@ -124,7 +120,6 @@ func (m *SingleClusterManager) GetClusterClients(clusterID string) (*ClusterClie
 
 func (m *SingleClusterManager) GetPrometheusConnectionInfo(clusterID string) (*PrometheusConnectionInfo, error) {
 	return &PrometheusConnectionInfo{
-		CTX:         contextutils.WithTask(m.ctx, clusterID),
 		URL:         "",
 		BearerToken: "",
 	}, nil

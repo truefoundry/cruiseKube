@@ -73,7 +73,11 @@ func (d DeploymentWrapper) GetInitContainerSpecs(ctx context.Context, kubeClient
 }
 
 func (d DeploymentWrapper) GetSelector() (labels.Selector, error) {
-	return metav1.LabelSelectorAsSelector(d.Spec.Selector)
+	selector, err := metav1.LabelSelectorAsSelector(d.Spec.Selector)
+	if err != nil {
+		return nil, fmt.Errorf("LabelSelectorAsSelector failed for selector %v: %w", d.Spec.Selector, err)
+	}
+	return selector, nil
 }
 
 func (d DeploymentWrapper) GetCreationTime() time.Time {
@@ -120,7 +124,11 @@ func (s StatefulSetWrapper) GetInitContainerSpecs(ctx context.Context, kubeClien
 }
 
 func (s StatefulSetWrapper) GetSelector() (labels.Selector, error) {
-	return metav1.LabelSelectorAsSelector(s.Spec.Selector)
+	selector, err := metav1.LabelSelectorAsSelector(s.Spec.Selector)
+	if err != nil {
+		return nil, fmt.Errorf("LabelSelectorAsSelector failed for selector %v: %w", s.Spec.Selector, err)
+	}
+	return selector, nil
 }
 
 func (s StatefulSetWrapper) GetCreationTime() time.Time {
@@ -167,7 +175,11 @@ func (d DaemonSetWrapper) GetInitContainerSpecs(ctx context.Context, kubeClient 
 }
 
 func (d DaemonSetWrapper) GetSelector() (labels.Selector, error) {
-	return metav1.LabelSelectorAsSelector(d.Spec.Selector)
+	selector, err := metav1.LabelSelectorAsSelector(d.Spec.Selector)
+	if err != nil {
+		return nil, fmt.Errorf("LabelSelectorAsSelector failed for selector %v: %w", d.Spec.Selector, err)
+	}
+	return selector, nil
 }
 
 func (d DaemonSetWrapper) GetCreationTime() time.Time {
@@ -350,7 +362,6 @@ func ExtractUniqueNamespaces(workloads map[string]WorkloadInfo) []string {
 
 // CheckHPAOnCPU checks if workloads are horizontally autoscaled based on CPU metrics
 func CheckHPAOnCPU(ctx context.Context, dynamicClient dynamic.Interface, targetNamespace string, workloadHpaCpuMap map[string]bool) error {
-
 	hpaGVR := schema.GroupVersionResource{
 		Group:    "autoscaling",
 		Version:  "v2",
@@ -368,7 +379,7 @@ func CheckHPAOnCPU(ctx context.Context, dynamicClient dynamic.Interface, targetN
 
 	if err != nil {
 		logging.Errorf(ctx, "Could not list HPAs: %v", err)
-		return err
+		return fmt.Errorf("failed to list HPAs: %w", err)
 	}
 
 	for _, hpaUnstructured := range hpaList.Items {
@@ -543,7 +554,7 @@ func checkExcludedAnnotation(podTemplate *corev1.PodTemplateSpec) bool {
 	if podTemplate.Annotations == nil {
 		return false
 	}
-	return podTemplate.Annotations[ExcludedAnnotation] == "true"
+	return podTemplate.Annotations[ExcludedAnnotation] == TrueValue
 }
 
 func checkDoNotDisruptAnnotation(podTemplate *corev1.PodTemplateSpec) bool {
@@ -560,21 +571,21 @@ func checkDoNotDisruptAnnotation(podTemplate *corev1.PodTemplateSpec) bool {
 
 	// Check cruiseKube.truefoundry.com/do-not-disrupt=true (prevents disruption)
 	if value, exists := podTemplate.Annotations["cruiseKube.truefoundry.com/do-not-disrupt"]; exists {
-		if strings.ToLower(value) == "true" {
+		if strings.ToLower(value) == TrueValue {
 			return true
 		}
 	}
 
 	// Check karpenter.sh/do-not-evict=true (prevents eviction)
 	if value, exists := podTemplate.Annotations["karpenter.sh/do-not-evict"]; exists {
-		if strings.ToLower(value) == "true" {
+		if strings.ToLower(value) == TrueValue {
 			return true
 		}
 	}
 
 	// Check karpenter.sh/do-not-disrupt=true (prevents disruption)
 	if value, exists := podTemplate.Annotations["karpenter.sh/do-not-disrupt"]; exists {
-		if strings.ToLower(value) == "true" {
+		if strings.ToLower(value) == TrueValue {
 			return true
 		}
 	}

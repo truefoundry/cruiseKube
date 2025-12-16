@@ -17,6 +17,23 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Setup go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+      - name: Install dependencies
+        run: go mod tidy
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v7
+        with:
+          args: --timeout 5m
+          version: v2.1.6
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
           fetch-depth: "0"
       - name: Setup go
@@ -26,11 +43,9 @@ jobs:
           cache: true
       - name: Install dependencies
         run: go mod tidy
-      - name: golangci-lint
-        uses: golangci/golangci-lint-action@v6
-        with:
-          args: -v --timeout 5m
-          version: v1.64.8
+      - name: Build
+        run: go build -v ./...
+
   test:
     runs-on: ubuntu-latest
     steps:

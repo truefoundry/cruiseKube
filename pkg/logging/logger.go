@@ -35,25 +35,33 @@ func argsToAttrs(args ...any) []slog.Attr {
 // Structured logging functions with context
 func Info(ctx context.Context, msg string, args ...any) {
 	attrs := getContextualAttrs(ctx)
-	allAttrs := append(attrs, argsToAttrs(args...)...)
+	allAttrs := make([]slog.Attr, 0, len(attrs)+len(args)/2)
+	allAttrs = append(allAttrs, attrs...)
+	allAttrs = append(allAttrs, argsToAttrs(args...)...)
 	defaultLogger.LogAttrs(ctx, slog.LevelInfo, msg, allAttrs...)
 }
 
 func Error(ctx context.Context, msg string, args ...any) {
 	attrs := getContextualAttrs(ctx)
-	allAttrs := append(attrs, argsToAttrs(args...)...)
+	allAttrs := make([]slog.Attr, 0, len(attrs)+len(args)/2)
+	allAttrs = append(allAttrs, attrs...)
+	allAttrs = append(allAttrs, argsToAttrs(args...)...)
 	defaultLogger.LogAttrs(ctx, slog.LevelError, msg, allAttrs...)
 }
 
 func Warn(ctx context.Context, msg string, args ...any) {
 	attrs := getContextualAttrs(ctx)
-	allAttrs := append(attrs, argsToAttrs(args...)...)
+	allAttrs := make([]slog.Attr, 0, len(attrs)+len(args)/2)
+	allAttrs = append(allAttrs, attrs...)
+	allAttrs = append(allAttrs, argsToAttrs(args...)...)
 	defaultLogger.LogAttrs(ctx, slog.LevelWarn, msg, allAttrs...)
 }
 
 func Debug(ctx context.Context, msg string, args ...any) {
 	attrs := getContextualAttrs(ctx)
-	allAttrs := append(attrs, argsToAttrs(args...)...)
+	allAttrs := make([]slog.Attr, 0, len(attrs)+len(args)/2)
+	allAttrs = append(allAttrs, attrs...)
+	allAttrs = append(allAttrs, argsToAttrs(args...)...)
 	defaultLogger.LogAttrs(ctx, slog.LevelDebug, msg, allAttrs...)
 }
 

@@ -34,6 +34,7 @@ func HandleUIStaticFiles(c *gin.Context) {
 	var content []byte
 	var err error
 	for _, path := range paths {
+		// #nosec G304 - paths are controlled static file paths
 		content, err = os.ReadFile(path)
 		if err == nil {
 			break
@@ -47,12 +48,23 @@ func HandleUIStaticFiles(c *gin.Context) {
 	}
 
 	contentType := "text/plain"
-	if strings.HasSuffix(fileName, ".js") {
+	switch {
+	case strings.HasSuffix(fileName, ".js"):
 		contentType = "application/javascript"
-	} else if strings.HasSuffix(fileName, ".css") {
+	case strings.HasSuffix(fileName, ".css"):
 		contentType = "text/css"
-	} else if strings.HasSuffix(fileName, ".html") {
+	case strings.HasSuffix(fileName, ".html"):
 		contentType = "text/html"
+	case strings.HasSuffix(fileName, ".png"):
+		contentType = "image/png"
+	case strings.HasSuffix(fileName, ".jpg"), strings.HasSuffix(fileName, ".jpeg"):
+		contentType = "image/jpeg"
+	case strings.HasSuffix(fileName, ".gif"):
+		contentType = "image/gif"
+	case strings.HasSuffix(fileName, ".svg"):
+		contentType = "image/svg+xml"
+	case strings.HasSuffix(fileName, ".ico"):
+		contentType = "image/x-icon"
 	}
 
 	c.Data(http.StatusOK, contentType, content)
@@ -187,7 +199,7 @@ func HandlePrometheusProxy(c *gin.Context) {
 		})
 		return
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	for header, values := range resp.Header {
 		for _, value := range values {

@@ -2,6 +2,7 @@ package telemetry
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"time"
 
@@ -18,17 +19,17 @@ import (
 func Init(ctx context.Context, cfg config.TelemetryConfig) (func(context.Context) error, error) {
 	err := os.Setenv("OTEL_EXPORTER_OTLP_ENDPOINT", cfg.ExporterOTLPEndpoint)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to set env var OTEL_EXPORTER_OTLP_ENDPOINT: %w", err)
 	}
 
 	err = os.Setenv("OTEL_EXPORTER_OTLP_HEADERS", cfg.ExporterOTLPHeaders)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to set env var OTEL_EXPORTER_OTLP_HEADERS: %w", err)
 	}
 
 	err = os.Setenv("OTEL_SERVICE_NAME", cfg.ServiceName)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to set env var OTEL_SERVICE_NAME: %w", err)
 	}
 
 	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(
@@ -38,7 +39,7 @@ func Init(ctx context.Context, cfg config.TelemetryConfig) (func(context.Context
 
 	exporter, err := otlptracehttp.New(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create otlp exporter: %w", err)
 	}
 
 	sampler := trace.ParentBased(trace.TraceIDRatioBased(cfg.TraceRatio))
