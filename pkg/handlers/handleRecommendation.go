@@ -39,8 +39,6 @@ func generateRecommendationAnalysisForCluster(ctx context.Context, clusterID str
 
 	recomTask := clusterTask.GetCoreTask().(*task.ApplyRecommendationTask)
 
-	_, _ = recomTask.GenerateNodeStatsForCluster(ctx)
-
 	nodeRecommendationMap, err := recomTask.GenerateNodeStatsForCluster(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("error generating node recommendations: %w", err)
