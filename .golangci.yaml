@@ -2,7 +2,7 @@ version: "2"
 run:
   tests: false
   timeout: 5m
-  go: "1.23"
+  go: "1.24.0"
   modules-download-mode: readonly
 linters:
   enable:
