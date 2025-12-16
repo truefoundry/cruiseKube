@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/truefoundry/cruiseKube/pkg/logging"
-	"github.com/truefoundry/cruiseKube/pkg/repository/storage"
-	"github.com/truefoundry/cruiseKube/pkg/task/utils"
-	"github.com/truefoundry/cruiseKube/pkg/types"
+	"github.com/truefoundry/cruisekube/pkg/logging"
+	"github.com/truefoundry/cruisekube/pkg/repository/storage"
+	"github.com/truefoundry/cruisekube/pkg/task/utils"
+	"github.com/truefoundry/cruisekube/pkg/types"
 
 	"github.com/gin-gonic/gin"
 )

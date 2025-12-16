@@ -22,5 +22,5 @@ Please describe the tests that you ran to verify your changes.
 - [ ] I have made corresponding changes to the documentation
 - [ ] I have added tests that prove my fix is effective or that my feature works
 - [ ] New and existing unit tests pass locally with my changes 
-- [ ] A PR is open to update the helm chart (link)[https://github.com/truefoundry/cruiseKube/tree/main/charts/cruisekube] if applicable
+- [ ] A PR is open to update the helm chart (link)[https://github.com/truefoundry/cruisekube/tree/main/charts/cruisekube] if applicable
 - [ ] I have updated the [CHANGELOG.md](./CHANGELOG.md) file with the changes I made

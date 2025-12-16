@@ -1,22 +1,22 @@
-{{- if and .Values.cruiseKubeWebhook.enabled .Values.cruiseKubeWebhook.serviceMonitor.enabled }}
+{{- if and .Values.cruisekubeWebhook.enabled .Values.cruisekubeWebhook.serviceMonitor.enabled }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: {{ include "cruiseKubeWebhook.fullname" . }}-service-monitor
+  name: {{ include "cruisekubeWebhook.fullname" . }}-service-monitor
   labels:
-    {{- include "cruiseKubeWebhook.serviceMonitorLabels" . | nindent 4 }}
-  {{- if .Values.cruiseKubeWebhook.serviceMonitor.additionalAnnotations }}
+    {{- include "cruisekubeWebhook.serviceMonitorLabels" . | nindent 4 }}
+  {{- if .Values.cruisekubeWebhook.serviceMonitor.additionalAnnotations }}
   annotations:
-    {{- toYaml .Values.cruiseKubeWebhook.serviceMonitor.additionalAnnotations | nindent 4 }}
+    {{- toYaml .Values.cruisekubeWebhook.serviceMonitor.additionalAnnotations | nindent 4 }}
   {{- end }}
 spec:
-  jobLabel: {{ .Values.cruiseKubeWebhook.serviceMonitor.jobLabel }}
+  jobLabel: {{ .Values.cruisekubeWebhook.serviceMonitor.jobLabel }}
   selector:
     matchLabels:
-      {{ include "cruiseKubeWebhook.selectorLabels" . | nindent 6 }}
+      {{ include "cruisekubeWebhook.selectorLabels" . | nindent 6 }}
   namespaceSelector:
     matchNames:
     - {{ .Release.Namespace }}
   endpoints:
-  {{- toYaml .Values.cruiseKubeWebhook.serviceMonitor.endpoints | nindent 2 }}
+  {{- toYaml .Values.cruisekubeWebhook.serviceMonitor.endpoints | nindent 2 }}
 {{- end -}}

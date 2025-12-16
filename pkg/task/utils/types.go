@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"github.com/truefoundry/cruiseKube/pkg/types"
+	"github.com/truefoundry/cruisekube/pkg/types"
 
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/kubernetes"

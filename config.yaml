@@ -54,7 +54,7 @@ webhook:
     host: "http://localhost:8080"
     tfyClusterToken: "<cluster-token>"
 db:
-  filePath: "stats-data/cruiseKube.db"
+  filePath: "stats-data/cruisekube.db"
 recommendationSettings:
   newWorkloadThresholdHours: 1
   disableMemoryApplication: true

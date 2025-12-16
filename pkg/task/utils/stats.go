@@ -1,8 +1,8 @@
 package utils
 
 import (
-	"github.com/truefoundry/cruiseKube/pkg/repository/storage"
-	"github.com/truefoundry/cruiseKube/pkg/types"
+	"github.com/truefoundry/cruisekube/pkg/repository/storage"
+	"github.com/truefoundry/cruisekube/pkg/types"
 )
 
 type WorkloadConstraints = types.WorkloadConstraints

@@ -7,10 +7,10 @@ import (
 	"sync"
 	"time"
 
-	ctxUtils "github.com/truefoundry/cruiseKube/pkg/contextutils"
-	"github.com/truefoundry/cruiseKube/pkg/logging"
-	"github.com/truefoundry/cruiseKube/pkg/task/utils"
-	"github.com/truefoundry/cruiseKube/pkg/telemetry"
+	ctxUtils "github.com/truefoundry/cruisekube/pkg/contextutils"
+	"github.com/truefoundry/cruisekube/pkg/logging"
+	"github.com/truefoundry/cruisekube/pkg/task/utils"
+	"github.com/truefoundry/cruisekube/pkg/telemetry"
 
 	"github.com/prometheus/common/model"
 	"go.opentelemetry.io/otel"
@@ -30,7 +30,7 @@ const (
 	RateIntervalMinutes      = 1
 )
 
-var _ = otel.Tracer("cruiseKube/tasks/promql") // promqlTracer unused but kept for future use
+var _ = otel.Tracer("cruisekube/tasks/promql") // promqlTracer unused but kept for future use
 
 type QueryResult struct {
 	Result   model.Value
@@ -75,7 +75,7 @@ func (p *PrometheusProvider) ExecuteQueryWithRetry(ctx context.Context, clusterI
 	// Put identifiers into context; StartSpan will copy them as attributes
 	ctx = ctxUtils.WithQueryID(ctx, queryID)
 	ctx = ctxUtils.WithCluster(ctx, clusterId)
-	ctx, span := telemetry.StartSpan(ctx, "cruiseKube/tasks/promql", fmt.Sprintf("promql.query.%s", queryID))
+	ctx, span := telemetry.StartSpan(ctx, "cruisekube/tasks/promql", fmt.Sprintf("promql.query.%s", queryID))
 	defer span.End()
 
 	var lastErr error

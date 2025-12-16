@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/truefoundry/cruiseKube/pkg/task/utils"
-	"github.com/truefoundry/cruiseKube/pkg/types"
+	"github.com/truefoundry/cruisekube/pkg/task/utils"
+	"github.com/truefoundry/cruisekube/pkg/types"
 
 	"github.com/gin-gonic/gin"
 )

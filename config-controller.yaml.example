@@ -42,4 +42,4 @@ webhook:
   statsURL:
     host: "localhost:8080"
 db:
-  filePath: "stats-data/cruiseKube.db"
+  filePath: "stats-data/cruisekube.db"

@@ -1,9 +1,9 @@
 package server
 
 import (
-	"github.com/truefoundry/cruiseKube/pkg/handlers"
+	"github.com/truefoundry/cruisekube/pkg/handlers"
 
-	"github.com/truefoundry/cruiseKube/pkg/cluster"
+	"github.com/truefoundry/cruisekube/pkg/cluster"
 
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -12,7 +12,7 @@ import (
 
 func SetupServerEngine(mgr cluster.Manager, authAPI gin.HandlerFunc, authWebhook gin.HandlerFunc, ensureClusterExists gin.HandlerFunc, middleware ...gin.HandlerFunc) *gin.Engine {
 	r := gin.Default()
-	r.Use(otelgin.Middleware("cruiseKube-api"))
+	r.Use(otelgin.Middleware("cruisekube-api"))
 	r.Use(middleware...)
 
 	r.GET("/health", handlers.HandleHealth)
@@ -56,7 +56,7 @@ func SetupServerEngine(mgr cluster.Manager, authAPI gin.HandlerFunc, authWebhook
 
 func SetupWebhookServerEngine(middleware ...gin.HandlerFunc) *gin.Engine {
 	r := gin.New()
-	r.Use(otelgin.Middleware("cruiseKubeWebhook"))
+	r.Use(otelgin.Middleware("cruisekubeWebhook"))
 	r.Use(middleware...)
 
 	clusterGroup := r.Group("/clusters/:clusterID")

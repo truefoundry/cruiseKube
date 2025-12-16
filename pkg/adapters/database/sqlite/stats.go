@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/truefoundry/cruiseKube/pkg/types"
+	"github.com/truefoundry/cruisekube/pkg/types"
 )
 
 func (db *SQLiteStorage) UpsertStat(clusterID, workloadID string, stat types.WorkloadStat, generatedAt time.Time) error {

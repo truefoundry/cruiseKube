@@ -1,10 +1,10 @@
-{{- if and .Values.cruiseKubeWebhook.enabled .Values.cruiseKubeWebhook.certGen.enabled }}
+{{- if and .Values.cruisekubeWebhook.enabled .Values.cruisekubeWebhook.certGen.enabled }}
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ include "cruiseKubeWebhook.fullname" . }}-certgen-patch
+  name: {{ include "cruisekubeWebhook.fullname" . }}-certgen-patch
   labels:
-    {{- include "cruiseKubeWebhook.labels" . | nindent 4 }}
+    {{- include "cruisekubeWebhook.labels" . | nindent 4 }}
   annotations:
     "helm.sh/hook": post-install,post-upgrade
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
@@ -12,25 +12,25 @@ spec:
   ttlSecondsAfterFinished: 300
   template:
     metadata:
-      name: {{ include "cruiseKubeWebhook.fullname" . }}-certgen-patch
+      name: {{ include "cruisekubeWebhook.fullname" . }}-certgen-patch
       labels:
-        {{- include "cruiseKubeWebhook.labels" . | nindent 8 }}
+        {{- include "cruisekubeWebhook.labels" . | nindent 8 }}
     spec:
       restartPolicy: OnFailure
-      serviceAccountName: {{ include "cruiseKubeWebhook.certGenServiceAccountName" . }}
+      serviceAccountName: {{ include "cruisekubeWebhook.certGenServiceAccountName" . }}
       securityContext:
         runAsNonRoot: true
         runAsUser: 2000
         fsGroup: 2000
       containers:
       - name: cert-gen
-        image: {{ .Values.cruiseKubeWebhook.certGen.image.repository }}:{{ .Values.cruiseKubeWebhook.certGen.image.tag }}
-        imagePullPolicy: {{ .Values.cruiseKubeWebhook.certGen.image.imagePullPolicy }}
+        image: {{ .Values.cruisekubeWebhook.certGen.image.repository }}:{{ .Values.cruisekubeWebhook.certGen.image.tag }}
+        imagePullPolicy: {{ .Values.cruisekubeWebhook.certGen.image.imagePullPolicy }}
         args:
         - patch
-        - --webhook-name={{ include "cruiseKubeWebhook.fullname" . }}-webhook-config
+        - --webhook-name={{ include "cruisekubeWebhook.fullname" . }}-webhook-config
         - --namespace={{ .Release.Namespace }}
-        - --secret-name={{ include "cruiseKubeWebhook.tlsSecretName" . }}
+        - --secret-name={{ include "cruisekubeWebhook.tlsSecretName" . }}
         - --patch-validating=false
         - --log-level=debug
         securityContext:
@@ -40,5 +40,5 @@ spec:
             - ALL
           readOnlyRootFilesystem: true
         resources:
-          {{- toYaml .Values.cruiseKubeWebhook.certGen.resources | nindent 10 }}
+          {{- toYaml .Values.cruisekubeWebhook.certGen.resources | nindent 10 }}
 {{- end }}

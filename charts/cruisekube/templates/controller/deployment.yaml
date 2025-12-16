@@ -1,40 +1,40 @@
-{{- if .Values.cruiseKubeController.enabled }}
+{{- if .Values.cruisekubeController.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "cruiseKubeController.fullname" . }}
+  name: {{ include "cruisekubeController.fullname" . }}
   labels:
-    {{- include "cruiseKubeController.labels" . | nindent 4 }}
+    {{- include "cruisekubeController.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.cruiseKubeController.replicas }}
+  replicas: {{ .Values.cruisekubeController.replicas }}
   selector:
     matchLabels:
-      {{- include "cruiseKubeController.selectorLabels" . | nindent 6 }}
+      {{- include "cruisekubeController.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       annotations:
-        {{- with .Values.cruiseKubeController.podAnnotations }}
+        {{- with .Values.cruisekubeController.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
       labels:
-        {{- include "cruiseKubeController.labels" . | nindent 8 }}
-        {{- with .Values.cruiseKubeController.podLabels }}
+        {{- include "cruisekubeController.labels" . | nindent 8 }}
+        {{- with .Values.cruisekubeController.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
-      {{- with .Values.cruiseKubeController.imagePullSecrets }}
+      {{- with .Values.cruisekubeController.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "cruiseKubeController.serviceAccountName" . }}
+      serviceAccountName: {{ include "cruisekubeController.serviceAccountName" . }}
       containers:
         - name: {{ .Chart.Name }}-controller
-          image: "{{ .Values.cruiseKubeController.image.repository }}:{{ include "cruiseKubeController.imageTag" . }}"
-          imagePullPolicy: {{ .Values.cruiseKubeController.image.pullPolicy }}
-          command: ["./cruiseKube"]
+          image: "{{ .Values.cruisekubeController.image.repository }}:{{ include "cruisekubeController.imageTag" . }}"
+          imagePullPolicy: {{ .Values.cruisekubeController.image.pullPolicy }}
+          command: ["./cruisekube"]
           args:
             - "--execution-mode=controller"
-            - "--controller-mode={{ .Values.cruiseKubeController.controller.mode }}"
+            - "--controller-mode={{ .Values.cruisekubeController.controller.mode }}"
           ports:
             - name: http
               containerPort: 8080
@@ -43,24 +43,24 @@ spec:
               containerPort: 8081
               protocol: TCP
           resources:
-            {{- toYaml .Values.cruiseKubeController.resources | nindent 12 }}
+            {{- toYaml .Values.cruisekubeController.resources | nindent 12 }}
           env:
-            {{- range $key, $value := .Values.cruiseKubeController.env }}
+            {{- range $key, $value := .Values.cruisekubeController.env }}
             - name: {{ $key }}
               value: {{ $value | quote }}
             {{- end }}
           volumeMounts:
-            {{- if .Values.cruiseKubeController.persistence.enabled }}
+            {{- if .Values.cruisekubeController.persistence.enabled }}
             - name: data
-              mountPath: {{ .Values.cruiseKubeController.persistence.mountPath }}
+              mountPath: {{ .Values.cruisekubeController.persistence.mountPath }}
             {{- end }}
-            {{- with .Values.cruiseKubeController.volumeMounts }}
+            {{- with .Values.cruisekubeController.volumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
       volumes:
-        {{- if .Values.cruiseKubeController.persistence.enabled }}
+        {{- if .Values.cruisekubeController.persistence.enabled }}
         - name: data
           persistentVolumeClaim:
-            claimName: {{ include "cruiseKubeController.fullname" . }}-data
+            claimName: {{ include "cruisekubeController.fullname" . }}-data
         {{- end }}
 {{- end }}

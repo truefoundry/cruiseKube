@@ -10,10 +10,10 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/truefoundry/cruiseKube/pkg/cluster"
-	"github.com/truefoundry/cruiseKube/pkg/logging"
-	"github.com/truefoundry/cruiseKube/pkg/repository/storage"
-	"github.com/truefoundry/cruiseKube/pkg/types"
+	"github.com/truefoundry/cruisekube/pkg/cluster"
+	"github.com/truefoundry/cruisekube/pkg/logging"
+	"github.com/truefoundry/cruisekube/pkg/repository/storage"
+	"github.com/truefoundry/cruisekube/pkg/types"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel/attribute"
 
@@ -73,7 +73,7 @@ func HandleUIStaticFiles(c *gin.Context) {
 func HandleRoot(c *gin.Context) {
 	c.Data(http.StatusOK, "application/json",
 		[]byte(`{
-			"message": "cruiseKube API Server",
+			"message": "cruisekube API Server",
 			"endpoints": {
 				"/clusters": "Lists all available clusters",
 				"/clusters/{clusterId}/stats": "Serves stats file for specific cluster",

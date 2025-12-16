@@ -9,11 +9,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/truefoundry/cruiseKube/pkg/contextutils"
+	"github.com/truefoundry/cruisekube/pkg/contextutils"
 
-	"github.com/truefoundry/cruiseKube/pkg/logging"
-	"github.com/truefoundry/cruiseKube/pkg/repository/storage"
-	"github.com/truefoundry/cruiseKube/pkg/types"
+	"github.com/truefoundry/cruisekube/pkg/logging"
+	"github.com/truefoundry/cruisekube/pkg/repository/storage"
+	"github.com/truefoundry/cruisekube/pkg/types"
 
 	"github.com/gin-gonic/gin"
 )

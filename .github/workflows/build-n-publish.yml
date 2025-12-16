@@ -48,8 +48,8 @@ jobs:
       - name: Update Helm values.yaml
         run: |
           cd charts/cruisekube
-          yq -i '.cruiseKubeController.image.tag="${{ github.sha }}"' values.yaml
-          yq -i '.cruiseKubeWebhook.image.tag="${{ github.sha }}"' values.yaml
+          yq -i '.cruisekubeController.image.tag="${{ github.sha }}"' values.yaml
+          yq -i '.cruisekubeWebhook.image.tag="${{ github.sha }}"' values.yaml
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
           git add values.yaml

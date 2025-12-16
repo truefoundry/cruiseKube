@@ -1,25 +1,25 @@
-{{- if and .Values.cruiseKubeController.enabled .Values.cruiseKubeController.persistence.enabled }}
+{{- if and .Values.cruisekubeController.enabled .Values.cruisekubeController.persistence.enabled }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ include "cruiseKubeController.fullname" . }}-data
+  name: {{ include "cruisekubeController.fullname" . }}-data
   labels:
-    {{- include "cruiseKubeController.labels" . | nindent 4 }}
-  {{- with .Values.cruiseKubeController.persistence.annotations }}
+    {{- include "cruisekubeController.labels" . | nindent 4 }}
+  {{- with .Values.cruisekubeController.persistence.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
   accessModes:
-    - {{ .Values.cruiseKubeController.persistence.accessMode }}
+    - {{ .Values.cruisekubeController.persistence.accessMode }}
   resources:
     requests:
-      storage: {{ .Values.cruiseKubeController.persistence.size }}
-  {{- if .Values.cruiseKubeController.persistence.storageClass }}
-  {{- if eq "-" .Values.cruiseKubeController.persistence.storageClass }}
+      storage: {{ .Values.cruisekubeController.persistence.size }}
+  {{- if .Values.cruisekubeController.persistence.storageClass }}
+  {{- if eq "-" .Values.cruisekubeController.persistence.storageClass }}
   storageClassName: ""
   {{- else }}
-  storageClassName: {{ .Values.cruiseKubeController.persistence.storageClass }}
+  storageClassName: {{ .Values.cruisekubeController.persistence.storageClass }}
   {{- end }}
   {{- end }}
 {{- end }}

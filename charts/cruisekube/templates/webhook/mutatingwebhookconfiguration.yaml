@@ -1,18 +1,18 @@
-{{- if .Values.cruiseKubeWebhook.enabled }}
+{{- if .Values.cruisekubeWebhook.enabled }}
 apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration
 metadata:
-  name: {{ include "cruiseKubeWebhook.fullname" . }}-webhook-config
+  name: {{ include "cruisekubeWebhook.fullname" . }}-webhook-config
   labels:
-    {{- include "cruiseKubeWebhook.labels" . | nindent 4 }}
+    {{- include "cruisekubeWebhook.labels" . | nindent 4 }}
 webhooks:
-- name: {{ printf "%s.%s.cruiseKube.truefoundry.com" (include "cruiseKubeWebhook.fullname" .) .Release.Namespace }}
+- name: {{ printf "%s.%s.cruisekube.truefoundry.com" (include "cruisekubeWebhook.fullname" .) .Release.Namespace }}
   clientConfig:
     service:
-      name: {{ include "cruiseKubeWebhook.webhookServiceName" . }}
+      name: {{ include "cruisekubeWebhook.webhookServiceName" . }}
       namespace: {{ .Release.Namespace }}
-      path: {{ printf "/clusters/%s/webhook/mutate" .Values.cruiseKubeWebhook.mutatingWebhookConfiguration.clusterID }}
-      port: {{ .Values.cruiseKubeWebhook.service.httpsPort }}
+      path: {{ printf "/clusters/%s/webhook/mutate" .Values.cruisekubeWebhook.mutatingWebhookConfiguration.clusterID }}
+      port: {{ .Values.cruisekubeWebhook.service.httpsPort }}
     caBundle: Cg==
   rules:
   - operations: ["CREATE"]
@@ -22,11 +22,11 @@ webhooks:
     scope: "*"
   admissionReviewVersions: ["v1"]
   sideEffects: None
-  failurePolicy: {{ .Values.cruiseKubeWebhook.mutatingWebhookConfiguration.failurePolicy }}
+  failurePolicy: {{ .Values.cruisekubeWebhook.mutatingWebhookConfiguration.failurePolicy }}
   reinvocationPolicy: Never
   matchPolicy: Equivalent
-  timeoutSeconds: {{ .Values.cruiseKubeWebhook.mutatingWebhookConfiguration.timeoutSeconds }}
+  timeoutSeconds: {{ .Values.cruisekubeWebhook.mutatingWebhookConfiguration.timeoutSeconds }}
   namespaceSelector:
-    {{- include "cruiseKubeWebhook.mutatingWebhookConfigurationNamespaceSelector" . | nindent 4 }}
+    {{- include "cruisekubeWebhook.mutatingWebhookConfigurationNamespaceSelector" . | nindent 4 }}
   objectSelector: {}
 {{- end }}

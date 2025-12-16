@@ -93,7 +93,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "max by (cluster) (cruiseKube_cluster_cpu_utilization_cores{cluster=\"$cluster\"}) / max by (cluster) (cruiseKube_cluster_cpu_allocated_cores{cluster=\"$cluster\"})",
+          "expr": "max by (cluster) (cruisekube_cluster_cpu_utilization_cores{cluster=\"$cluster\"}) / max by (cluster) (cruisekube_cluster_cpu_allocated_cores{cluster=\"$cluster\"})",
           "range": true,
           "refId": "A"
         }
@@ -159,7 +159,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "max by (cluster) (cruiseKube_cluster_memory_utilization_bytes{cluster=\"$cluster\"}) / max by (cluster) (cruiseKube_cluster_memory_allocated_bytes{cluster=\"$cluster\"})",
+          "expr": "max by (cluster) (cruisekube_cluster_memory_utilization_bytes{cluster=\"$cluster\"}) / max by (cluster) (cruisekube_cluster_memory_allocated_bytes{cluster=\"$cluster\"})",
           "refId": "A"
         }
       ],
@@ -280,7 +280,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "max by (cluster) (cruiseKube_cluster_unschedulable_pods_count{cluster=\"$cluster\"})",
+          "expr": "max by (cluster) (cruisekube_cluster_unschedulable_pods_count{cluster=\"$cluster\"})",
           "legendFormat": "Unschedulable",
           "refId": "A"
         },
@@ -289,7 +289,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "max by (cluster) (cruiseKube_cluster_oom_events_total{cluster=\"$cluster\"})",
+          "expr": "max by (cluster) (cruisekube_cluster_oom_events_total{cluster=\"$cluster\"})",
           "legendFormat": "OOM Events",
           "refId": "B"
         }
@@ -393,7 +393,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "max by (cluster) (cruiseKube_cluster_cpu_allocated_cores{cluster=\"$cluster\"})",
+          "expr": "max by (cluster) (cruisekube_cluster_cpu_allocated_cores{cluster=\"$cluster\"})",
           "legendFormat": "Allocated",
           "refId": "A"
         },
@@ -402,7 +402,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "max by (cluster) (cruiseKube_cluster_cpu_request_cores{cluster=\"$cluster\"})",
+          "expr": "max by (cluster) (cruisekube_cluster_cpu_request_cores{cluster=\"$cluster\"})",
           "legendFormat": "Requested",
           "refId": "B"
         },
@@ -411,7 +411,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "max by (cluster) (cruiseKube_cluster_cpu_utilization_cores{cluster=\"$cluster\"})",
+          "expr": "max by (cluster) (cruisekube_cluster_cpu_utilization_cores{cluster=\"$cluster\"})",
           "legendFormat": "Utilization",
           "refId": "C"
         }
@@ -502,7 +502,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "max by (cluster) (cruiseKube_node_cpu_load_max{cluster=\"$cluster\"})",
+          "expr": "max by (cluster) (cruisekube_node_cpu_load_max{cluster=\"$cluster\"})",
           "legendFormat": "Load Max",
           "refId": "A"
         },
@@ -511,7 +511,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "max by (cluster) (cruiseKube_node_cpu_load_p50{cluster=\"$cluster\"})",
+          "expr": "max by (cluster) (cruisekube_node_cpu_load_p50{cluster=\"$cluster\"})",
           "legendFormat": "Load P50",
           "refId": "B"
         }
@@ -602,7 +602,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "max by (cluster) (cruiseKube_node_cpu_waiting_max{cluster=\"$cluster\"})",
+          "expr": "max by (cluster) (cruisekube_node_cpu_waiting_max{cluster=\"$cluster\"})",
           "legendFormat": "Node Max",
           "refId": "A"
         },
@@ -611,7 +611,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "max by (cluster) (cruiseKube_node_cpu_waiting_p50{cluster=\"$cluster\"})",
+          "expr": "max by (cluster) (cruisekube_node_cpu_waiting_p50{cluster=\"$cluster\"})",
           "legendFormat": "Node P50",
           "refId": "B"
         },
@@ -620,7 +620,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "max by (cluster) (cruiseKube_container_cpu_waiting_max{cluster=\"$cluster\"})",
+          "expr": "max by (cluster) (cruisekube_container_cpu_waiting_max{cluster=\"$cluster\"})",
           "legendFormat": "Container Max",
           "refId": "C"
         },
@@ -629,7 +629,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "max by (cluster) (cruiseKube_container_cpu_waiting_p50{cluster=\"$cluster\"})",
+          "expr": "max by (cluster) (cruisekube_container_cpu_waiting_p50{cluster=\"$cluster\"})",
           "legendFormat": "Container P50",
           "refId": "D"
         }
@@ -689,7 +689,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "max by (cluster) (cruiseKube_cluster_spike_cpu_cores{cluster=\"$cluster\"})",
+          "expr": "max by (cluster) (cruisekube_cluster_spike_cpu_cores{cluster=\"$cluster\"})",
           "refId": "A"
         }
       ],
@@ -792,7 +792,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "max by (cluster) (cruiseKube_cluster_memory_allocated_bytes{cluster=\"$cluster\"})",
+          "expr": "max by (cluster) (cruisekube_cluster_memory_allocated_bytes{cluster=\"$cluster\"})",
           "legendFormat": "Allocated",
           "refId": "A"
         },
@@ -801,7 +801,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "max by (cluster) (cruiseKube_cluster_memory_request_bytes{cluster=\"$cluster\"})",
+          "expr": "max by (cluster) (cruisekube_cluster_memory_request_bytes{cluster=\"$cluster\"})",
           "legendFormat": "Requested",
           "refId": "B"
         },
@@ -810,7 +810,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "max by (cluster) (cruiseKube_cluster_memory_utilization_bytes{cluster=\"$cluster\"})",
+          "expr": "max by (cluster) (cruisekube_cluster_memory_utilization_bytes{cluster=\"$cluster\"})",
           "legendFormat": "Utilization",
           "refId": "C"
         }
@@ -901,7 +901,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "max by (cluster) (cruiseKube_node_memory_waiting_max{cluster=\"$cluster\"})",
+          "expr": "max by (cluster) (cruisekube_node_memory_waiting_max{cluster=\"$cluster\"})",
           "legendFormat": "Node Max",
           "refId": "A"
         },
@@ -910,7 +910,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "max by (cluster) (cruiseKube_node_memory_waiting_p50{cluster=\"$cluster\"})",
+          "expr": "max by (cluster) (cruisekube_node_memory_waiting_p50{cluster=\"$cluster\"})",
           "legendFormat": "Node P50",
           "refId": "B"
         },
@@ -919,7 +919,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "max by (cluster) (cruiseKube_container_memory_waiting_max{cluster=\"$cluster\"})",
+          "expr": "max by (cluster) (cruisekube_container_memory_waiting_max{cluster=\"$cluster\"})",
           "legendFormat": "Container Max",
           "refId": "C"
         },
@@ -928,7 +928,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "max by (cluster) (cruiseKube_container_memory_waiting_p50{cluster=\"$cluster\"})",
+          "expr": "max by (cluster) (cruisekube_container_memory_waiting_p50{cluster=\"$cluster\"})",
           "legendFormat": "Container P50",
           "refId": "D"
         }
@@ -988,7 +988,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "max by (cluster) (cruiseKube_cluster_spike_memory_bytes{cluster=\"$cluster\"})",
+          "expr": "max by (cluster) (cruisekube_cluster_spike_memory_bytes{cluster=\"$cluster\"})",
           "refId": "A"
         }
       ],
@@ -1123,7 +1123,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "sum(cruiseKube_optimizable_pods_count{cluster=\"$cluster\"})",
+          "expr": "sum(cruisekube_optimizable_pods_count{cluster=\"$cluster\"})",
           "legendFormat": "Optimizable",
           "range": true,
           "refId": "A"
@@ -1134,7 +1134,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "sum(cruiseKube_non_optimizable_pods_count{cluster=\"$cluster\"})",
+          "expr": "sum(cruisekube_non_optimizable_pods_count{cluster=\"$cluster\"})",
           "legendFormat": "Non-Optimizable",
           "range": true,
           "refId": "B"
@@ -1239,12 +1239,12 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "sum by (cluster) (increase(cruiseKube_eviction_count{cluster=\"$cluster\"}[5m])) or vector(0)",
-          "legendFormat": "cruiseKube Evictions (5m)",
+          "expr": "sum by (cluster) (increase(cruisekube_eviction_count{cluster=\"$cluster\"}[5m])) or vector(0)",
+          "legendFormat": "cruisekube Evictions (5m)",
           "refId": "A"
         }
       ],
-      "title": "cruiseKube Evictions",
+      "title": "cruisekube Evictions",
       "type": "timeseries"
     },
     {
@@ -1330,7 +1330,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "max by (cluster) (cruiseKube_karpenter_consolidation_eviction_count{cluster=\"$cluster\"})",
+          "expr": "max by (cluster) (cruisekube_karpenter_consolidation_eviction_count{cluster=\"$cluster\"})",
           "legendFormat": "Karpenter Consolidation",
           "refId": "A"
         }
@@ -1434,7 +1434,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "max by (cluster, task_name) (cruiseKube_task_completion_time_seconds{cluster=\"$cluster\"})",
+          "expr": "max by (cluster, task_name) (cruisekube_task_completion_time_seconds{cluster=\"$cluster\"})",
           "legendFormat": "{{task_name}}",
           "refId": "A"
         }
@@ -1541,7 +1541,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "sum by (cluster, task_name) (increase(cruiseKube_task_run_count{cluster=\"$cluster\", status=\"success\"}[5m]))",
+          "expr": "sum by (cluster, task_name) (increase(cruisekube_task_run_count{cluster=\"$cluster\", status=\"success\"}[5m]))",
           "legendFormat": "{{task_name}} - success",
           "refId": "A"
         },
@@ -1550,7 +1550,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "sum by (cluster, task_name) (increase(cruiseKube_task_run_count{cluster=\"$cluster\", status=\"failure\"}[5m]))",
+          "expr": "sum by (cluster, task_name) (increase(cruisekube_task_run_count{cluster=\"$cluster\", status=\"failure\"}[5m]))",
           "legendFormat": "{{task_name}} - failure",
           "refId": "B"
         }
@@ -1658,7 +1658,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "sum by (status)(\n  rate(cruiseKube_webhook_controller_api_calls{cluster=\"$cluster\"}[5m])\n)",
+          "expr": "sum by (status)(\n  rate(cruisekube_webhook_controller_api_calls{cluster=\"$cluster\"}[5m])\n)",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -1671,7 +1671,7 @@
   "preload": false,
   "refresh": "30s",
   "schemaVersion": 41,
-  "tags": ["cruiseKube"],
+  "tags": ["cruisekube"],
   "templating": {
     "list": [
       {
@@ -1697,13 +1697,13 @@
           "type": "prometheus",
           "uid": "${datasource}"
         },
-        "definition": "label_values(cruiseKube_cluster_cpu_utilization_cores, cluster)",
+        "definition": "label_values(cruisekube_cluster_cpu_utilization_cores, cluster)",
         "includeAll": false,
         "label": "Cluster",
         "name": "cluster",
         "options": [],
         "query": {
-          "query": "label_values(cruiseKube_cluster_cpu_utilization_cores, cluster)",
+          "query": "label_values(cruisekube_cluster_cpu_utilization_cores, cluster)",
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 2,
@@ -1719,7 +1719,7 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "cruiseKube Metrics Dashboard",
-  "uid": "cruiseKube-metrics",
+  "title": "cruisekube Metrics Dashboard",
+  "uid": "cruisekube-metrics",
   "version": 13
 }

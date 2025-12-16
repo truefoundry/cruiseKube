@@ -11,10 +11,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/truefoundry/cruiseKube/pkg/contextutils"
-	"github.com/truefoundry/cruiseKube/pkg/logging"
-	"github.com/truefoundry/cruiseKube/pkg/metrics"
-	"github.com/truefoundry/cruiseKube/pkg/types"
+	"github.com/truefoundry/cruisekube/pkg/contextutils"
+	"github.com/truefoundry/cruisekube/pkg/logging"
+	"github.com/truefoundry/cruisekube/pkg/metrics"
+	"github.com/truefoundry/cruisekube/pkg/types"
 
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )

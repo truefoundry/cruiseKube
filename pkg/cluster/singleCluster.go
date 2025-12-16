@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/truefoundry/cruiseKube/pkg/task"
+	"github.com/truefoundry/cruisekube/pkg/task"
 
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"k8s.io/client-go/dynamic"

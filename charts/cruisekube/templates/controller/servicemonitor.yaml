@@ -1,22 +1,22 @@
-{{- if and .Values.cruiseKubeController.enabled .Values.cruiseKubeController.serviceMonitor.enabled }}
+{{- if and .Values.cruisekubeController.enabled .Values.cruisekubeController.serviceMonitor.enabled }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: {{ include "cruiseKubeController.fullname" . }}-service-monitor
+  name: {{ include "cruisekubeController.fullname" . }}-service-monitor
   labels:
-    {{- include "cruiseKubeController.serviceMonitorLabels" . | nindent 4 }}
-  {{- if .Values.cruiseKubeController.serviceMonitor.additionalAnnotations }}
+    {{- include "cruisekubeController.serviceMonitorLabels" . | nindent 4 }}
+  {{- if .Values.cruisekubeController.serviceMonitor.additionalAnnotations }}
   annotations:
-    {{- toYaml .Values.cruiseKubeController.serviceMonitor.additionalAnnotations | nindent 4 }}
+    {{- toYaml .Values.cruisekubeController.serviceMonitor.additionalAnnotations | nindent 4 }}
   {{- end }}
 spec:
-  jobLabel: {{ .Values.cruiseKubeController.serviceMonitor.jobLabel }}
+  jobLabel: {{ .Values.cruisekubeController.serviceMonitor.jobLabel }}
   selector:
     matchLabels:
-      {{ include "cruiseKubeController.selectorLabels" . | nindent 6 }}
+      {{ include "cruisekubeController.selectorLabels" . | nindent 6 }}
   namespaceSelector:
     matchNames:
     - {{ .Release.Namespace }}
   endpoints:
-  {{- toYaml .Values.cruiseKubeController.serviceMonitor.endpoints | nindent 2 }}
+  {{- toYaml .Values.cruisekubeController.serviceMonitor.endpoints | nindent 2 }}
 {{- end -}}

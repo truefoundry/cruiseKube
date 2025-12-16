@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/truefoundry/cruiseKube/pkg/cluster"
-	"github.com/truefoundry/cruiseKube/pkg/logging"
-	"github.com/truefoundry/cruiseKube/pkg/task/utils"
-	"github.com/truefoundry/cruiseKube/pkg/types"
+	"github.com/truefoundry/cruisekube/pkg/cluster"
+	"github.com/truefoundry/cruisekube/pkg/logging"
+	"github.com/truefoundry/cruisekube/pkg/task/utils"
+	"github.com/truefoundry/cruisekube/pkg/types"
 
 	"github.com/gin-gonic/gin"
 	corev1 "k8s.io/api/core/v1"
@@ -66,7 +66,7 @@ func KillswitchHandler(c *gin.Context) {
 }
 
 func deleteMutatingWebhookConfiguration(ctx context.Context, kubeClient *kubernetes.Clientset, clusterID string, dryRun bool) error {
-	name := fmt.Sprintf("cruiseKube-resource-adjuster-%s", clusterID)
+	name := fmt.Sprintf("cruisekube-resource-adjuster-%s", clusterID)
 
 	if dryRun {
 		_, err := kubeClient.AdmissionregistrationV1().MutatingWebhookConfigurations().Get(ctx, name, metav1.GetOptions{})

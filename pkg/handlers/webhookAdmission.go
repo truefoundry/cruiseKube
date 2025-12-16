@@ -10,10 +10,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/truefoundry/cruiseKube/pkg/client"
-	"github.com/truefoundry/cruiseKube/pkg/config"
-	"github.com/truefoundry/cruiseKube/pkg/logging"
-	"github.com/truefoundry/cruiseKube/pkg/task/utils"
+	"github.com/truefoundry/cruisekube/pkg/client"
+	"github.com/truefoundry/cruisekube/pkg/config"
+	"github.com/truefoundry/cruisekube/pkg/logging"
+	"github.com/truefoundry/cruisekube/pkg/task/utils"
 
 	"github.com/gin-gonic/gin"
 	admissionv1 "k8s.io/api/admission/v1"

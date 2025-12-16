@@ -6,7 +6,7 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/truefoundry/cruiseKube/pkg/contextutils"
+	"github.com/truefoundry/cruisekube/pkg/contextutils"
 )
 
 var defaultLogger *slog.Logger

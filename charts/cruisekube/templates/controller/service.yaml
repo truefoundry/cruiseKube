@@ -1,25 +1,25 @@
-{{- if .Values.cruiseKubeController.enabled }}
+{{- if .Values.cruisekubeController.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "cruiseKubeController.fullname" . }}
+  name: {{ include "cruisekubeController.fullname" . }}
   labels:
-    {{- include "cruiseKubeController.labels" . | nindent 4 }}
-  {{- with .Values.cruiseKubeController.service.annotations }}
+    {{- include "cruisekubeController.labels" . | nindent 4 }}
+  {{- with .Values.cruisekubeController.service.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  type: {{ .Values.cruiseKubeController.service.type }}
+  type: {{ .Values.cruisekubeController.service.type }}
   ports:
-    - port: {{ .Values.cruiseKubeController.service.httpPort }}
+    - port: {{ .Values.cruisekubeController.service.httpPort }}
       targetPort: http
       protocol: TCP
       name: http
-    - port: {{ .Values.cruiseKubeController.service.metricsPort }}
+    - port: {{ .Values.cruisekubeController.service.metricsPort }}
       targetPort: metrics
       protocol: TCP
       name: metrics
   selector:
-    {{- include "cruiseKubeController.selectorLabels" . | nindent 4 }}
+    {{- include "cruisekubeController.selectorLabels" . | nindent 4 }}
 {{- end }}

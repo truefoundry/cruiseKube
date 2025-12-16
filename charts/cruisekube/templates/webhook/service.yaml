@@ -1,25 +1,25 @@
-{{- if .Values.cruiseKubeWebhook.enabled }}
+{{- if .Values.cruisekubeWebhook.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "cruiseKubeWebhook.webhookServiceName" . }}
+  name: {{ include "cruisekubeWebhook.webhookServiceName" . }}
   labels:
-    {{- include "cruiseKubeWebhook.labels" . | nindent 4 }}
-  {{- with .Values.cruiseKubeWebhook.service.annotations }}
+    {{- include "cruisekubeWebhook.labels" . | nindent 4 }}
+  {{- with .Values.cruisekubeWebhook.service.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  type: {{ .Values.cruiseKubeWebhook.service.type }}
+  type: {{ .Values.cruisekubeWebhook.service.type }}
   ports:
-    - port: {{ .Values.cruiseKubeWebhook.service.httpsPort }}
+    - port: {{ .Values.cruisekubeWebhook.service.httpsPort }}
       targetPort: https
       protocol: TCP
       name: https
-    - port: {{ .Values.cruiseKubeWebhook.service.metricsPort }}
+    - port: {{ .Values.cruisekubeWebhook.service.metricsPort }}
       targetPort: metrics
       protocol: TCP
       name: metrics
   selector:
-    {{- include "cruiseKubeWebhook.selectorLabels" . | nindent 4 }}
+    {{- include "cruisekubeWebhook.selectorLabels" . | nindent 4 }}
 {{- end }}

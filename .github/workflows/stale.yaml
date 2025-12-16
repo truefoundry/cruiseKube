@@ -1,4 +1,4 @@
-name: StaleBot for cruiseKube
+name: StaleBot for cruisekube
 on:
   workflow_dispatch:
   schedule:
@@ -12,8 +12,8 @@ jobs:
       issues: write
       discussions: write
       pull-requests: write
-    if: github.repository == 'truefoundry/cruiseKube'
-    name: Stale issue bot for cruiseKube
+    if: github.repository == 'truefoundry/cruisekube'
+    name: Stale issue bot for cruisekube
     steps:
       - uses: actions/stale@v9.0.0
         with:

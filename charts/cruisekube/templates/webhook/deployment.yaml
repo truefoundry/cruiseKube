@@ -1,41 +1,41 @@
-{{- if .Values.cruiseKubeWebhook.enabled }}
+{{- if .Values.cruisekubeWebhook.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "cruiseKubeWebhook.fullname" . }}
+  name: {{ include "cruisekubeWebhook.fullname" . }}
   labels:
-    {{- include "cruiseKubeWebhook.labels" . | nindent 4 }}
+    {{- include "cruisekubeWebhook.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.cruiseKubeWebhook.replicas }}
+  replicas: {{ .Values.cruisekubeWebhook.replicas }}
   selector:
     matchLabels:
-      {{- include "cruiseKubeWebhook.selectorLabels" . | nindent 6 }}
+      {{- include "cruisekubeWebhook.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       annotations:
-        {{- with .Values.cruiseKubeWebhook.podAnnotations }}
+        {{- with .Values.cruisekubeWebhook.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
       labels:
-        {{- include "cruiseKubeWebhook.labels" . | nindent 8 }}
-        {{- with .Values.cruiseKubeWebhook.podLabels }}
+        {{- include "cruisekubeWebhook.labels" . | nindent 8 }}
+        {{- with .Values.cruisekubeWebhook.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
-      {{- with .Values.cruiseKubeWebhook.imagePullSecrets }}
+      {{- with .Values.cruisekubeWebhook.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "cruiseKubeWebhook.serviceAccountName" . }}
+      serviceAccountName: {{ include "cruisekubeWebhook.serviceAccountName" . }}
       containers:
         - name: {{ .Chart.Name }}-webhook
-          image: "{{ .Values.cruiseKubeWebhook.image.repository }}:{{ include "cruiseKubeWebhook.imageTag" . }}"
-          imagePullPolicy: {{ .Values.cruiseKubeWebhook.image.pullPolicy }}
-          command: ["./cruiseKube"]
+          image: "{{ .Values.cruisekubeWebhook.image.repository }}:{{ include "cruisekubeWebhook.imageTag" . }}"
+          imagePullPolicy: {{ .Values.cruisekubeWebhook.image.pullPolicy }}
+          command: ["./cruisekube"]
           args:
             - "--execution-mode=webhook"
-            - "--webhook-certs-dir={{ .Values.cruiseKubeWebhook.webhook.certsDir }}"
-            - "--webhook-stats-url-host={{ .Values.cruiseKubeWebhook.webhook.statsURL.host }}"
+            - "--webhook-certs-dir={{ .Values.cruisekubeWebhook.webhook.certsDir }}"
+            - "--webhook-stats-url-host={{ .Values.cruisekubeWebhook.webhook.statsURL.host }}"
           ports:
             - name: https
               containerPort: 8443
@@ -44,18 +44,18 @@ spec:
               containerPort: 8081
               protocol: TCP
           resources:
-            {{- toYaml .Values.cruiseKubeWebhook.resources | nindent 12 }}
+            {{- toYaml .Values.cruisekubeWebhook.resources | nindent 12 }}
           env:
-            {{- range $key, $value := .Values.cruiseKubeWebhook.env }}
+            {{- range $key, $value := .Values.cruisekubeWebhook.env }}
             - name: {{ $key }}
               value: {{ $value | quote }}
             {{- end }}
           volumeMounts:
             - name: webhook-certs
-              mountPath: {{ .Values.cruiseKubeWebhook.webhook.certsDir }}
+              mountPath: {{ .Values.cruisekubeWebhook.webhook.certsDir }}
               readOnly: true
       volumes:
         - name: webhook-certs
           secret:
-            secretName: {{ include "cruiseKubeWebhook.tlsSecretName" . }}
+            secretName: {{ include "cruisekubeWebhook.tlsSecretName" . }}
 {{- end }}

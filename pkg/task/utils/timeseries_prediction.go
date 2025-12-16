@@ -13,7 +13,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/truefoundry/cruiseKube/pkg/logging"
+	"github.com/truefoundry/cruisekube/pkg/logging"
 
 	"github.com/prometheus/common/model"
 

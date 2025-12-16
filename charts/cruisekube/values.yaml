@@ -1,4 +1,4 @@
-cruiseKubeController:
+cruisekubeController:
   enabled: true
   replicas: 1
   image:
@@ -31,7 +31,7 @@ cruiseKubeController:
     annotations: {}
   serviceMonitor:
     enabled: true
-    jobLabel: cruiseKube-controller
+    jobLabel: cruisekube-controller
     additionalLabels: {}
     additionalAnnotations: {}
     endpoints:
@@ -49,7 +49,7 @@ cruiseKubeController:
   volumeMounts: []
   env: {}
 
-cruiseKubeWebhook:
+cruisekubeWebhook:
   enabled: true
   replicas: 1
   image:
@@ -104,7 +104,7 @@ cruiseKubeWebhook:
     annotations: {}
   serviceMonitor:
     enabled: true
-    jobLabel: cruiseKube-webhook
+    jobLabel: cruisekube-webhook
     additionalLabels: {}
     additionalAnnotations: {}
     endpoints:

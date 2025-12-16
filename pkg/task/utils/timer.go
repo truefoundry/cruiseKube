@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/truefoundry/cruiseKube/pkg/logging"
+	"github.com/truefoundry/cruisekube/pkg/logging"
 )
 
 func TimeIt(ctx context.Context, name string) func() {

@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Create a report to help us improve cruiseKube
+about: Create a report to help us improve cruisekube
 title: '[BUG] '
 labels: 'bug'
 assignees: ''
@@ -10,9 +10,9 @@ assignees: ''
 A clear and concise description of the bug.
 
 ## Steps to Reproduce
-1. Install cruiseKube using helm chart with command '...'
+1. Install cruisekube using helm chart with command '...'
 2. YAML for the scale target resource and the service being scaled '...'
-3. Steps to enable cruiseKube for the service '...'
+3. Steps to enable cruisekube for the service '...'
 4. See error
 
 ## Expected Behavior
@@ -23,7 +23,7 @@ A clear and concise description of what actually happened.
 
 ## Environment
 - Kubernetes version:
-- cruiseKube version:
+- cruisekube version:
 - Installation method (helm/manual):
   - values.yaml used:
 - External components in the request path (ingress, service mesh, etc.):

@@ -5,11 +5,11 @@ on:
     - cron: '0 9 * * *'
 
 jobs:
-  image-scan-build-cruiseKube:
-    name: Image Vulnerability Scan for Build cruiseKube
+  image-scan-build-cruisekube:
+    name: Image Vulnerability Scan for Build cruisekube
     uses: truefoundry/github-workflows-public/.github/workflows/update-grype-report.yml@main
     with:
-      grype_config_file: cruiseKube-grype-config.yaml
+      grype_config_file: cruisekube-grype-config.yaml
       dockerfile_path: 'Dockerfile'
-      image_artifact_name: 'cruiseKube'
+      image_artifact_name: 'cruisekube'
       artifactory_repository_url: ${{ vars.TRUEFOUNDRY_ARTIFACTORY_PUBLIC_REPOSITORY }}

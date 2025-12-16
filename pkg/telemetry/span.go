@@ -3,7 +3,7 @@ package telemetry
 import (
 	stdctx "context"
 
-	"github.com/truefoundry/cruiseKube/pkg/contextutils"
+	"github.com/truefoundry/cruisekube/pkg/contextutils"
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"

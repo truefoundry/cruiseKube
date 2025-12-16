@@ -4,9 +4,9 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
-	"github.com/truefoundry/cruiseKube/pkg/cluster"
-	"github.com/truefoundry/cruiseKube/pkg/config"
-	"github.com/truefoundry/cruiseKube/pkg/logging"
+	"github.com/truefoundry/cruisekube/pkg/cluster"
+	"github.com/truefoundry/cruisekube/pkg/config"
+	"github.com/truefoundry/cruisekube/pkg/logging"
 	"go.opentelemetry.io/otel/attribute"
 
 	oteltrace "go.opentelemetry.io/otel/trace"

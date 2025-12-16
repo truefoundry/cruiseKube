@@ -3,7 +3,7 @@ package ports
 import (
 	"time"
 
-	"github.com/truefoundry/cruiseKube/pkg/types"
+	"github.com/truefoundry/cruisekube/pkg/types"
 )
 
 type Database interface {
