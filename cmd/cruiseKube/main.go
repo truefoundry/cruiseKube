@@ -59,17 +59,40 @@ func main() {
 	rootCmd.PersistentFlags().Bool("apply-recommendation-dry-run", true, "Apply recommendation dry run")
 
 	// Bind flags to viper
-	v.BindPFlag("controllerMode", rootCmd.PersistentFlags().Lookup("controller-mode"))
-	v.BindPFlag("executionMode", rootCmd.PersistentFlags().Lookup("execution-mode"))
-	v.BindPFlag("dependencies.local.kubeconfigPath", rootCmd.PersistentFlags().Lookup("kubeconfig-path"))
-	v.BindPFlag("dependencies.local.prometheusURL", rootCmd.PersistentFlags().Lookup("prometheus-url"))
-	v.BindPFlag("dependencies.inCluster.prometheusURL", rootCmd.PersistentFlags().Lookup("prometheus-url"))
-	v.BindPFlag("server.port", rootCmd.PersistentFlags().Lookup("server-port"))
-	v.BindPFlag("webhook.port", rootCmd.PersistentFlags().Lookup("webhook-port"))
-	v.BindPFlag("webhook.certsDir", rootCmd.PersistentFlags().Lookup("webhook-certs-dir"))
-	v.BindPFlag("webhook.statsURL.host", rootCmd.PersistentFlags().Lookup("webhook-stats-url-host"))
-	v.BindPFlag("controller.tasks.applyRecommendation.dryRun", rootCmd.PersistentFlags().Lookup("apply-recommendation-dry-run"))
-	v.BindPFlag("db.filePath", rootCmd.PersistentFlags().Lookup("db-file-path"))
+	ctx := context.Background()
+	if err := v.BindPFlag("controllerMode", rootCmd.PersistentFlags().Lookup("controller-mode")); err != nil {
+		logging.Fatalf(ctx, "Failed to bind flag: %v", err)
+	}
+	if err := v.BindPFlag("executionMode", rootCmd.PersistentFlags().Lookup("execution-mode")); err != nil {
+		logging.Fatalf(ctx, "Failed to bind flag: %v", err)
+	}
+	if err := v.BindPFlag("dependencies.local.kubeconfigPath", rootCmd.PersistentFlags().Lookup("kubeconfig-path")); err != nil {
+		logging.Fatalf(ctx, "Failed to bind flag: %v", err)
+	}
+	if err := v.BindPFlag("dependencies.local.prometheusURL", rootCmd.PersistentFlags().Lookup("prometheus-url")); err != nil {
+		logging.Fatalf(ctx, "Failed to bind flag: %v", err)
+	}
+	if err := v.BindPFlag("dependencies.inCluster.prometheusURL", rootCmd.PersistentFlags().Lookup("prometheus-url")); err != nil {
+		logging.Fatalf(ctx, "Failed to bind flag: %v", err)
+	}
+	if err := v.BindPFlag("server.port", rootCmd.PersistentFlags().Lookup("server-port")); err != nil {
+		logging.Fatalf(ctx, "Failed to bind flag: %v", err)
+	}
+	if err := v.BindPFlag("webhook.port", rootCmd.PersistentFlags().Lookup("webhook-port")); err != nil {
+		logging.Fatalf(ctx, "Failed to bind flag: %v", err)
+	}
+	if err := v.BindPFlag("webhook.certsDir", rootCmd.PersistentFlags().Lookup("webhook-certs-dir")); err != nil {
+		logging.Fatalf(ctx, "Failed to bind flag: %v", err)
+	}
+	if err := v.BindPFlag("webhook.statsURL.host", rootCmd.PersistentFlags().Lookup("webhook-stats-url-host")); err != nil {
+		logging.Fatalf(ctx, "Failed to bind flag: %v", err)
+	}
+	if err := v.BindPFlag("controller.tasks.applyRecommendation.dryRun", rootCmd.PersistentFlags().Lookup("apply-recommendation-dry-run")); err != nil {
+		logging.Fatalf(ctx, "Failed to bind flag: %v", err)
+	}
+	if err := v.BindPFlag("db.filePath", rootCmd.PersistentFlags().Lookup("db-file-path")); err != nil {
+		logging.Fatalf(ctx, "Failed to bind flag: %v", err)
+	}
 
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
@@ -309,8 +332,12 @@ func setupControllerMode(ctx context.Context, cfg *config.Config) {
 		))
 	}
 
-	clusterManager.ScheduleAllTasks()
-	clusterManager.StartTasks()
+	if err := clusterManager.ScheduleAllTasks(); err != nil {
+		logging.Fatalf(ctx, "Failed to schedule tasks: %v", err)
+	}
+	if err := clusterManager.StartTasks(); err != nil {
+		logging.Fatalf(ctx, "Failed to start tasks: %v", err)
+	}
 }
 
 func setupWebhookMode(ctx context.Context, cfg *config.Config) {
