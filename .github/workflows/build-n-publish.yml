@@ -47,7 +47,7 @@ jobs:
           git checkout main -- charts/
       - name: Update Helm values.yaml
         run: |
-          cd charts/cruiseKube
+          cd charts/cruisekube
           yq -i '.cruiseKubeController.image.tag="${{ github.sha }}"' values.yaml
           yq -i '.cruiseKubeWebhook.image.tag="${{ github.sha }}"' values.yaml
           git config user.name "$GITHUB_ACTOR"

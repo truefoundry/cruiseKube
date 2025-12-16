@@ -34,16 +34,16 @@ jobs:
       - name: Read chart values
         id: read_chart
         run: |
-          CHART_VERSION=$(yq -r '.version' charts/cruiseKube/Chart.yaml)
+          CHART_VERSION=$(yq -r '.version' charts/cruisekube/Chart.yaml)
           echo "CHART_VERSION=$CHART_VERSION" >> $GITHUB_OUTPUT
 
-          APP_VERSION=$(yq -r '.appVersion' charts/cruiseKube/Chart.yaml)
+          APP_VERSION=$(yq -r '.appVersion' charts/cruisekube/Chart.yaml)
           echo "APP_VERSION=$APP_VERSION" >> $GITHUB_OUTPUT
 
-          CHART_NAME=$(yq -r '.name' charts/cruiseKube/Chart.yaml)
+          CHART_NAME=$(yq -r '.name' charts/cruisekube/Chart.yaml)
           echo "CHART_NAME=$CHART_NAME" >> $GITHUB_OUTPUT
 
-          cruiseKube_TAG=$(yq -r '.cruiseKubeController.image.tag' charts/cruiseKube/values.yaml)
+          cruiseKube_TAG=$(yq -r '.cruiseKubeController.image.tag' charts/cruisekube/values.yaml)
           echo "cruiseKube_TAG=$cruiseKube_TAG" >> $GITHUB_OUTPUT
 
           echo "Chart values read: $CHART_NAME v$CHART_VERSION (app v$APP_VERSION)"
