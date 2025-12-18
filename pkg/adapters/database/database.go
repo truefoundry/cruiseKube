@@ -2,6 +2,7 @@ package database
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"time"
 
@@ -165,7 +166,7 @@ func (s *GormDB) GetStatForWorkload(clusterID, workloadID string) (*types.Worklo
 		First(&rowStat).Error
 
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, fmt.Errorf("workload stat not found for cluster %s, workload %s", clusterID, workloadID)
 		}
 		return nil, fmt.Errorf("failed to query workload stat: %w", err)
@@ -213,7 +214,7 @@ func (s *GormDB) GetStatOverridesForWorkload(clusterID, workloadID string) (*typ
 		First(&rowStat).Error
 
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, fmt.Errorf("workload overrides not found for cluster %s, workload %s", clusterID, workloadID)
 		}
 		return nil, fmt.Errorf("failed to query workload overrides: %w", err)
