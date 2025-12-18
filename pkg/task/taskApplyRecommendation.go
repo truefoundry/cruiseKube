@@ -24,10 +24,7 @@ import (
 )
 
 const (
-	cruisekubePausePodNamespace     = "cruisekube-test"
-	cruisekubePausePodDaemonSet     = "cruisekube-pause-daemonset"
-	DefaultCPUForcruisekubePausePod = 0.001
-	CPUClampValue                   = 10
+	CPUClampValue = 10
 )
 
 type RecommendationResult struct {
@@ -195,14 +192,6 @@ func (a *ApplyRecommendationTask) ApplyRecommendationsWithStrategy(
 			availableMemory -= nonOptimizablePod.CurrentMemory
 		}
 
-		// adding back the cruisekube pause pod resources because we will recalculate the spec for it
-		for _, pod := range nodeInfo.Pods {
-			if pod.Namespace == cruisekubePausePodNamespace && pod.WorkloadName == cruisekubePausePodDaemonSet && pod.WorkloadKind == utils.DaemonSetKind {
-				availableCPU += pod.RequestedCPU - DefaultCPUForcruisekubePausePod
-				availableMemory += pod.RequestedMemory
-				break
-			}
-		}
 
 		result, err := strategy.OptimizeNode(a.kubeClient, overridesMap, utils.NodeOptimizationData{
 			NodeName:          nodeName,
@@ -279,31 +268,6 @@ func (a *ApplyRecommendationTask) ApplyRecommendationsWithStrategy(
 			}
 		}
 
-		pausePodName := ""
-		for _, pod := range nodeInfo.Pods {
-			if pod.Namespace == cruisekubePausePodNamespace && pod.WorkloadName == cruisekubePausePodDaemonSet && pod.WorkloadKind == utils.DaemonSetKind {
-				pausePodName = pod.Name
-				break
-			}
-		}
-		if pausePodName != "" {
-			if applyChanges {
-				freshPod, found := podsOnNode[utils.GetPodKey(cruisekubePausePodNamespace, pausePodName)]
-				if !found {
-					logging.Errorf(ctx, "Pod %s/%s not found on node %s", cruisekubePausePodNamespace, pausePodName, nodeName)
-					continue
-				}
-
-				utils.UpdatePodCPUResources(ctx, a.kubeClient, freshPod, "pause", 0.0, result.MaxRestCPU)
-				// TODO: cannot decrease memory limit. will be possible from 1.34
-				// contextutils.UpdatePodMemoryResources(ctx, kubeClient, freshPod, "pause", 0.0, result.MaxRestMemory)
-				logging.Infof(ctx, "pause pod %v/%v cpu limit updated: %v -> %v", cruisekubePausePodNamespace, pausePodName, 0.0, result.MaxRestCPU)
-				logging.Infof(ctx, "pause pod %v/%v memory limit updated: %v -> %v", cruisekubePausePodNamespace, pausePodName, 0.0, result.MaxRestMemory)
-			} else {
-				logging.Infof(ctx, "[dry run] pause pod %v/%v cpu limit updated: %v -> %v", cruisekubePausePodNamespace, pausePodName, 0.0, result.MaxRestCPU)
-				logging.Infof(ctx, "[dry run] pause pod %v/%v memory limit updated: %v -> %v", cruisekubePausePodNamespace, pausePodName, 0.0, result.MaxRestMemory)
-			}
-		}
 		logging.Infof(ctx, "Successfully applied %d recommendations and evicted %d pods", len(appliedRecommendations), len(podsToEvict))
 	}
 
@@ -555,10 +519,6 @@ func (a *ApplyRecommendationTask) segregateOptimizableNonOptimizablePods(ctx con
 			continue
 		}
 
-		if podInfo.Namespace == cruisekubePausePodNamespace && podInfo.WorkloadName == cruisekubePausePodDaemonSet && podInfo.WorkloadKind == utils.DaemonSetKind {
-			// Not adding cruisekube pause pod to either of optimizable or non-optimizable
-			continue
-		}
 
 		optimizablePods = append(optimizablePods, podInfo)
 	}
