@@ -4,6 +4,10 @@ run:
   timeout: 5m
   go: "1.24.0"
   modules-download-mode: readonly
+formatters:
+  enable:
+    - gofmt
+    - goimports
 linters:
   enable:
     - bodyclose
@@ -20,9 +24,7 @@ linters:
 #    - forcetypeassert
     - goconst
     - gocritic
-#    - gofmt // Invalid
     - goheader
-#    - goimports // Invalid
     - gomoddirectives
     - gomodguard
     - goprintffuncname
@@ -38,18 +40,16 @@ linters:
     - nakedret
     - nilerr
     - nilnil
-#    - noctx
+#    - noctx - // TODO: Enable (SQLite package)
     - nolintlint
     - nonamedreturns
     - nosprintfhostport
     - predeclared
-#    - promlinter
-#    - revive
+#    - promlinter // TODO: Enable
+#    - revive // TODO: Enable
     - staticcheck
-#    - stylecheck // Invalid
     - thelper
     - tparallel
-#    - typecheck // Invalid
     - unconvert
     - unparam
     - unused
