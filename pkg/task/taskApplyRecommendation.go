@@ -191,8 +191,8 @@ func (a *ApplyRecommendationTask) ApplyRecommendationsWithStrategy(
 		availableMemory := nodeInfo.AllocatableMemory
 		// reducing the available resources by the pods i can't touch
 		for _, nonOptimizablePod := range nonOptimizablePods {
-			availableCPU -= nonOptimizablePod.CurrentCPU
 			availableMemory -= nonOptimizablePod.CurrentMemory
+			availableCPU -= nonOptimizablePod.CurrentCPU
 		}
 
 		// adding back the cruisekube pause pod resources because we will recalculate the spec for it

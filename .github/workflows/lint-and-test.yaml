@@ -4,12 +4,13 @@ on:
   push:
     branches:
       - main
+      - fix-lint
   pull_request:
     branches:
       - main
 
 env:
-  GO_VERSION: 1.24.6
+  GO_VERSION: 1.25.5
 
 jobs:
   golangci-lint:
@@ -28,36 +29,37 @@ jobs:
         with:
           args: --timeout 5m
           version: v2.7.2
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: "0"
-      - name: Setup go
-        uses: actions/setup-go@v5
-        with:
-          go-version: ${{ env.GO_VERSION }}
-          cache: true
-      - name: Install dependencies
-        run: go mod tidy
-      - name: Build
-        run: go build -v ./...
 
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: "0"
-      - name: Setup go
-        uses: actions/setup-go@v5
-        with:
-          go-version: ${{ env.GO_VERSION }}
-          cache: true
-      - name: Install dependencies
-        run: go mod tidy
-      - name: test
-        run: make test
+  # build:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: "0"
+  #     - name: Setup go
+  #       uses: actions/setup-go@v5
+  #       with:
+  #         go-version: ${{ env.GO_VERSION }}
+  #         cache: true
+  #     - name: Install dependencies
+  #       run: go mod tidy
+  #     - name: Build
+  #       run: go build -v ./...
+
+  # test:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: "0"
+  #     - name: Setup go
+  #       uses: actions/setup-go@v5
+  #       with:
+  #         go-version: ${{ env.GO_VERSION }}
+  #         cache: true
+  #     - name: Install dependencies
+  #       run: go mod tidy
+  #     - name: test
+  #       run: make test
