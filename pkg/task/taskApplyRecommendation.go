@@ -129,7 +129,7 @@ func (a *ApplyRecommendationTask) Run(ctx context.Context) error {
 	workloadOverrides, err := recommenderClient.ListWorkloads(ctx, a.config.ClusterID)
 	if err != nil {
 		logging.Errorf(ctx, "Error loading workload overrides from client: %v", err)
-		return err
+		return fmt.Errorf("failed to list workloads from recommender service: %w", err)
 	}
 
 	overridesMap := make(map[string]*types.WorkloadOverrideInfo)

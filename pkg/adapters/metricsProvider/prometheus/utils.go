@@ -1,6 +1,7 @@
 package prometheus
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 )
@@ -15,7 +16,11 @@ func (rt *BearerTokenRoundTripper) RoundTrip(req *http.Request) (*http.Response,
 	if rt.BearerToken != "" {
 		req.Header.Set("Authorization", "Bearer "+rt.BearerToken)
 	}
-	return rt.Proxied.RoundTrip(req)
+	resp, err := rt.Proxied.RoundTrip(req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to execute round trip: %w", err)
+	}
+	return resp, nil
 }
 
 // GetPrometheusClientConfig returns optimized default configuration

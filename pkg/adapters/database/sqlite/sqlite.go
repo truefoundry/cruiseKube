@@ -35,7 +35,10 @@ func NewSQLiteAdapter(dbPath string) (*SQLiteStorage, error) {
 }
 
 func (db *SQLiteStorage) Close() error {
-	return db.conn.Close()
+	if err := db.conn.Close(); err != nil {
+		return fmt.Errorf("failed to close database connection: %w", err)
+	}
+	return nil
 }
 
 func (db *SQLiteStorage) createTables() error {
@@ -65,7 +68,7 @@ func (db *SQLiteStorage) createTables() error {
 
 	_, err := db.conn.Exec(query)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to create tables: %w", err)
 	}
 
 	migrationQuery := `

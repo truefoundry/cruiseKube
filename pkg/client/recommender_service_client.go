@@ -177,7 +177,11 @@ func (c *RecommenderServiceClient) makeRawRequest(ctx context.Context, method, e
 		req.SetBasicAuth(c.username, c.password)
 	}
 
-	return c.httpClient.Do(req)
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to execute HTTP request: %w", err)
+	}
+	return resp, nil
 }
 
 func (c *RecommenderServiceClient) Health(ctx context.Context) (*HealthResponse, error) {

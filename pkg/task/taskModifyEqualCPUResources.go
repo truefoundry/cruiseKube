@@ -71,7 +71,7 @@ func (m *ModifyEqualCPUResourcesTask) Run(ctx context.Context) error {
 	workloadList, err := utils.ListAllWorkloadsWithSelectors(ctx, m.kubeClient, targetNamespace)
 	if err != nil {
 		logging.Errorf(ctx, "Error getting workload list with selectors: %v", err)
-		return err
+		return fmt.Errorf("failed to list workloads with selectors: %w", err)
 	}
 
 	allPods, err := m.getAllPodsAcrossNamespaces(ctx, targetNamespace)
@@ -177,38 +177,74 @@ func (m *ModifyEqualCPUResourcesTask) processWorkload(ctx context.Context, workl
 	return len(containersToModify)
 }
 
+// createCPUPatches creates JSON patches for CPU limit modifications
+func createCPUPatches(modifications []containerModification, containers []corev1.Container) []map[string]interface{} {
+	var patches []map[string]interface{}
+	for _, mod := range modifications {
+		for i, container := range containers {
+			if container.Name == mod.Name {
+				patches = append(patches, map[string]interface{}{
+					"op":    "replace",
+					"path":  fmt.Sprintf("/spec/template/spec/containers/%d/resources/limits/cpu", i),
+					"value": fmt.Sprintf("%dm", mod.NewCPULimitMilli),
+				})
+				break
+			}
+		}
+	}
+	return patches
+}
+
 func (m *ModifyEqualCPUResourcesTask) updateWorkloadCPULimits(ctx context.Context, workloadInfo utils.WorkloadLabelSelectorList, modifications []containerModification) error {
+	var patchFunc func(ctx context.Context, namespace, name string, patchType types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) error
+	var patches []map[string]interface{}
+
 	switch workloadInfo.Kind {
 	case utils.DeploymentKind:
-		return m.updateDeploymentCPULimits(ctx, workloadInfo, modifications)
+		deployment, err := m.kubeClient.AppsV1().Deployments(workloadInfo.Namespace).Get(ctx, workloadInfo.Name, metav1.GetOptions{})
+		if err != nil {
+			return fmt.Errorf("error getting deployment: %w", err)
+		}
+		patchFunc = func(ctx context.Context, namespace, name string, patchType types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) error {
+			_, err := m.kubeClient.AppsV1().Deployments(namespace).Patch(ctx, name, patchType, data, opts, subresources...)
+			if err != nil {
+				return fmt.Errorf("failed to patch deployment: %w", err)
+			}
+			return nil
+		}
+		patches = createCPUPatches(modifications, deployment.Spec.Template.Spec.Containers)
+
 	case utils.StatefulSetKind:
-		return m.updateStatefulSetCPULimits(ctx, workloadInfo, modifications)
+		statefulSet, err := m.kubeClient.AppsV1().StatefulSets(workloadInfo.Namespace).Get(ctx, workloadInfo.Name, metav1.GetOptions{})
+		if err != nil {
+			return fmt.Errorf("error getting statefulset: %w", err)
+		}
+		patchFunc = func(ctx context.Context, namespace, name string, patchType types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) error {
+			_, err := m.kubeClient.AppsV1().StatefulSets(namespace).Patch(ctx, name, patchType, data, opts, subresources...)
+			if err != nil {
+				return fmt.Errorf("failed to patch statefulset: %w", err)
+			}
+			return nil
+		}
+		patches = createCPUPatches(modifications, statefulSet.Spec.Template.Spec.Containers)
+
 	case utils.DaemonSetKind:
-		return m.updateDaemonSetCPULimits(ctx, workloadInfo, modifications)
+		daemonSet, err := m.kubeClient.AppsV1().DaemonSets(workloadInfo.Namespace).Get(ctx, workloadInfo.Name, metav1.GetOptions{})
+		if err != nil {
+			return fmt.Errorf("error getting daemonset: %w", err)
+		}
+		patchFunc = func(ctx context.Context, namespace, name string, patchType types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) error {
+			_, err := m.kubeClient.AppsV1().DaemonSets(namespace).Patch(ctx, name, patchType, data, opts, subresources...)
+			if err != nil {
+				return fmt.Errorf("failed to patch daemonset: %w", err)
+			}
+			return nil
+		}
+		patches = createCPUPatches(modifications, daemonSet.Spec.Template.Spec.Containers)
+
 	default:
 		return fmt.Errorf("unsupported workload kind: %s", workloadInfo.Kind)
 	}
-}
-
-func (m *ModifyEqualCPUResourcesTask) updateDeploymentCPULimits(ctx context.Context, workloadInfo utils.WorkloadLabelSelectorList, modifications []containerModification) error {
-	deployment, err := m.kubeClient.AppsV1().Deployments(workloadInfo.Namespace).Get(ctx, workloadInfo.Name, metav1.GetOptions{})
-	if err != nil {
-		return fmt.Errorf("error getting deployment: %w", err)
-	}
-
-	var patches []map[string]interface{}
-	for _, mod := range modifications {
-		for i, container := range deployment.Spec.Template.Spec.Containers {
-			if container.Name == mod.Name {
-				patches = append(patches, map[string]interface{}{
-					"op":    "replace",
-					"path":  fmt.Sprintf("/spec/template/spec/containers/%d/resources/limits/cpu", i),
-					"value": fmt.Sprintf("%dm", mod.NewCPULimitMilli),
-				})
-				break
-			}
-		}
-	}
 
 	if len(patches) == 0 {
 		return nil
@@ -219,93 +255,5 @@ func (m *ModifyEqualCPUResourcesTask) updateDeploymentCPULimits(ctx context.Cont
 		return fmt.Errorf("failed to marshal JSON patch: %w", err)
 	}
 
-	_, err = m.kubeClient.AppsV1().Deployments(workloadInfo.Namespace).Patch(
-		ctx,
-		workloadInfo.Name,
-		types.JSONPatchType,
-		patchBytes,
-		metav1.PatchOptions{},
-	)
-
-	return err
-}
-
-func (m *ModifyEqualCPUResourcesTask) updateStatefulSetCPULimits(ctx context.Context, workloadInfo utils.WorkloadLabelSelectorList, modifications []containerModification) error {
-	statefulSet, err := m.kubeClient.AppsV1().StatefulSets(workloadInfo.Namespace).Get(ctx, workloadInfo.Name, metav1.GetOptions{})
-	if err != nil {
-		return fmt.Errorf("error getting statefulset: %w", err)
-	}
-
-	var patches []map[string]interface{}
-	for _, mod := range modifications {
-		for i, container := range statefulSet.Spec.Template.Spec.Containers {
-			if container.Name == mod.Name {
-				patches = append(patches, map[string]interface{}{
-					"op":    "replace",
-					"path":  fmt.Sprintf("/spec/template/spec/containers/%d/resources/limits/cpu", i),
-					"value": fmt.Sprintf("%dm", mod.NewCPULimitMilli),
-				})
-				break
-			}
-		}
-	}
-
-	if len(patches) == 0 {
-		return nil
-	}
-
-	patchBytes, err := json.Marshal(patches)
-	if err != nil {
-		return fmt.Errorf("failed to marshal JSON patch: %w", err)
-	}
-
-	_, err = m.kubeClient.AppsV1().StatefulSets(workloadInfo.Namespace).Patch(
-		ctx,
-		workloadInfo.Name,
-		types.JSONPatchType,
-		patchBytes,
-		metav1.PatchOptions{},
-	)
-
-	return err
-}
-
-func (m *ModifyEqualCPUResourcesTask) updateDaemonSetCPULimits(ctx context.Context, workloadInfo utils.WorkloadLabelSelectorList, modifications []containerModification) error {
-	daemonSet, err := m.kubeClient.AppsV1().DaemonSets(workloadInfo.Namespace).Get(ctx, workloadInfo.Name, metav1.GetOptions{})
-	if err != nil {
-		return fmt.Errorf("error getting daemonset: %w", err)
-	}
-
-	var patches []map[string]interface{}
-	for _, mod := range modifications {
-		for i, container := range daemonSet.Spec.Template.Spec.Containers {
-			if container.Name == mod.Name {
-				patches = append(patches, map[string]interface{}{
-					"op":    "replace",
-					"path":  fmt.Sprintf("/spec/template/spec/containers/%d/resources/limits/cpu", i),
-					"value": fmt.Sprintf("%dm", mod.NewCPULimitMilli),
-				})
-				break
-			}
-		}
-	}
-
-	if len(patches) == 0 {
-		return nil
-	}
-
-	patchBytes, err := json.Marshal(patches)
-	if err != nil {
-		return fmt.Errorf("failed to marshal JSON patch: %w", err)
-	}
-
-	_, err = m.kubeClient.AppsV1().DaemonSets(workloadInfo.Namespace).Patch(
-		ctx,
-		workloadInfo.Name,
-		types.JSONPatchType,
-		patchBytes,
-		metav1.PatchOptions{},
-	)
-
-	return err
+	return patchFunc(ctx, workloadInfo.Namespace, workloadInfo.Name, types.JSONPatchType, patchBytes, metav1.PatchOptions{})
 }

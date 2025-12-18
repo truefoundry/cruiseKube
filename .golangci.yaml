@@ -56,8 +56,8 @@ linters:
     - usetesting
     - whitespace
     # Ignored for now, but we should enable it in the future
-    # - wrapcheck
-    # - gocognit
-    # - dupl
-    # - gocyclo
-    # - maintidx
+    - wrapcheck
+#    - gocognit
+    - dupl
+#    - gocyclo
+    - maintidx
