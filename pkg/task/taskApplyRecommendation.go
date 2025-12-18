@@ -192,7 +192,6 @@ func (a *ApplyRecommendationTask) ApplyRecommendationsWithStrategy(
 			availableCPU -= nonOptimizablePod.CurrentCPU
 		}
 
-
 		result, err := strategy.OptimizeNode(a.kubeClient, overridesMap, utils.NodeOptimizationData{
 			NodeName:          nodeName,
 			AllocatableCPU:    availableCPU,
@@ -519,7 +518,6 @@ func (a *ApplyRecommendationTask) segregateOptimizableNonOptimizablePods(ctx con
 			})
 			continue
 		}
-
 
 		optimizablePods = append(optimizablePods, podInfo)
 	}
