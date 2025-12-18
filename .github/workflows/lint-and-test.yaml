@@ -21,7 +21,6 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: ${{ env.GO_VERSION }}
-          cache: true
       - name: Install dependencies
         run: go mod tidy
       - name: golangci-lint
