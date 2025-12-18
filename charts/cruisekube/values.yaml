@@ -120,3 +120,29 @@ cruisekubeWebhook:
       cpu: 100m
       memory: 128Mi
   env: {}
+
+cruisekubeFrontend:
+  enabled: true
+  replicas: 1
+  image:
+    repository: tfy.jfrog.io/tfy-images/cruisekube-frontend
+    imagePullPolicy: IfNotPresent
+    tag: "0.1.5"
+  imagePullSecrets: []
+  nameOverride: ""
+  fullnameOverride: ""
+  podAnnotations: {}
+  podLabels: {}
+  service:
+    type: ClusterIP
+    httpPort: 3000
+    annotations: {}
+  backendURL: ""
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+  env: {}
