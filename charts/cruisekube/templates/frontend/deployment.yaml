@@ -1,0 +1,49 @@
+{{- if .Values.cruisekubeFrontend.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "cruisekubeFrontend.fullname" . }}
+  labels:
+    {{- include "cruisekubeFrontend.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.cruisekubeFrontend.replicas }}
+  selector:
+    matchLabels:
+      {{- include "cruisekubeFrontend.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        {{- with .Values.cruisekubeFrontend.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "cruisekubeFrontend.labels" . | nindent 8 }}
+        {{- with .Values.cruisekubeFrontend.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.cruisekubeFrontend.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}-frontend
+          image: "{{ .Values.cruisekubeFrontend.image.repository }}:{{ include "cruisekubeFrontend.imageTag" . }}"
+          imagePullPolicy: {{ .Values.cruisekubeFrontend.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.cruisekubeFrontend.resources | nindent 12 }}
+          env:
+            - name: PORT
+              value: "3000"
+            - name: BACKEND_URL
+              value: {{ if .Values.cruisekubeFrontend.backendURL }}{{ .Values.cruisekubeFrontend.backendURL | quote }}{{ else }}{{ printf "http://%s:8080" (include "cruisekubeController.fullname" .) | quote }}{{ end }}
+            {{- range $key, $value := .Values.cruisekubeFrontend.env }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+{{- end }}
+
