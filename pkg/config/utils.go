@@ -5,5 +5,5 @@ import (
 )
 
 func GetConfigFromGinContext(c *gin.Context) *Config {
-	return c.MustGet("appConfig").(*Config)
+	return c.MustGet("appConfig").(*Config) //nolint:forcetypeassert
 }

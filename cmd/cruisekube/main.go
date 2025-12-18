@@ -119,7 +119,7 @@ func runcruisekube(cmd *cobra.Command, args []string) {
 		}
 
 		defer func() {
-			if err := shutdown(context.Background()); err != nil {
+			if err := shutdown(ctx); err != nil {
 				logging.Errorf(ctx, "Failed to shutdown telemetry: %v", err)
 			}
 		}()

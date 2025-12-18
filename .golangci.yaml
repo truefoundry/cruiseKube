@@ -8,7 +8,7 @@ linters:
   enable:
     - bodyclose
     - containedctx
-#     - contextcheck
+    - contextcheck
     - copyloopvar
     - dogsled
     - durationcheck
@@ -16,18 +16,18 @@ linters:
     - errchkjson
     - errname
     - errorlint
-#    - exhaustive
-#     - forcetypeassert
+    - exhaustive
+#    - forcetypeassert
     - goconst
     - gocritic
-    # - gofmt
+#    - gofmt // Invalid
     - goheader
-    # - goimports
-#     - gomoddirectives
+#    - goimports // Invalid
+    - gomoddirectives
     - gomodguard
     - goprintffuncname
     - gosec
-    # - gosimple
+#    - gosimple // Invalid
     - govet
     - grouper
     - importas
@@ -38,18 +38,18 @@ linters:
     - nakedret
     - nilerr
     - nilnil
-#     - noctx
+#    - noctx
     - nolintlint
-#     - nonamedreturns
+    - nonamedreturns
     - nosprintfhostport
     - predeclared
-#     - promlinter
-    # - revive
+#    - promlinter
+#    - revive
     - staticcheck
-    # - stylecheck
+#    - stylecheck // Invalid
     - thelper
     - tparallel
-    # - typecheck
+#    - typecheck // Invalid
     - unconvert
     - unparam
     - unused

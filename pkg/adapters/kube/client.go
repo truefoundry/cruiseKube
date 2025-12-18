@@ -68,7 +68,7 @@ func isRunningInCluster() bool {
 	return false
 }
 
-func NewDynamicClient(ctx context.Context, kubeconfigPath string) (dynamic.Interface, error) {
+func NewDynamicClient(ctx context.Context, kubeconfigPath string) (*dynamic.DynamicClient, error) {
 	var config *rest.Config
 	var err error
 

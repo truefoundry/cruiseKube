@@ -480,8 +480,9 @@ func (a *ApplyRecommendationTask) getFreshPodsOnNode(ctx context.Context, nodeNa
 	return podMap, nil
 }
 
-func (a *ApplyRecommendationTask) segregateOptimizableNonOptimizablePods(ctx context.Context, allPodInfos []utils.PodInfo, overridesMap map[string]*types.WorkloadOverrideInfo) (optimizablePods []utils.PodInfo, nonOptimizablePods []utils.NonOptimizablePodInfo) {
-	nonOptimizablePods = make([]utils.NonOptimizablePodInfo, 0)
+func (a *ApplyRecommendationTask) segregateOptimizableNonOptimizablePods(ctx context.Context, allPodInfos []utils.PodInfo, overridesMap map[string]*types.WorkloadOverrideInfo) ([]utils.PodInfo, []utils.NonOptimizablePodInfo) {
+	optimizablePods := make([]utils.PodInfo, 0)
+	nonOptimizablePods := make([]utils.NonOptimizablePodInfo, 0)
 
 	for _, podInfo := range allPodInfos {
 		if len(a.config.RecommendationSettings.ApplyBlacklistedNamespaces) > 0 && slices.Contains(a.config.RecommendationSettings.ApplyBlacklistedNamespaces, podInfo.Namespace) {
