@@ -60,4 +60,4 @@ linters:
 #    - gocognit
     - dupl
 #    - gocyclo
-    - maintidx
+#    - maintidx
