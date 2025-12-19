@@ -46,7 +46,11 @@ type ParallelQueryRequest struct {
 
 func (p *PrometheusProvider) getOrCreateQuerySemaphore(clusterId string) chan struct{} {
 	if semaphore, ok := p.querySemaphores.Load(clusterId); ok {
-		return semaphore.(chan struct{})
+		sem, ok := semaphore.(chan struct{})
+		if !ok {
+			panic("invalid semaphore type")
+		}
+		return sem
 	}
 	semaphore := make(chan struct{}, p.config.MaxConcurrentQueries)
 	p.querySemaphores.Store(clusterId, semaphore)
@@ -64,7 +68,11 @@ func (p *PrometheusProvider) releaseQuerySlot(ctx context.Context, clusterId str
 		logging.Errorf(ctx, "Query semaphore not found for cluster %s", clusterId)
 		return
 	}
-	<-semaphore.(chan struct{})
+	sem, ok := semaphore.(chan struct{})
+	if !ok {
+		panic("invalid semaphore type")
+	}
+	<-sem
 }
 
 func (p *PrometheusProvider) createQueryContext(ctx context.Context) (context.Context, context.CancelFunc) {

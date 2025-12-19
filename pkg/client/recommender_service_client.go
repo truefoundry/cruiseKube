@@ -98,7 +98,8 @@ func NewRecommenderServiceClientWithClusterToken(host, clusterToken string) *Rec
 	})
 }
 
-func (c *RecommenderServiceClient) makeRequest(ctx context.Context, method, endpoint string, body interface{}, result interface{}) (err error) {
+func (c *RecommenderServiceClient) makeRequest(ctx context.Context, method, endpoint string, body interface{}, result interface{}) error {
+	var err error
 	defer func() {
 		status := "success"
 		if err != nil {
@@ -177,7 +178,11 @@ func (c *RecommenderServiceClient) makeRawRequest(ctx context.Context, method, e
 		req.SetBasicAuth(c.username, c.password)
 	}
 
-	return c.httpClient.Do(req)
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to execute HTTP request: %w", err)
+	}
+	return resp, nil
 }
 
 func (c *RecommenderServiceClient) Health(ctx context.Context) (*HealthResponse, error) {

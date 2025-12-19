@@ -33,13 +33,13 @@ func (s *Scheduler) Register(ctx context.Context, name string, schedule string, 
 
 	go func() {
 		logging.Infof(ctx, "Launching initial task: %s", name)
-		_ = task(context.Background())
+		_ = task(ctx)
 
 		for {
 			select {
 			case <-ticker.C:
 				logging.Infof(ctx, "Launching task: %s", name)
-				_ = task(context.Background())
+				_ = task(ctx)
 			case <-s.quit:
 				ticker.Stop()
 				return

@@ -26,14 +26,13 @@ func NewKubeClient(ctx context.Context, kubeconfigPath string) (*kubernetes.Clie
 		logging.Infof(ctx, "Detected in-cluster environment, using service account configuration")
 		config, err = rest.InClusterConfig()
 		if err != nil {
-			logging.Errorf(ctx, "Failed to get in-cluster config: %v", err)
-			return nil, err
+			return nil, fmt.Errorf("failed to get in-cluster config: %w", err)
 		}
 	} else {
 		logging.Infof(ctx, "Using kubeconfig file: %s", kubeconfigPath)
 		config, err = clientcmd.BuildConfigFromFlags("", kubeconfigPath)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to build config from flags: %w", err)
 		}
 	}
 
@@ -49,7 +48,7 @@ func NewKubeClient(ctx context.Context, kubeconfigPath string) (*kubernetes.Clie
 
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create kubernetes clientset: %w", err)
 	}
 
 	logging.Infof(ctx, "Kubernetes client initialized successfully")
@@ -68,7 +67,7 @@ func isRunningInCluster() bool {
 	return false
 }
 
-func NewDynamicClient(ctx context.Context, kubeconfigPath string) (dynamic.Interface, error) {
+func NewDynamicClient(ctx context.Context, kubeconfigPath string) (*dynamic.DynamicClient, error) {
 	var config *rest.Config
 	var err error
 
@@ -78,7 +77,7 @@ func NewDynamicClient(ctx context.Context, kubeconfigPath string) (dynamic.Inter
 		config, err = rest.InClusterConfig()
 		if err != nil {
 			logging.Errorf(ctx, "Failed to get in-cluster config: %v", err)
-			return nil, err
+			return nil, fmt.Errorf("failed to get in-cluster config: %w", err)
 		}
 	} else {
 		if kubeconfigPath == "" {
@@ -87,7 +86,7 @@ func NewDynamicClient(ctx context.Context, kubeconfigPath string) (dynamic.Inter
 		logging.Infof(ctx, "Using kubeconfig file for dynamic client: %s", kubeconfigPath)
 		config, err = clientcmd.BuildConfigFromFlags("", kubeconfigPath)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to build config from flags: %w", err)
 		}
 	}
 
@@ -103,7 +102,7 @@ func NewDynamicClient(ctx context.Context, kubeconfigPath string) (dynamic.Inter
 
 	dynamicClient, err := dynamic.NewForConfig(config)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create dynamic client: %w", err)
 	}
 
 	logging.Infof(ctx, "Kubernetes dynamic client initialized successfully")

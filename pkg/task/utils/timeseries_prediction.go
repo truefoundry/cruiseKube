@@ -1,16 +1,12 @@
 package utils
 
 import (
-	"bytes"
 	"cmp"
 	"context"
-	"encoding/json"
 	"fmt"
 	"maps"
-	"net/http"
 	"slices"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/truefoundry/cruisekube/pkg/logging"
@@ -18,7 +14,6 @@ import (
 	"github.com/prometheus/common/model"
 
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
-	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
 const timeStepSize = 60 * time.Minute
@@ -27,213 +22,6 @@ const timeStepSize = 60 * time.Minute
 type TimeSeriesRequest struct {
 	TimeSeriesData  []map[string][]float64 `json:"timeseries_data"`
 	ForecastHorizon int                    `json:"forecast_horizon"`
-}
-
-func callTimeSeriesModel(ctx context.Context, timeseriesData []map[string][]float64, forecastHorizon int) (PredictionStatsResponse, error) {
-	// Create request payload
-	logging.Infof(ctx, "Calling time series model with forecast horizon: %d", forecastHorizon)
-	requestPayload := TimeSeriesRequest{
-		TimeSeriesData:  timeseriesData,
-		ForecastHorizon: forecastHorizon,
-	}
-
-	payloadBytes, err := json.Marshal(requestPayload)
-	if err != nil {
-		return PredictionStatsResponse{}, fmt.Errorf("failed to marshal request payload: %w", err)
-	}
-
-	// Create HTTP client with timeout
-	client := &http.Client{
-		Timeout:   300 * time.Second,
-		Transport: otelhttp.NewTransport(http.DefaultTransport),
-	}
-
-	// Make HTTP POST request
-	url := ""
-	resp, err := client.Post(url, "application/json", bytes.NewBuffer(payloadBytes))
-	if err != nil {
-		return PredictionStatsResponse{}, fmt.Errorf("failed to make HTTP request to time series model: %w", err)
-	}
-	defer func() { _ = resp.Body.Close() }()
-	logging.Infof(ctx, "Response from time series model for query: %d", resp.StatusCode)
-
-	// Check response status
-	if resp.StatusCode != http.StatusOK {
-		return PredictionStatsResponse{}, fmt.Errorf("time series model returned status code %d", resp.StatusCode)
-	}
-
-	// Parse response
-	var response PredictionStatsResponse
-	decoder := json.NewDecoder(resp.Body)
-	if err := decoder.Decode(&response); err != nil {
-		return PredictionStatsResponse{}, fmt.Errorf("failed to parse response from time series model: %w", err)
-	}
-
-	return response, nil
-}
-
-// callTimeSeriesModelInParallel processes multiple samples in parallel with concurrency limit
-func callTimeSeriesModelInParallel(ctx context.Context, matrix model.Matrix, namespace string, maxConcurrency int) map[string]WorkloadPrediction {
-	semaphore := make(chan struct{}, maxConcurrency)
-	results := make(chan struct {
-		key        string
-		prediction WorkloadPrediction
-		err        error
-	}, len(matrix))
-
-	var wg sync.WaitGroup
-
-	// Combine replicasets into deployments
-	combinedMatrix := combineReplicasetsToDeployments(matrix)
-
-	// Launch goroutines for each sample
-	for _, sample := range combinedMatrix {
-		wg.Add(1)
-		go func(sample *model.SampleStream) {
-			defer wg.Done()
-
-			// Acquire semaphore
-			semaphore <- struct{}{}
-			defer func() { <-semaphore }()
-
-			var values []float64
-			for _, v := range sample.Values {
-				values = append(values, float64(v.Value))
-			}
-			timeSeriesData := append([]map[string][]float64{}, map[string][]float64{"cpu": values})
-
-			workloadContainerKey := GetWorkloadContainerKey(
-				string(sample.Metric["created_by_kind"]),
-				namespace,
-				string(sample.Metric["created_by_name"]),
-				string(sample.Metric["container"]))
-
-			predictionStat, err := callTimeSeriesModel(ctx, timeSeriesData, 1)
-			if err != nil {
-				logging.Errorf(ctx, "Error predicting stats from time series model for namespace %s, key %s: %v", namespace, workloadContainerKey, err)
-				results <- struct {
-					key        string
-					prediction WorkloadPrediction
-					err        error
-				}{key: workloadContainerKey, err: err}
-				return
-			}
-
-			workloadMedian := predictionStat.Median[0][0][0]
-			workloadP90 := predictionStat.P90[0][0][0]
-			workloadP95 := predictionStat.P95[0][0][0]
-			workloadP99 := predictionStat.P99[0][0][0]
-
-			results <- struct {
-				key        string
-				prediction WorkloadPrediction
-				err        error
-			}{
-				key: workloadContainerKey,
-				prediction: WorkloadPrediction{
-					Median: workloadMedian,
-					P90:    workloadP90,
-					P95:    workloadP95,
-					P99:    workloadP99,
-				},
-			}
-		}(sample)
-	}
-
-	// Close results channel when all goroutines complete
-	go func() {
-		wg.Wait()
-		close(results)
-	}()
-
-	// Collect results
-	workloadContainerKeyVsPrediction := make(map[string]WorkloadPrediction)
-	for result := range results {
-		if result.err == nil {
-			workloadContainerKeyVsPrediction[result.key] = result.prediction
-		}
-	}
-
-	return workloadContainerKeyVsPrediction
-}
-
-func callMemoryTimeSeriesModelInParallel(ctx context.Context, matrix model.Matrix, namespace string, maxConcurrency int) map[string]WorkloadPrediction {
-	semaphore := make(chan struct{}, maxConcurrency)
-	results := make(chan struct {
-		key        string
-		prediction WorkloadPrediction
-		err        error
-	}, len(matrix))
-
-	var wg sync.WaitGroup
-
-	combinedMatrix := combineReplicasetsToDeployments(matrix)
-
-	for _, sample := range combinedMatrix {
-		wg.Add(1)
-		go func(sample *model.SampleStream) {
-			defer wg.Done()
-
-			semaphore <- struct{}{}
-			defer func() { <-semaphore }()
-
-			var values []float64
-			for _, v := range sample.Values {
-				values = append(values, float64(v.Value))
-			}
-			timeSeriesData := append([]map[string][]float64{}, map[string][]float64{"memory": values})
-
-			workloadContainerKey := GetWorkloadContainerKey(
-				string(sample.Metric["created_by_kind"]),
-				namespace,
-				string(sample.Metric["created_by_name"]),
-				string(sample.Metric["container"]))
-
-			predictionStat, err := callTimeSeriesModel(ctx, timeSeriesData, 1)
-			if err != nil {
-				logging.Errorf(ctx, "Error predicting memory stats from time series model for namespace %s, key %s: %v", namespace, workloadContainerKey, err)
-				results <- struct {
-					key        string
-					prediction WorkloadPrediction
-					err        error
-				}{key: workloadContainerKey, err: err}
-				return
-			}
-
-			workloadMedian := predictionStat.Median[0][0][0]
-			workloadP90 := predictionStat.P90[0][0][0]
-			workloadP95 := predictionStat.P95[0][0][0]
-			workloadP99 := predictionStat.P99[0][0][0]
-
-			results <- struct {
-				key        string
-				prediction WorkloadPrediction
-				err        error
-			}{
-				key: workloadContainerKey,
-				prediction: WorkloadPrediction{
-					Median: workloadMedian,
-					P90:    workloadP90,
-					P95:    workloadP95,
-					P99:    workloadP99,
-				},
-			}
-		}(sample)
-	}
-
-	go func() {
-		wg.Wait()
-		close(results)
-	}()
-
-	workloadContainerKeyVsPrediction := make(map[string]WorkloadPrediction)
-	for result := range results {
-		if result.err == nil {
-			workloadContainerKeyVsPrediction[result.key] = result.prediction
-		}
-	}
-
-	return workloadContainerKeyVsPrediction
 }
 
 func combineReplicasetsToDeployments(matrix model.Matrix) model.Matrix {
@@ -311,85 +99,6 @@ func combineTimeSeriesByMax(samples []*model.SampleStream) []model.SamplePair {
 	})
 
 	return result
-}
-
-// returns namespace -> workload -> prediction
-func PredictCPUStatsFromTimeSeriesModel(ctx context.Context, namespaces []string, promClient v1.API, psiAdjusted bool) (map[string]map[string]WorkloadPrediction, error) {
-	logging.Infof(ctx, "Predicting stats from time series model for namespaces: %v with psiAdjusted: %v", namespaces, psiAdjusted)
-	result := make(map[string]map[string]WorkloadPrediction)
-	for _, namespace := range namespaces {
-		query := EncloseWithinQuantileOverTime(
-			BuildBatchCoreCPUExpression(namespace, psiAdjusted),
-			timeStepSize,
-			1.0,
-		)
-
-		ctx, cancel := context.WithTimeout(ctx, 2*time.Minute)
-		defer cancel()
-		end := time.Now()
-		start := end.Add(-MLLookbackWindow)
-		r := v1.Range{
-			Start: start,
-			End:   end,
-			Step:  timeStepSize,
-		}
-
-		logging.Infof(ctx, "Querying prometheus with query: %s", CompressQueryForLogging(query))
-		val, _, err := promClient.QueryRange(ctx, query, r)
-		if err != nil {
-			fmt.Printf("Error querying prometheus: %v\n", err)
-			return nil, err
-		}
-
-		matrix, ok := val.(model.Matrix)
-		if !ok {
-			logging.Errorf(ctx, "Unable to convert to matrix")
-			continue
-		}
-
-		workloadContainerKeyVsPrediction := callTimeSeriesModelInParallel(ctx, matrix, namespace, 20)
-		result[namespace] = workloadContainerKeyVsPrediction
-	}
-	return result, nil
-}
-
-func PredictMemoryStatsFromTimeSeriesModel(ctx context.Context, namespaces []string, promClient v1.API) (map[string]map[string]WorkloadPrediction, error) {
-	logging.Info(ctx, "Predicting memory stats from time series model for namespaces: ", namespaces)
-	result := make(map[string]map[string]WorkloadPrediction)
-	for _, namespace := range namespaces {
-		query := EncloseWithinMemoryCleanupFunction(EncloseWithinQuantileOverTime(
-			BuildBatchMemoryUsageExpression(namespace),
-			timeStepSize,
-			1.0,
-		), MemoryDecimalPlaces)
-
-		ctx, cancel := context.WithTimeout(ctx, 2*time.Minute)
-		defer cancel()
-		end := time.Now()
-		start := end.Add(-MLLookbackWindow)
-		r := v1.Range{
-			Start: start,
-			End:   end,
-			Step:  timeStepSize,
-		}
-
-		logging.Infof(ctx, "Querying prometheus for memory with query: %s", CompressQueryForLogging(query))
-		val, _, err := promClient.QueryRange(ctx, query, r)
-		if err != nil {
-			fmt.Printf("Error querying prometheus for memory: %v\n", err)
-			return nil, err
-		}
-
-		matrix, ok := val.(model.Matrix)
-		if !ok {
-			logging.Errorf(ctx, "Unable to convert to matrix for memory")
-			continue
-		}
-
-		workloadContainerKeyVsPrediction := callMemoryTimeSeriesModelInParallel(ctx, matrix, namespace, 20)
-		result[namespace] = workloadContainerKeyVsPrediction
-	}
-	return result, nil
 }
 
 func EncloseWithinMemoryCleanupFunction(query string, memoryDecimalPlaces int) string {
@@ -544,7 +253,7 @@ func PredictSimpleStatsFromTimeSeriesModel(ctx context.Context, namespaces []str
 			val, _, err := promClient.QueryRange(ctx, query, r)
 			if err != nil {
 				logging.Errorf(ctx, "Error querying prometheus for simple %s predictions: %v", resourceType, err)
-				return nil, err
+				return nil, fmt.Errorf("failed to query prometheus for simple %s predictions: %w", resourceType, err)
 			}
 
 			var ok bool

@@ -126,7 +126,7 @@ func (a *ApplyRecommendationTask) Run(ctx context.Context) error {
 	workloadOverrides, err := recommenderClient.ListWorkloads(ctx, a.config.ClusterID)
 	if err != nil {
 		logging.Errorf(ctx, "Error loading workload overrides from client: %v", err)
-		return err
+		return fmt.Errorf("failed to list workloads from recommender service: %w", err)
 	}
 
 	overridesMap := make(map[string]*types.WorkloadOverrideInfo)
@@ -188,10 +188,9 @@ func (a *ApplyRecommendationTask) ApplyRecommendationsWithStrategy(
 		availableMemory := nodeInfo.AllocatableMemory
 		// reducing the available resources by the pods i can't touch
 		for _, nonOptimizablePod := range nonOptimizablePods {
-			availableCPU -= nonOptimizablePod.CurrentCPU
 			availableMemory -= nonOptimizablePod.CurrentMemory
+			availableCPU -= nonOptimizablePod.CurrentCPU
 		}
-
 
 		result, err := strategy.OptimizeNode(a.kubeClient, overridesMap, utils.NodeOptimizationData{
 			NodeName:          nodeName,
@@ -444,8 +443,9 @@ func (a *ApplyRecommendationTask) getFreshPodsOnNode(ctx context.Context, nodeNa
 	return podMap, nil
 }
 
-func (a *ApplyRecommendationTask) segregateOptimizableNonOptimizablePods(ctx context.Context, allPodInfos []utils.PodInfo, overridesMap map[string]*types.WorkloadOverrideInfo) (optimizablePods []utils.PodInfo, nonOptimizablePods []utils.NonOptimizablePodInfo) {
-	nonOptimizablePods = make([]utils.NonOptimizablePodInfo, 0)
+func (a *ApplyRecommendationTask) segregateOptimizableNonOptimizablePods(ctx context.Context, allPodInfos []utils.PodInfo, overridesMap map[string]*types.WorkloadOverrideInfo) ([]utils.PodInfo, []utils.NonOptimizablePodInfo) {
+	optimizablePods := make([]utils.PodInfo, 0)
+	nonOptimizablePods := make([]utils.NonOptimizablePodInfo, 0)
 
 	for _, podInfo := range allPodInfos {
 		if len(a.config.RecommendationSettings.ApplyBlacklistedNamespaces) > 0 && slices.Contains(a.config.RecommendationSettings.ApplyBlacklistedNamespaces, podInfo.Namespace) {
@@ -518,7 +518,6 @@ func (a *ApplyRecommendationTask) segregateOptimizableNonOptimizablePods(ctx con
 			})
 			continue
 		}
-
 
 		optimizablePods = append(optimizablePods, podInfo)
 	}

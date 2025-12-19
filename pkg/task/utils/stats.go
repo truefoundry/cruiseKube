@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"fmt"
+
 	"github.com/truefoundry/cruisekube/pkg/repository/storage"
 	"github.com/truefoundry/cruisekube/pkg/types"
 )
@@ -24,7 +26,7 @@ type StatsResponse = types.StatsResponse
 func LoadStatsFromClusterStorage(clusterID string) (*StatsResponse, error) {
 	var statsFile StatsResponse
 	if err := storage.Stg.ReadClusterStats(clusterID, &statsFile); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to read cluster stats: %w", err)
 	}
 	return &statsFile, nil
 }

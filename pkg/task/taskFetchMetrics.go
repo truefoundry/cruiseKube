@@ -144,21 +144,15 @@ func (f *FetchMetricsTask) fetchNodeCPUWaiting(ctx context.Context) {
 	baseQuery := `rate(node_pressure_cpu_waiting_seconds_total{job="node-exporter"}[1m])
 	unless on (node) sum by (node) (kube_node_status_allocatable{job="kube-state-metrics",resource="nvidia_com_gpu"} > 0)`
 
-	maxQuery := `max(` + baseQuery + `)`
-	result, _, err := f.promClient.ExecuteQueryWithRetry(ctx, f.config.ClusterID, maxQuery, "node_cpu_waiting_max")
-	if err != nil {
-		logging.Errorf(ctx, "fetchNodeCPUWaiting (max): %v", err)
-	} else if val := f.extractScalarValue(result); val != nil {
-		metrics.NodeCPUWaitingMax.WithLabelValues(f.config.ClusterID).Set(*val)
-	}
-
-	p50Query := `quantile(0.50, ` + baseQuery + `)`
-	result, _, err = f.promClient.ExecuteQueryWithRetry(ctx, f.config.ClusterID, p50Query, "node_cpu_waiting_p50")
-	if err != nil {
-		logging.Errorf(ctx, "fetchNodeCPUWaiting (p50): %v", err)
-	} else if val := f.extractScalarValue(result); val != nil {
-		metrics.NodeCPUWaitingP50.WithLabelValues(f.config.ClusterID).Set(*val)
-	}
+	f.fetchMaxAndP50Metrics(
+		ctx,
+		baseQuery,
+		metrics.NodeCPUWaitingMax.WithLabelValues(f.config.ClusterID),
+		metrics.NodeCPUWaitingP50.WithLabelValues(f.config.ClusterID),
+		"node_cpu_waiting_max",
+		"node_cpu_waiting_p50",
+		"fetchNodeCPUWaiting",
+	)
 }
 
 func (f *FetchMetricsTask) fetchNodeCPULoad(ctx context.Context) {
@@ -173,42 +167,30 @@ func (f *FetchMetricsTask) fetchNodeCPULoad(ctx context.Context) {
 	unless on (node)
 	  sum by (node) (kube_node_status_allocatable{job="kube-state-metrics",resource="nvidia_com_gpu"} > 0)`
 
-	maxQuery := `max(` + baseQuery + `)`
-	result, _, err := f.promClient.ExecuteQueryWithRetry(ctx, f.config.ClusterID, maxQuery, "node_cpu_load_max")
-	if err != nil {
-		logging.Errorf(ctx, "fetchNodeCPULoad (max): %v", err)
-	} else if val := f.extractScalarValue(result); val != nil {
-		metrics.NodeCPULoadMax.WithLabelValues(f.config.ClusterID).Set(*val)
-	}
-
-	p50Query := `quantile(0.50, ` + baseQuery + `)`
-	result, _, err = f.promClient.ExecuteQueryWithRetry(ctx, f.config.ClusterID, p50Query, "node_cpu_load_p50")
-	if err != nil {
-		logging.Errorf(ctx, "fetchNodeCPULoad (p50): %v", err)
-	} else if val := f.extractScalarValue(result); val != nil {
-		metrics.NodeCPULoadP50.WithLabelValues(f.config.ClusterID).Set(*val)
-	}
+	f.fetchMaxAndP50Metrics(
+		ctx,
+		baseQuery,
+		metrics.NodeCPULoadMax.WithLabelValues(f.config.ClusterID),
+		metrics.NodeCPULoadP50.WithLabelValues(f.config.ClusterID),
+		"node_cpu_load_max",
+		"node_cpu_load_p50",
+		"fetchNodeCPULoad",
+	)
 }
 
 func (f *FetchMetricsTask) fetchContainerCPUWaiting(ctx context.Context) {
 	baseQuery := `rate(container_pressure_cpu_waiting_seconds_total{job="kubelet",container!=""}[1m])
 	unless on (node) sum by (node) (kube_node_status_allocatable{job="kube-state-metrics",resource="nvidia_com_gpu"} > 0)`
 
-	maxQuery := `max(` + baseQuery + `)`
-	result, _, err := f.promClient.ExecuteQueryWithRetry(ctx, f.config.ClusterID, maxQuery, "container_cpu_waiting_max")
-	if err != nil {
-		logging.Errorf(ctx, "fetchContainerCPUWaiting (max): %v", err)
-	} else if val := f.extractScalarValue(result); val != nil {
-		metrics.ContainerCPUWaitingMax.WithLabelValues(f.config.ClusterID).Set(*val)
-	}
-
-	p50Query := `quantile(0.50, ` + baseQuery + `)`
-	result, _, err = f.promClient.ExecuteQueryWithRetry(ctx, f.config.ClusterID, p50Query, "container_cpu_waiting_p50")
-	if err != nil {
-		logging.Errorf(ctx, "fetchContainerCPUWaiting (p50): %v", err)
-	} else if val := f.extractScalarValue(result); val != nil {
-		metrics.ContainerCPUWaitingP50.WithLabelValues(f.config.ClusterID).Set(*val)
-	}
+	f.fetchMaxAndP50Metrics(
+		ctx,
+		baseQuery,
+		metrics.ContainerCPUWaitingMax.WithLabelValues(f.config.ClusterID),
+		metrics.ContainerCPUWaitingP50.WithLabelValues(f.config.ClusterID),
+		"container_cpu_waiting_max",
+		"container_cpu_waiting_p50",
+		"fetchContainerCPUWaiting",
+	)
 }
 
 func (f *FetchMetricsTask) fetchClusterMemoryUtilization(ctx context.Context) {
@@ -278,42 +260,30 @@ func (f *FetchMetricsTask) fetchNodeMemoryWaiting(ctx context.Context) {
 	baseQuery := `rate(node_pressure_memory_waiting_seconds_total{job="node-exporter"}[1m])
 	unless on (node) sum by (node) (kube_node_status_allocatable{job="kube-state-metrics",resource="nvidia_com_gpu"} > 0)`
 
-	maxQuery := `max(` + baseQuery + `)`
-	result, _, err := f.promClient.ExecuteQueryWithRetry(ctx, f.config.ClusterID, maxQuery, "node_memory_waiting_max")
-	if err != nil {
-		logging.Errorf(ctx, "fetchNodeMemoryWaiting (max): %v", err)
-	} else if val := f.extractScalarValue(result); val != nil {
-		metrics.NodeMemoryWaitingMax.WithLabelValues(f.config.ClusterID).Set(*val)
-	}
-
-	p50Query := `quantile(0.50, ` + baseQuery + `)`
-	result, _, err = f.promClient.ExecuteQueryWithRetry(ctx, f.config.ClusterID, p50Query, "node_memory_waiting_p50")
-	if err != nil {
-		logging.Errorf(ctx, "fetchNodeMemoryWaiting (p50): %v", err)
-	} else if val := f.extractScalarValue(result); val != nil {
-		metrics.NodeMemoryWaitingP50.WithLabelValues(f.config.ClusterID).Set(*val)
-	}
+	f.fetchMaxAndP50Metrics(
+		ctx,
+		baseQuery,
+		metrics.NodeMemoryWaitingMax.WithLabelValues(f.config.ClusterID),
+		metrics.NodeMemoryWaitingP50.WithLabelValues(f.config.ClusterID),
+		"node_memory_waiting_max",
+		"node_memory_waiting_p50",
+		"fetchNodeMemoryWaiting",
+	)
 }
 
 func (f *FetchMetricsTask) fetchContainerMemoryWaiting(ctx context.Context) {
 	baseQuery := `rate(container_pressure_memory_waiting_seconds_total{job="kubelet",container!=""}[1m])
 	unless on (node) sum by (node) (kube_node_status_allocatable{job="kube-state-metrics",resource="nvidia_com_gpu"} > 0)`
 
-	maxQuery := `max(` + baseQuery + `)`
-	result, _, err := f.promClient.ExecuteQueryWithRetry(ctx, f.config.ClusterID, maxQuery, "container_memory_waiting_max")
-	if err != nil {
-		logging.Errorf(ctx, "fetchContainerMemoryWaiting (max): %v", err)
-	} else if val := f.extractScalarValue(result); val != nil {
-		metrics.ContainerMemoryWaitingMax.WithLabelValues(f.config.ClusterID).Set(*val)
-	}
-
-	p50Query := `quantile(0.50, ` + baseQuery + `)`
-	result, _, err = f.promClient.ExecuteQueryWithRetry(ctx, f.config.ClusterID, p50Query, "container_memory_waiting_p50")
-	if err != nil {
-		logging.Errorf(ctx, "fetchContainerMemoryWaiting (p50): %v", err)
-	} else if val := f.extractScalarValue(result); val != nil {
-		metrics.ContainerMemoryWaitingP50.WithLabelValues(f.config.ClusterID).Set(*val)
-	}
+	f.fetchMaxAndP50Metrics(
+		ctx,
+		baseQuery,
+		metrics.ContainerMemoryWaitingMax.WithLabelValues(f.config.ClusterID),
+		metrics.ContainerMemoryWaitingP50.WithLabelValues(f.config.ClusterID),
+		"container_memory_waiting_max",
+		"container_memory_waiting_p50",
+		"fetchContainerMemoryWaiting",
+	)
 }
 
 func (f *FetchMetricsTask) fetchClusterOOMEvents(ctx context.Context) {
@@ -418,4 +388,30 @@ func (f *FetchMetricsTask) fetchWorkloadStatsAge(ctx context.Context) {
 	metrics.WorkloadStatsAgeP50.WithLabelValues(f.config.ClusterID).Set(ages[p50Index])
 
 	logging.Infof(ctx, "fetchWorkloadStatsAge: max=%.1fm, p90=%.1fm, p50=%.1fm", maxAge, ages[p90Index], ages[p50Index])
+}
+
+func (f *FetchMetricsTask) fetchMaxAndP50Metrics(
+	ctx context.Context,
+	baseQuery string,
+	maxMetric interface{ Set(float64) },
+	p50Metric interface{ Set(float64) },
+	maxQueryName string,
+	p50QueryName string,
+	errorPrefix string,
+) {
+	maxQuery := `max(` + baseQuery + `)`
+	result, _, err := f.promClient.ExecuteQueryWithRetry(ctx, f.config.ClusterID, maxQuery, maxQueryName)
+	if err != nil {
+		logging.Errorf(ctx, "%s (max): %v", errorPrefix, err)
+	} else if val := f.extractScalarValue(result); val != nil {
+		maxMetric.Set(*val)
+	}
+
+	p50Query := `quantile(0.50, ` + baseQuery + `)`
+	result, _, err = f.promClient.ExecuteQueryWithRetry(ctx, f.config.ClusterID, p50Query, p50QueryName)
+	if err != nil {
+		logging.Errorf(ctx, "%s (p50): %v", errorPrefix, err)
+	} else if val := f.extractScalarValue(result); val != nil {
+		p50Metric.Set(*val)
+	}
 }

@@ -2,6 +2,7 @@ package prometheus
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"net/http"
 	"sync"
@@ -77,7 +78,7 @@ func NewPrometheusProvider(ctx context.Context, config *PrometheusClientConfig) 
 	})
 	if err != nil {
 		logging.Error(ctx, "Failed to create Prometheus client", err)
-		return nil, err
+		return nil, fmt.Errorf("failed to create prometheus client: %w", err)
 	}
 	client := v1.NewAPI(apiClient)
 

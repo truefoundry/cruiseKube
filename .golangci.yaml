@@ -4,11 +4,15 @@ run:
   timeout: 5m
   go: "1.24.0"
   modules-download-mode: readonly
+formatters:
+  enable:
+    - gofmt
+    - goimports
 linters:
   enable:
     - bodyclose
     - containedctx
-#     - contextcheck
+    - contextcheck
     - copyloopvar
     - dogsled
     - durationcheck
@@ -16,18 +20,16 @@ linters:
     - errchkjson
     - errname
     - errorlint
-#    - exhaustive
-#     - forcetypeassert
+    - exhaustive
+#    - forcetypeassert
     - goconst
     - gocritic
-    # - gofmt
     - goheader
-    # - goimports
-#     - gomoddirectives
+    - gomoddirectives
     - gomodguard
     - goprintffuncname
     - gosec
-    # - gosimple
+#    - gosimple // Invalid
     - govet
     - grouper
     - importas
@@ -38,26 +40,24 @@ linters:
     - nakedret
     - nilerr
     - nilnil
-#     - noctx
+#    - noctx - // TODO: Enable (SQLite package)
     - nolintlint
-#     - nonamedreturns
+    - nonamedreturns
     - nosprintfhostport
     - predeclared
-#     - promlinter
-    # - revive
+#    - promlinter // TODO: Enable
+#    - revive // TODO: Enable
     - staticcheck
-    # - stylecheck
     - thelper
     - tparallel
-    # - typecheck
     - unconvert
     - unparam
     - unused
     - usetesting
     - whitespace
     # Ignored for now, but we should enable it in the future
-    # - wrapcheck
-    # - gocognit
-    # - dupl
-    # - gocyclo
-    # - maintidx
+    - wrapcheck
+#    - gocognit
+    - dupl
+#    - gocyclo
+#    - maintidx

@@ -89,7 +89,7 @@ func (c *CreateStatsTask) Run(ctx context.Context) error {
 	workloadList, err := utils.ListAllWorkloads(ctx, c.kubeClient, targetNamespace)
 	if err != nil {
 		logging.Errorf(ctx, "Error getting workload list: %v", err)
-		return err
+		return fmt.Errorf("failed to list workloads: %w", err)
 	}
 
 	isPSIEnabled := c.isPSIEnabled(ctx)
@@ -121,33 +121,20 @@ func (c *CreateStatsTask) Run(ctx context.Context) error {
 	namespaceQueryResults, namespaceVsWorkloadMetrics, err := c.promClient.FetchStatsForNamespaces(ctx, c.config.ClusterID, namespaces, isPSIEnabled)
 	if err != nil {
 		logging.Errorf(ctx, "Error executing batch queries: %v", err)
-		return err
+		return fmt.Errorf("failed to fetch stats for namespaces: %w", err)
 	}
-
-	// namespaceVsWorkloadPredictions, err := PredictCPUStatsFromTimeSeriesModel(namespaces, promClient, false)
-	// if err != nil {
-	// 	log.Printf("Error predicting stats from time series model: %v", err)
-	// }
-	// namespaceVsWorkloadPredictionsPSIAdjusted, err := PredictCPUStatsFromTimeSeriesModel(namespaces, promClient, true)
-	// if err != nil {
-	// 	log.Printf("Error predicting stats from time series model: %v", err)
-	// }
-	// namespaceVsWorkloadMemoryPredictions, err := PredictMemoryStatsFromTimeSeriesModel(namespaces, promClient)
-	// if err != nil {
-	// 	log.Printf("Error predicting memory stats from time series model: %v", err)
-	// }
 
 	namespaceVsSimpleCPUPredictions, err := utils.PredictSimpleStatsFromTimeSeriesModel(ctx, namespaces, c.promClient.GetClient(), "cpu", isPSIEnabled)
 	if err != nil {
 		logging.Errorf(ctx, "Error predicting simple CPU stats from time series model: %v", err)
-		return err
+		return fmt.Errorf("failed to predict simple CPU stats: %w", err)
 	}
 	var namespaceVsSimpleMemoryPredictions map[string]map[string]utils.SimplePrediction
 	if !c.config.Metadata.SkipMemory {
 		namespaceVsSimpleMemoryPredictions, err = utils.PredictSimpleStatsFromTimeSeriesModel(ctx, namespaces, c.promClient.GetClient(), "memory", isPSIEnabled)
 		if err != nil {
 			logging.Errorf(ctx, "Error predicting simple memory stats from time series model: %v", err)
-			return err
+			return fmt.Errorf("failed to predict simple memory stats: %w", err)
 		}
 	}
 
@@ -160,14 +147,14 @@ func (c *CreateStatsTask) Run(ctx context.Context) error {
 		err = utils.CheckHPAOnCPU(ctx, c.dynamicClient, targetNamespace, workloadHpaCpuMap)
 		if err != nil {
 			logging.Errorf(ctx, "Error checking HPA status: %v", err)
-			return err
+			return fmt.Errorf("failed to check HPA on CPU: %w", err)
 		}
 	}
 
 	pdbCache, err := utils.FetchPDBsForNamespaces(ctx, c.kubeClient, namespaces)
 	if err != nil {
 		logging.Errorf(ctx, "Error fetching PDBs: %v", err)
-		return err
+		return fmt.Errorf("failed to fetch PDBs for namespaces: %w", err)
 	}
 
 	// namespaceVsWorkloadPredictions := map[string]map[string]contextutils.WorkloadPrediction{}

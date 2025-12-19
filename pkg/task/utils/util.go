@@ -524,7 +524,8 @@ func GetWorkloadKey(kind, namespace, name string) string {
 	return fmt.Sprintf("%s:%s:%s", kind, namespace, name)
 }
 
-func ParseWorkloadKey(rawKey string) (kind, namespace, name string, ok bool) {
+// ParseWorkloadKey parses workload key in format kind:namespace:name
+func ParseWorkloadKey(rawKey string) (string, string, string, bool) {
 	parts := strings.Split(rawKey, ":")
 	if len(parts) != 3 {
 		return "", "", "", false
@@ -536,7 +537,8 @@ func GetWorkloadContainerKey(kind, namespace, name, containerName string) string
 	return fmt.Sprintf("%s:%s:%s:%s", kind, namespace, name, containerName)
 }
 
-func ParseWorkloadContainerKey(rawKey string) (kind, namespace, workloadName, containerName string, ok bool) {
+// ParseWorkloadContainerKey parses workload container key in format kind:namespace:workloadName:containerName
+func ParseWorkloadContainerKey(rawKey string) (string, string, string, string, bool) {
 	parts := strings.Split(rawKey, ":")
 	if len(parts) != 4 {
 		return "", "", "", "", false
@@ -544,7 +546,7 @@ func ParseWorkloadContainerKey(rawKey string) (kind, namespace, workloadName, co
 	return parts[0], parts[1], parts[2], parts[3], true
 }
 
-func ExtractWorkloadFromReplicaSet(replicaSetName string) (deploymentName string, isDeployment bool) {
+func ExtractWorkloadFromReplicaSet(replicaSetName string) (string, bool) {
 	re := regexp.MustCompile(`^(.+)-[a-f0-9]{6,12}$`)
 	if matches := re.FindStringSubmatch(replicaSetName); len(matches) == 2 {
 		return matches[1], true
