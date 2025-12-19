@@ -12,10 +12,6 @@ global:
     existingSecret:
       name: ""  # Name of existing Kubernetes secret containing PostgreSQL credentials
       keys:
-        # Keys in the secret for PostgreSQL chart
-        postgresPasswordKey: ""  # Key for PostgreSQL admin password
-        userPasswordKey: ""               # Key for user password
-        # Keys in the secret for cruisekubeController environment variables
         hostKey: ""                  # Key for PostgreSQL host
         portKey: ""                  # Key for PostgreSQL port
         databaseKey: ""                # Key for database name
@@ -70,18 +66,18 @@ cruisekubeController:
       memory: 128Mi
   volumeMounts: []
   env:
-    POSTGRES_HOST: "{{ .Values.global.postgresql.host }}"
-    POSTGRES_PORT: "{{ .Values.global.postgresql.port }}"
-    POSTGRES_DB: "{{ .Values.global.postgresql.auth.database }}"
-    POSTGRES_USER: "{{ .Values.global.postgresql.auth.username }}"
-    POSTGRES_PASSWORD: "{{ .Values.global.postgresql.auth.password }}"
+    CRUISEKUBE_DB_HOST: "{{ .Values.global.postgresql.host }}"
+    CRUISEKUBE_DB_PORT: "{{ .Values.global.postgresql.port }}"
+    CRUISEKUBE_DB_DATABASE: "{{ .Values.global.postgresql.auth.database }}"
+    CRUISEKUBE_DB_USERNAME: "{{ .Values.global.postgresql.auth.username }}"
+    CRUISEKUBE_DB_PASSWORD: "{{ .Values.global.postgresql.auth.password }}"
   envFromSecret:
-    - name: POSTGRES_PASSWORD
+    - name: CRUISEKUBE_DB_PASSWORD
       valueFrom:
         secretKeyRef:
           name: "{{ .Values.global.postgresql.existingSecret.name }}"
           key: "{{ .Values.global.postgresql.existingSecret.keys.userPasswordKey }}"
-    - name: POSTGRES_HOST
+    - name: CRUISEKUBE_DB_HOST
       valueFrom:
         secretKeyRef:
           name: "{{ .Values.global.postgresql.existingSecret.name }}"
@@ -163,14 +159,12 @@ cruisekubeWebhook:
 
 postgresql:
   # Automatically disable PostgreSQL when using external secret (external database)
-  enabled: "{{ if .Values.global.postgresql.existingSecret.name }}false{{ else }}true{{ end }}"
+  enabled: false
+  namespaceOverride: "cruisekube-system"
   auth:
     username: "{{ .Values.global.postgresql.auth.username }}"
     password: "{{ .Values.global.postgresql.auth.password }}"
     database: "{{ .Values.global.postgresql.auth.database }}"
-    existingSecret: "{{ .Values.global.postgresql.existingSecret.name }}"
-    secretKeys:
-      userPasswordKey: "{{ .Values.global.postgresql.existingSecret.keys.userPasswordKey }}"
   primary:
     persistence:
       enabled: true
