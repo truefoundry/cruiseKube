@@ -7,6 +7,7 @@ import (
 )
 
 type Database interface {
+	Close() error
 	// Upsert
 	UpsertStat(clusterID, workloadID string, stat types.WorkloadStat, generatedAt time.Time) error
 
