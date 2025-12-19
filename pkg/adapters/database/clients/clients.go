@@ -1,16 +1,13 @@
 package clients
 
 import (
-	"fmt"
-
 	"gorm.io/gorm"
 )
 
 const (
-	TYPE_SQLITE     = "sqlite"
-	TYPE_POSTGRES   = "postgres"
-	TYPE_POSTGRESQL = "postgresql"
-	TYPE_DEFAULT    = ""
+	TYPE_SQLITE   = "sqlite"
+	TYPE_POSTGRES = "postgres"
+	TYPE_DEFAULT  = ""
 )
 
 // FactoryConfig holds configuration for database connections
@@ -34,9 +31,9 @@ func CreateClientFactory(config FactoryConfig) (ClientFactory, error) {
 	switch config.Type {
 	case TYPE_SQLITE, TYPE_DEFAULT:
 		return NewSQLiteClientFactory(config.Database), nil
-	case TYPE_POSTGRES, TYPE_POSTGRESQL:
+	case TYPE_POSTGRES:
 		return NewPostgreSQLClientFactory(config), nil
 	default:
-		return nil, fmt.Errorf("unsupported database type: %s", config.Type)
+		return NewSQLiteClientFactory(config.Database), nil
 	}
 }
