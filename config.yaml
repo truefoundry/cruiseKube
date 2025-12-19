@@ -53,9 +53,17 @@ webhook:
   statsURL:
     host: "http://localhost:8080"
     tfyClusterToken: "<cluster-token>"
+# db:
+#   type: sqlite
+#   database: "stats-data/cruisekube.db"
 db:
-  type: sqlite
-  database: "stats-data/cruisekube.db"
+  type: postgres
+  host: localhost
+  port: 5432
+  database: cruisekube
+  username: cruisekube
+  password: cruisekube
+  sslmode: disable
 recommendationSettings:
   newWorkloadThresholdHours: 1
   disableMemoryApplication: true

@@ -390,7 +390,7 @@ main() {
     
     # check_prerequisites
     # create_kind_cluster
-    # build_and_load_image
+    build_and_load_image
     # setup_namespaces
     # add_helm_repos
     # install_prometheus
