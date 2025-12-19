@@ -42,4 +42,10 @@ webhook:
   statsURL:
     host: "localhost:8080"
 db:
-  filePath: "stats-data/cruisekube.db"
+  type: postgres
+  host: localhost
+  port: 5432
+  database: cruisekube
+  username: cruisekube_user
+  password: your_password_here
+  sslmode: disable

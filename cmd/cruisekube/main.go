@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/truefoundry/cruisekube/pkg/adapters/database/sqlite"
+	"github.com/truefoundry/cruisekube/pkg/adapters/database"
 	"github.com/truefoundry/cruisekube/pkg/adapters/kube"
 	"github.com/truefoundry/cruisekube/pkg/adapters/metricsProvider/prometheus"
 	"github.com/truefoundry/cruisekube/pkg/cluster"
@@ -156,13 +156,21 @@ func setupControllerMode(ctx context.Context, cfg *config.Config) {
 	////////
 	// Storage Repo
 	////////
-	SQLiteAdapter, err := sqlite.NewSQLiteAdapter(cfg.DB.FilePath)
+	DatabaseAdapter, err := database.NewDatabase(database.DatabaseConfig{
+		Type:     cfg.DB.Type,
+		Host:     cfg.DB.Host,
+		Port:     cfg.DB.Port,
+		Database: cfg.DB.Database,
+		Username: cfg.DB.Username,
+		Password: cfg.DB.Password,
+		SSLMode:  cfg.DB.SSLMode,
+	})
 	if err != nil {
 		logging.Fatalf(ctx, "Failed to initialize database: %v", err)
 	}
-	logging.Infof(ctx, "SQLite Adapter initialized")
+	logging.Infof(ctx, "Database initialized")
 
-	storageRepo, err := storage.NewStorageRepo(SQLiteAdapter)
+	storageRepo, err := storage.NewStorageRepo(DatabaseAdapter)
 	if err != nil {
 		logging.Fatalf(ctx, "Failed to initialize storage: %v", err)
 	}

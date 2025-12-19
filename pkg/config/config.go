@@ -77,7 +77,13 @@ type WebhookConfig struct {
 }
 
 type DatabaseConfig struct {
-	FilePath string `yaml:"filePath" mapstructure:"filePath"`
+	Type     string `yaml:"type" json:"type"`         // "sqlite" or "postgres"
+	Host     string `yaml:"host" json:"host"`         // For postgres
+	Port     int    `yaml:"port" json:"port"`         // For postgres
+	Database string `yaml:"database" json:"database"` // Database name or file path
+	Username string `yaml:"username" json:"username"` // For postgres
+	Password string `yaml:"password" json:"password"` // For postgres
+	SSLMode  string `yaml:"sslmode" json:"sslmode"`   // For postgres
 }
 
 type RecommendationSettings struct {
