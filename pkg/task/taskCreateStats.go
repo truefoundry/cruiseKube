@@ -124,19 +124,6 @@ func (c *CreateStatsTask) Run(ctx context.Context) error {
 		return fmt.Errorf("failed to fetch stats for namespaces: %w", err)
 	}
 
-	// namespaceVsWorkloadPredictions, err := PredictCPUStatsFromTimeSeriesModel(namespaces, promClient, false)
-	// if err != nil {
-	// 	log.Printf("Error predicting stats from time series model: %v", err)
-	// }
-	// namespaceVsWorkloadPredictionsPSIAdjusted, err := PredictCPUStatsFromTimeSeriesModel(namespaces, promClient, true)
-	// if err != nil {
-	// 	log.Printf("Error predicting stats from time series model: %v", err)
-	// }
-	// namespaceVsWorkloadMemoryPredictions, err := PredictMemoryStatsFromTimeSeriesModel(namespaces, promClient)
-	// if err != nil {
-	// 	log.Printf("Error predicting memory stats from time series model: %v", err)
-	// }
-
 	namespaceVsSimpleCPUPredictions, err := utils.PredictSimpleStatsFromTimeSeriesModel(ctx, namespaces, c.promClient.GetClient(), "cpu", isPSIEnabled)
 	if err != nil {
 		logging.Errorf(ctx, "Error predicting simple CPU stats from time series model: %v", err)
