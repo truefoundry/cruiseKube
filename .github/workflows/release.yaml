@@ -27,6 +27,7 @@ jobs:
         with:
           fetch-depth: "0"
           submodules: true
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install yq
         run: |
