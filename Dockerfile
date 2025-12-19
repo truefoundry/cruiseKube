@@ -6,7 +6,7 @@ COPY go.mod go.sum ./
 RUN go mod download
 COPY ./cmd ./cmd
 COPY ./pkg ./pkg
-# The sqlite driver wouldn't work without CGO_ENABLED=1
+
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o cruisekube cmd/cruisekube/main.go
 
 # Runtime stage
