@@ -15,7 +15,6 @@ RUN apk --no-cache add ca-certificates tzdata sqlite
 WORKDIR /app
 COPY --from=builder /app/cruisekube .
 COPY config.yaml /app/config.yaml
-COPY web /app/web
 RUN mkdir -p /app/data
 EXPOSE 8080
 CMD ["./cruisekube"]
