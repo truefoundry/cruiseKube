@@ -7,7 +7,7 @@ RUN go mod download
 COPY ./cmd ./cmd
 COPY ./pkg ./pkg
 # The sqlite driver wouldn't work without CGO_ENABLED=1
-RUN CGO_ENABLED=1 GOOS=linux go build -a -installsuffix cgo -o cruisekube cmd/cruisekube/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o cruisekube cmd/cruisekube/main.go
 
 # Runtime stage
 FROM public.ecr.aws/docker/library/alpine:3.22
