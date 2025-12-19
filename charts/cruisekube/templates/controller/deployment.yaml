@@ -45,6 +45,28 @@ spec:
           resources:
             {{- toYaml .Values.cruisekubeController.resources | nindent 12 }}
           env:
+            {{- if .Values.global.postgresql.auth }}
+            {{- if .Values.global.postgresql.auth.host }}
+            - name: CRUISEKUBE_DB_HOST
+              value: {{ .Values.global.postgresql.auth.host | quote }}
+            {{- end }}
+            {{- if .Values.global.postgresql.auth.port }}
+            - name: CRUISEKUBE_DB_PORT
+              value: {{ .Values.global.postgresql.auth.port | toString | quote }}
+            {{- end }}
+            {{- if .Values.global.postgresql.auth.username }}
+            - name: CRUISEKUBE_DB_USERNAME
+              value: {{ .Values.global.postgresql.auth.username | quote }}
+            {{- end }}
+            {{- if .Values.global.postgresql.auth.password }}
+            - name: CRUISEKUBE_DB_PASSWORD
+              value: {{ .Values.global.postgresql.auth.password | quote }}
+            {{- end }}
+            {{- if .Values.global.postgresql.auth.database }}
+            - name: CRUISEKUBE_DB_DATABASE
+              value: {{ .Values.global.postgresql.auth.database | quote }}
+            {{- end }}
+            {{- end }}
             {{- range $key, $value := .Values.cruisekubeController.env }}
             - name: {{ $key }}
               value: {{ $value | quote }}

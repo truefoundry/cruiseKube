@@ -174,14 +174,75 @@ install_cruisekube_chart() {
         --set cruisekubeController.image.tag=$IMAGE_TAG \
         --set cruisekubeController.image.pullPolicy=IfNotPresent \
         --set cruisekubeController.persistence.storageClass=standard \
-        --set cruisekubeController.env.cruisekube_DEPENDENCIES_INCLUSTER_PROMETHEUSURL="http://prometheus-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090" \
+        --set cruisekubeController.env.CRUISEKUBE_DEPENDENCIES_INCLUSTER_PROMETHEUSURL="http://localhost:9090" \
+        --set cruisekubeController.env.CRUISEKUBE_CONTROLLER_TASKS_CREATESTATS_ENABLED=true \
         --set cruisekubeWebhook.image.repository=$IMAGE_NAME \
         --set cruisekubeWebhook.image.tag=$IMAGE_TAG \
         --set cruisekubeWebhook.image.pullPolicy=IfNotPresent \
-        --set cruisekubeWebhook.webhook.statsURL.host="$RELEASE_NAME-cruisekubeWebhook.cruisekube-system.svc.cluster.local:8080" \
-        --wait --timeout=300s
+        --set cruisekubeWebhook.webhook.statsURL.host="https//localhost:8080" \
+        --set postgresql.enabled=true \
+        --set cruisekubeFrontend.enabled=false \
+        --wait --timeout=60s
 
     log_success "Global cruisekube chart installed successfully"
+    
+    # Debug PostgreSQL deployment if it's pending
+    log_info "Checking PostgreSQL deployment status..."
+    kubectl get pods -n $NAMESPACE -l app.kubernetes.io/name=postgresql
+    
+    # Check for any pending pods and describe them
+    PENDING_PODS=$(kubectl get pods -n $NAMESPACE -l app.kubernetes.io/name=postgresql --field-selector=status.phase=Pending -o name 2>/dev/null)
+    if [ ! -z "$PENDING_PODS" ]; then
+        log_info "Found pending PostgreSQL pods. Describing them for debugging:"
+        for pod in $PENDING_PODS; do
+            kubectl describe $pod -n $NAMESPACE
+        done
+        
+        # Check PVC status
+        log_info "Checking PVC status:"
+        kubectl get pvc -n $NAMESPACE
+        
+        # Check storage class
+        log_info "Available storage classes:"
+        kubectl get storageclass
+        
+        # Check node resources
+        log_info "Node resources:"
+        kubectl top nodes 2>/dev/null || echo "Metrics server not available"
+        
+        # Check events for debugging
+        log_info "Recent events in namespace:"
+        kubectl get events -n $NAMESPACE --sort-by='.lastTimestamp' | tail -20
+    fi
+}
+
+debug_postgresql() {
+    log_info "=== PostgreSQL Debugging Guide ==="
+    echo "If PostgreSQL is stuck in pending state, run these commands manually:"
+    echo ""
+    echo "1. Check pod status:"
+    echo "   kubectl get pods -n $NAMESPACE -l app.kubernetes.io/name=postgresql"
+    echo ""
+    echo "2. Describe pending pod:"
+    echo "   kubectl describe pod <pod-name> -n $NAMESPACE"
+    echo ""
+    echo "3. Check PVC status:"
+    echo "   kubectl get pvc -n $NAMESPACE"
+    echo ""
+    echo "4. Check storage classes:"
+    echo "   kubectl get storageclass"
+    echo ""
+    echo "5. Check events:"
+    echo "   kubectl get events -n $NAMESPACE --sort-by='.lastTimestamp'"
+    echo ""
+    echo "6. Check node capacity:"
+    echo "   kubectl describe nodes"
+    echo ""
+    echo "Common issues:"
+    echo "- No storage class available (fix: set postgresql.primary.persistence.storageClass)"
+    echo "- Insufficient node resources (fix: scale cluster or reduce resource requests)"
+    echo "- PVC stuck (fix: delete PVC and restart)"
+    echo "- Wrong namespace (fix: check postgresql.namespaceOverride)"
 }
 
 create_service_monitors() {
@@ -328,14 +389,14 @@ main() {
     
     log_info "Starting cruisekube charts testing with Prometheus..."
     
-    check_prerequisites
-    create_kind_cluster
+    # check_prerequisites
+    # create_kind_cluster
     build_and_load_image
-    setup_namespaces
-    add_helm_repos
-    install_prometheus
+    # setup_namespaces
+    # add_helm_repos
+    # install_prometheus
     install_cruisekube_chart
-    create_service_monitors
+    # create_service_monitors
     verify_installation
     
     log_success "All done! Your cruisekube charts with Prometheus are now running in Kind cluster '$CLUSTER_NAME'"

@@ -1,10 +1,18 @@
+global:
+  postgresql:
+    auth:
+      host: "cruisekube-postgresql"
+      port:
+      username: "cruisekube"
+      password: "cruisekube"
+      database: "cruisekube"
 cruisekubeController:
   enabled: true
   replicas: 1
   image:
     repository: tfy.jfrog.io/tfy-images/cruisekube
     imagePullPolicy: IfNotPresent
-    tag: "0.1.6"
+    tag: "0.1.7"
   imagePullSecrets: []
   nameOverride: ""
   fullnameOverride: ""
@@ -55,7 +63,7 @@ cruisekubeWebhook:
   image:
     repository: tfy.jfrog.io/tfy-images/cruisekube
     imagePullPolicy: IfNotPresent
-    tag: "0.1.6"
+    tag: "0.1.7"
   imagePullSecrets: []
   nameOverride: ""
   fullnameOverride: ""
@@ -121,13 +129,29 @@ cruisekubeWebhook:
       memory: 128Mi
   env: {}
 
+
+postgresql:
+  enabled: false
+  primary:
+    persistence:
+      enabled: true
+      size: 2Gi
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+
+
 cruisekubeFrontend:
   enabled: true
   replicas: 1
   image:
     repository: tfy.jfrog.io/tfy-images/cruisekube-frontend
     imagePullPolicy: IfNotPresent
-    tag: "0.1.6"
+    tag: "0.1.7"
   imagePullSecrets: []
   nameOverride: ""
   fullnameOverride: ""
