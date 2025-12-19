@@ -83,7 +83,7 @@ jobs:
       image_tag: ${{ needs.read-chart-values.outputs.cruisekube_frontend_tag }}
       image_artifact_name: "cruisekube-frontend"
       dockerfile_path: "cruiseKube-frontend/Dockerfile"
-      context: "cruiseKube-frontend"
+      image_context: "cruiseKube-frontend"
       artifactory_registry_url: ${{ vars.TRUEFOUNDRY_ARTIFACTORY_REGISTRY_URL }}
       artifactory_repository_url: ${{ vars.TRUEFOUNDRY_ARTIFACTORY_PUBLIC_REPOSITORY }}
       platforms: 'linux/amd64'
