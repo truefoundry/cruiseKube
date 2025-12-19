@@ -1,21 +1,11 @@
 global:
   postgresql:
-    # Connection details
-    host: "cruisekube-postgresql"  # Default to in-cluster PostgreSQL service, override for external PostgreSQL
-    port: "5432"
-    # Authentication - use either direct values OR existingSecret
+    host: "cruisekube-postgresql"
+    port:
     auth:
       username: "cruisekube"
       password: "cruisekube"
       database: "cruisekube"
-    # Kubernetes secret configuration (takes precedence over auth fields if set)
-    existingSecret:
-      name: ""  # Name of existing Kubernetes secret containing PostgreSQL credentials
-      keys:
-        hostKey: ""                  # Key for PostgreSQL host
-        portKey: ""                  # Key for PostgreSQL port
-        databaseKey: ""                # Key for database name
-        usernameKey: ""              # Key for username
 cruisekubeController:
   enabled: true
   replicas: 1
@@ -66,24 +56,10 @@ cruisekubeController:
       memory: 128Mi
   volumeMounts: []
   env:
-    CRUISEKUBE_DB_TYPE: "postgres"
     CRUISEKUBE_DB_HOST: "{{ .Values.global.postgresql.host }}"
-    CRUISEKUBE_DB_PORT: "{{ .Values.global.postgresql.port }}"
     CRUISEKUBE_DB_USERNAME: "{{ .Values.global.postgresql.auth.username }}"
     CRUISEKUBE_DB_PASSWORD: "{{ .Values.global.postgresql.auth.password }}"
     CRUISEKUBE_DB_DATABASE: "{{ .Values.global.postgresql.auth.database }}"
-  envFromSecret: 
-    # - name: CRUISEKUBE_DB_PASSWORD
-    #   valueFrom:
-    #     secretKeyRef:
-    #       name: "{{ .Values.global.postgresql.existingSecret.name }}"
-    #       key: "{{ .Values.global.postgresql.existingSecret.keys.userPasswordKey }}"
-    # - name: CRUISEKUBE_DB_HOST
-    #   valueFrom:
-    #     secretKeyRef:
-    #       name: "{{ .Values.global.postgresql.existingSecret.name }}"
-    #       key: "{{ .Values.global.postgresql.existingSecret.keys.hostKey }}"
-
 
 cruisekubeWebhook:
   enabled: true

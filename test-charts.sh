@@ -174,11 +174,12 @@ install_cruisekube_chart() {
         --set cruisekubeController.image.tag=$IMAGE_TAG \
         --set cruisekubeController.image.pullPolicy=IfNotPresent \
         --set cruisekubeController.persistence.storageClass=standard \
-        --set cruisekubeController.env.CRUISEKUBE_DEPENDENCIES_INCLUSTER_PROMETHEUSURL="http://prometheus-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090" \
+        --set cruisekubeController.env.CRUISEKUBE_DEPENDENCIES_INCLUSTER_PROMETHEUSURL="http://localhost:9090" \
+        --set cruisekubeController.env.CRUISEKUBE_CONTROLLER_TASKS_CREATESTATS_ENABLED=true \
         --set cruisekubeWebhook.image.repository=$IMAGE_NAME \
         --set cruisekubeWebhook.image.tag=$IMAGE_TAG \
         --set cruisekubeWebhook.image.pullPolicy=IfNotPresent \
-        --set cruisekubeWebhook.webhook.statsURL.host="$RELEASE_NAME-cruisekubeWebhook.cruisekube-system.svc.cluster.local:8080" \
+        --set cruisekubeWebhook.webhook.statsURL.host="https//localhost:8080" \
         --set postgresql.enabled=true \
         --set cruisekubeFrontend.enabled=false \
         --wait --timeout=60s
