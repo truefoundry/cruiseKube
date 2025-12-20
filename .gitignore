@@ -52,5 +52,5 @@ analysis/__pycache__/
 config-local.yaml
 config-local-oss.yaml
 charts/cruisekube/charts
-
+pkg/adapters/database/models_test.go
 
