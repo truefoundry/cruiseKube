@@ -2,7 +2,7 @@ global:
   postgresql:
     auth:
       host: "cruisekube-postgresql"
-      port:
+      port: 5432
       username: "cruisekube"
       password: "cruisekube"
       database: "cruisekube"
