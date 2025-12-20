@@ -112,10 +112,6 @@ func (s *GormDB) UpsertStat(clusterID, workloadID string, stat types.WorkloadSta
 		return fmt.Errorf("failed to upsert stats: %w", result.Error)
 	}
 
-	// Debug logging
-	fmt.Printf("DEBUG UpsertStat: ClusterID=%s, WorkloadID=%s, RowsAffected=%d, RecordID=%d\n",
-		clusterID, workloadID, result.RowsAffected, rowStat.ID)
-
 	return nil
 }
 
