@@ -12,7 +12,7 @@ cruisekubeController:
   image:
     repository: tfy.jfrog.io/tfy-images/cruisekube
     imagePullPolicy: IfNotPresent
-    tag: "0.1.7"
+    tag: "0.1.8"
   imagePullSecrets: []
   nameOverride: ""
   fullnameOverride: ""
@@ -63,7 +63,7 @@ cruisekubeWebhook:
   image:
     repository: tfy.jfrog.io/tfy-images/cruisekube
     imagePullPolicy: IfNotPresent
-    tag: "0.1.7"
+    tag: "0.1.8"
   imagePullSecrets: []
   nameOverride: ""
   fullnameOverride: ""
@@ -151,7 +151,7 @@ cruisekubeFrontend:
   image:
     repository: tfy.jfrog.io/tfy-images/cruisekube-frontend
     imagePullPolicy: IfNotPresent
-    tag: "0.1.7"
+    tag: "0.1.8"
   imagePullSecrets: []
   nameOverride: ""
   fullnameOverride: ""
