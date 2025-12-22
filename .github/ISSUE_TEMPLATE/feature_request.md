@@ -1,6 +1,6 @@
 ---
 name: Feature request
-about: Suggest a feature for cruisekube
+about: Suggest a feature for CruiseKube
 title: '[FEATURE] '
 labels: 'enhancement'
 assignees: ''
