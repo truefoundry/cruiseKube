@@ -65,7 +65,7 @@ sequenceDiagram
 ```
 
 1. Connects to target cluster prometheus and cluster
-2. Calculates stats related to CPU usage, CPU pressure, memory usage, OOM instances etc
+2. Calculates stats related to CPU usage, CPU pressure, memory usage, OOM instances etc.
 3. Stores the calculated telemetry into database
 
 ### **Runtime Optimizer Flow**
