@@ -55,7 +55,7 @@ sequenceDiagram
   participant DB as Database
 
   loop Every scrape/aggregation interval
-    T->>S: Listh Pods, Nodes (metadata)
+    T->>S: List Pods, Nodes (metadata)
     T->>P: Query metrics (usage, throttling, pressure)
     T->>T: Calculate stats per namespace/workload/container
     T->>T: Compute aggregates (e.g., percentiles, peaks, trends)
