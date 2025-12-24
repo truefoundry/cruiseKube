@@ -120,13 +120,11 @@ nav:
   - Getting started:
       - Introduction: src/gs-introduction.md
       - Installation: src/installation.md
-      - Concepts:
-          - Tasks: src/concepts-tasks.md
-          - Metrics Provider: src/concepts-metrics.md
-          - Database: src/concepts-database.md
-      - Configuration:
-          - Helm Values: src/config-fields.md
-          - Environment Variables: src/config-env.md
+      - Configuration: src/config.md
+      # - Concepts:
+      #     - Tasks: src/concepts-tasks.md
+      #     - Metrics Provider: src/concepts-metrics.md
+      #     - Database: src/concepts-database.md
   - Architecture:
       - Architecture: src/arch-overview.md
   - Development:
