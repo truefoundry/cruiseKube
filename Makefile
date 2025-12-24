@@ -3,7 +3,6 @@
 help:
 	@echo "Available targets:"
 	@echo "  test              - Run tests"
-	@echo "  build             - Build images"
 	@echo "  help              - Show this help message"
 
 test:
