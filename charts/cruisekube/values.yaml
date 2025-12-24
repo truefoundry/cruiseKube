@@ -1,47 +1,84 @@
+## @section Global parameters
 global:
   postgresql:
     auth:
+      ## @param global.postgresql.auth.host PostgreSQL hostname
       host: "cruisekube-postgresql"
+      ## @param global.postgresql.auth.port PostgreSQL port number
       port: 5432
+      ## @param global.postgresql.auth.username PostgreSQL username
       username: "cruisekube"
+      ## @param global.postgresql.auth.password PostgreSQL password
       password: "cruisekube"
+      ## @param global.postgresql.auth.database PostgreSQL database name
       database: "cruisekube"
+## @section CruiseKube Controller parameters
+
 cruisekubeController:
+  ## @param cruisekubeController.enabled Enable CruiseKube Controller deployment
   enabled: true
+  ## @param cruisekubeController.replicas Number of CruiseKube Controller replicas to deploy
   replicas: 1
   image:
+    ## @param cruisekubeController.image.repository CruiseKube Controller image repository
     repository: tfy.jfrog.io/tfy-images/cruisekube
+    ## @param cruisekubeController.image.imagePullPolicy CruiseKube Controller image pull policy
     imagePullPolicy: IfNotPresent
+    ## @param cruisekubeController.image.tag CruiseKube Controller image tag (immutable tags are recommended)
     tag: "0.1.8"
+  ## @param cruisekubeController.imagePullSecrets [array] CruiseKube Controller image pull secrets
   imagePullSecrets: []
+  ## @param cruisekubeController.nameOverride String to partially override cruisekube.fullname
   nameOverride: ""
+  ## @param cruisekubeController.fullnameOverride String to fully override cruisekube.fullname
   fullnameOverride: ""
   controller:
+    ## @param cruisekubeController.controller.mode Controller mode (inCluster or external)
     mode: "inCluster"
   serviceAccount:
+    ## @param cruisekubeController.serviceAccount.create Specifies whether a ServiceAccount should be created
     create: true
+    ## @param cruisekubeController.serviceAccount.name The name of the ServiceAccount to use
     name: ""
   rbac:
+    ## @param cruisekubeController.rbac.create Specifies whether RBAC resources should be created
     create: true
   persistence:
+    ## @param cruisekubeController.persistence.enabled Enable persistence using Persistent Volume Claims
     enabled: true
+    ## @param cruisekubeController.persistence.size Persistent Volume size
     size: 5Gi
+    ## @param cruisekubeController.persistence.storageClass Persistent Volume storage class
     storageClass: ""
+    ## @param cruisekubeController.persistence.accessMode Persistent Volume access mode
     accessMode: ReadWriteOnce
+    ## @param cruisekubeController.persistence.mountPath Persistent Volume mount path
     mountPath: /app/stats-data
+    ## @param cruisekubeController.persistence.annotations [object] Additional custom annotations for the PVC
     annotations: {}
+  ## @param cruisekubeController.podAnnotations [object] Annotations for CruiseKube Controller pods
   podAnnotations: {}
+  ## @param cruisekubeController.podLabels [object] Extra labels for CruiseKube Controller pods
   podLabels: {}
   service:
+    ## @param cruisekubeController.service.type CruiseKube Controller service type
     type: ClusterIP
+    ## @param cruisekubeController.service.httpPort CruiseKube Controller service HTTP port
     httpPort: 8080
+    ## @param cruisekubeController.service.metricsPort CruiseKube Controller service metrics port
     metricsPort: 8081
+    ## @param cruisekubeController.service.annotations [object] Additional custom annotations for the service
     annotations: {}
   serviceMonitor:
+    ## @param cruisekubeController.serviceMonitor.enabled Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator
     enabled: true
+    ## @param cruisekubeController.serviceMonitor.jobLabel The name of the label on the target service to use as the job name in Prometheus
     jobLabel: cruisekube-controller
+    ## @param cruisekubeController.serviceMonitor.additionalLabels [object] Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus
     additionalLabels: {}
+    ## @param cruisekubeController.serviceMonitor.additionalAnnotations [object] Additional annotations for the ServiceMonitor resource(s)
     additionalAnnotations: {}
+    ## @param cruisekubeController.serviceMonitor.endpoints [array] ServiceMonitor endpoints configuration
     endpoints:
       - port: metrics
         path: /metrics
@@ -49,72 +86,119 @@ cruisekubeController:
         scrapeTimeout: 10s
   resources:
     limits:
+      ## @param cruisekubeController.resources.limits.cpu The resources limits (CPU) for the CruiseKube Controller containers
       cpu: 500m
+      ## @param cruisekubeController.resources.limits.memory The resources limits (memory) for the CruiseKube Controller containers
       memory: 512Mi
     requests:
+      ## @param cruisekubeController.resources.requests.cpu The requested resources (CPU) for the CruiseKube Controller containers
       cpu: 100m
+      ## @param cruisekubeController.resources.requests.memory The requested resources (memory) for the CruiseKube Controller containers
       memory: 128Mi
+  ## @param cruisekubeController.volumeMounts [array] Optionally specify extra list of additional volumeMounts for the CruiseKube Controller container(s)
   volumeMounts: []
+  ## @param cruisekubeController.env [object] Environment variables to configure CruiseKube Controller
   env: {}
 
+## @section CruiseKube Webhook parameters
+
 cruisekubeWebhook:
+  ## @param cruisekubeWebhook.enabled Enable CruiseKube Webhook deployment
   enabled: true
+  ## @param cruisekubeWebhook.replicas Number of CruiseKube Webhook replicas to deploy
   replicas: 1
   image:
+    ## @param cruisekubeWebhook.image.repository CruiseKube Webhook image repository
     repository: tfy.jfrog.io/tfy-images/cruisekube
+    ## @param cruisekubeWebhook.image.imagePullPolicy CruiseKube Webhook image pull policy
     imagePullPolicy: IfNotPresent
+    ## @param cruisekubeWebhook.image.tag CruiseKube Webhook image tag (immutable tags are recommended)
     tag: "0.1.8"
+  ## @param cruisekubeWebhook.imagePullSecrets [array] CruiseKube Webhook image pull secrets
   imagePullSecrets: []
+  ## @param cruisekubeWebhook.nameOverride String to partially override cruisekube.fullname
   nameOverride: ""
+  ## @param cruisekubeWebhook.fullnameOverride String to fully override cruisekube.fullname
   fullnameOverride: ""
   webhook:
+    ## @param cruisekubeWebhook.webhook.certsDir Directory path for webhook certificates
     certsDir: "/certs"
     statsURL:
+      ## @param cruisekubeWebhook.webhook.statsURL.host Stats URL host for webhook
       host: ""
   mutatingWebhookConfiguration:
+    ## @param cruisekubeWebhook.mutatingWebhookConfiguration.clusterID Cluster ID for mutating webhook configuration
     clusterID: "default"
+    ## @param cruisekubeWebhook.mutatingWebhookConfiguration.timeoutSeconds Timeout in seconds for webhook calls
     timeoutSeconds: 10
+    ## @param cruisekubeWebhook.mutatingWebhookConfiguration.failurePolicy Failure policy for webhook (Ignore or Fail)
     failurePolicy: "Ignore"
     namespaceSelector:
+      ## @param cruisekubeWebhook.mutatingWebhookConfiguration.namespaceSelector.excludeNamespaces [array] Namespaces to exclude from webhook processing
       excludeNamespaces:
         - "kube-public"
         - "kube-node-lease"
         - "local-path-storage"
   certGen:
+    ## @param cruisekubeWebhook.certGen.enabled Enable certificate generation for webhook
     enabled: true
     image:
+      ## @param cruisekubeWebhook.certGen.image.repository Certificate generator image repository
       repository: registry.k8s.io/ingress-nginx/kube-webhook-certgen
+      ## @param cruisekubeWebhook.certGen.image.imagePullPolicy Certificate generator image pull policy
       imagePullPolicy: IfNotPresent
+      ## @param cruisekubeWebhook.certGen.image.tag Certificate generator image tag
       tag: v1.5.2
     resources:
       limits:
+        ## @param cruisekubeWebhook.certGen.resources.limits.cpu The resources limits (CPU) for the certificate generator containers
         cpu: 100m
+        ## @param cruisekubeWebhook.certGen.resources.limits.memory The resources limits (memory) for the certificate generator containers
         memory: 128Mi
       requests:
+        ## @param cruisekubeWebhook.certGen.resources.requests.cpu The requested resources (CPU) for the certificate generator containers
         cpu: 10m
+        ## @param cruisekubeWebhook.certGen.resources.requests.memory The requested resources (memory) for the certificate generator containers
         memory: 32Mi
     rbac:
+      ## @param cruisekubeWebhook.certGen.rbac.create Specifies whether RBAC resources should be created for certificate generator
       create: true
     serviceAccount:
+      ## @param cruisekubeWebhook.certGen.serviceAccount.create Specifies whether a ServiceAccount should be created for certificate generator
       create: true
+      ## @param cruisekubeWebhook.certGen.serviceAccount.name The name of the ServiceAccount to use for certificate generator
       name: ""
   rbac:
+    ## @param cruisekubeWebhook.rbac.create Specifies whether RBAC resources should be created
     create: true
+  ## @param cruisekubeWebhook.podAnnotations [object] Annotations for CruiseKube Webhook pods
   podAnnotations: {}
+  ## @param cruisekubeWebhook.podLabels [object] Extra labels for CruiseKube Webhook pods
   podLabels: {}
   serviceAccount:
+    ## @param cruisekubeWebhook.serviceAccount.create Specifies whether a ServiceAccount should be created
     create: true
+    ## @param cruisekubeWebhook.serviceAccount.name The name of the ServiceAccount to use
     name: ""
   service:
+    ## @param cruisekubeWebhook.service.type CruiseKube Webhook service type
     type: ClusterIP
+    ## @param cruisekubeWebhook.service.httpsPort CruiseKube Webhook service HTTPS port
     httpsPort: 8443
+    ## @param cruisekubeWebhook.service.metricsPort CruiseKube Webhook service metrics port
     metricsPort: 8081
+    ## @param cruisekubeWebhook.service.annotations [object] Additional custom annotations for the service
     annotations: {}
   serviceMonitor:
+    ## @param cruisekubeWebhook.serviceMonitor.enabled Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator
     enabled: true
+    ## @param cruisekubeWebhook.serviceMonitor.jobLabel The name of the label on the target service to use as the job name in Prometheus
     jobLabel: cruisekube-webhook
+    ## @param cruisekubeWebhook.serviceMonitor.additionalLabels [object] Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus
     additionalLabels: {}
+    ## @param cruisekubeWebhook.serviceMonitor.additionalAnnotations [object] Additional annotations for the ServiceMonitor resource(s)
     additionalAnnotations: {}
+    ## @param cruisekubeWebhook.serviceMonitor.endpoints [array] ServiceMonitor endpoints configuration
     endpoints:
       - port: metrics
         path: /metrics
@@ -122,51 +206,86 @@ cruisekubeWebhook:
         scrapeTimeout: 10s
   resources:
     limits:
+      ## @param cruisekubeWebhook.resources.limits.cpu The resources limits (CPU) for the CruiseKube Webhook containers
       cpu: 500m
+      ## @param cruisekubeWebhook.resources.limits.memory The resources limits (memory) for the CruiseKube Webhook containers
       memory: 512Mi
     requests:
+      ## @param cruisekubeWebhook.resources.requests.cpu The requested resources (CPU) for the CruiseKube Webhook containers
       cpu: 100m
+      ## @param cruisekubeWebhook.resources.requests.memory The requested resources (memory) for the CruiseKube Webhook containers
       memory: 128Mi
+  ## @param cruisekubeWebhook.env [object] Environment variables to configure CruiseKube Webhook
   env: {}
 
 
+## @section PostgreSQL parameters
+
 postgresql:
+  ## @param postgresql.enabled Switch to enable or disable the PostgreSQL helm chart
   enabled: false
   primary:
     persistence:
+      ## @param postgresql.primary.persistence.enabled Enable PostgreSQL Primary data persistence using PVC
       enabled: true
+      ## @param postgresql.primary.persistence.size PVC Storage Request for PostgreSQL volume
       size: 2Gi
     resources:
       limits:
+        ## @param postgresql.primary.resources.limits.cpu The resources limits (CPU) for the PostgreSQL Primary containers
         cpu: 500m
+        ## @param postgresql.primary.resources.limits.memory The resources limits (memory) for the PostgreSQL Primary containers
         memory: 512Mi
       requests:
+        ## @param postgresql.primary.resources.requests.cpu The requested resources (CPU) for the PostgreSQL Primary containers
         cpu: 100m
+        ## @param postgresql.primary.resources.requests.memory The requested resources (memory) for the PostgreSQL Primary containers
         memory: 128Mi
 
 
+## @section CruiseKube Frontend parameters
+
 cruisekubeFrontend:
+  ## @param cruisekubeFrontend.enabled Enable CruiseKube Frontend deployment
   enabled: true
+  ## @param cruisekubeFrontend.replicas Number of CruiseKube Frontend replicas to deploy
   replicas: 1
   image:
+    ## @param cruisekubeFrontend.image.repository CruiseKube Frontend image repository
     repository: tfy.jfrog.io/tfy-images/cruisekube-frontend
+    ## @param cruisekubeFrontend.image.imagePullPolicy CruiseKube Frontend image pull policy
     imagePullPolicy: IfNotPresent
+    ## @param cruisekubeFrontend.image.tag CruiseKube Frontend image tag (immutable tags are recommended)
     tag: "0.1.8"
+  ## @param cruisekubeFrontend.imagePullSecrets [array] CruiseKube Frontend image pull secrets
   imagePullSecrets: []
+  ## @param cruisekubeFrontend.nameOverride String to partially override cruisekube.fullname
   nameOverride: ""
+  ## @param cruisekubeFrontend.fullnameOverride String to fully override cruisekube.fullname
   fullnameOverride: ""
+  ## @param cruisekubeFrontend.podAnnotations [object] Annotations for CruiseKube Frontend pods
   podAnnotations: {}
+  ## @param cruisekubeFrontend.podLabels [object] Extra labels for CruiseKube Frontend pods
   podLabels: {}
   service:
+    ## @param cruisekubeFrontend.service.type CruiseKube Frontend service type
     type: ClusterIP
+    ## @param cruisekubeFrontend.service.httpPort CruiseKube Frontend service HTTP port
     httpPort: 3000
+    ## @param cruisekubeFrontend.service.annotations [object] Additional custom annotations for the service
     annotations: {}
+  ## @param cruisekubeFrontend.backendURL Backend URL for the frontend to connect to
   backendURL: ""
   resources:
     limits:
+      ## @param cruisekubeFrontend.resources.limits.cpu The resources limits (CPU) for the CruiseKube Frontend containers
       cpu: 200m
+      ## @param cruisekubeFrontend.resources.limits.memory The resources limits (memory) for the CruiseKube Frontend containers
       memory: 256Mi
     requests:
+      ## @param cruisekubeFrontend.resources.requests.cpu The requested resources (CPU) for the CruiseKube Frontend containers
       cpu: 50m
+      ## @param cruisekubeFrontend.resources.requests.memory The requested resources (memory) for the CruiseKube Frontend containers
       memory: 64Mi
+  ## @param cruisekubeFrontend.env [object] Environment variables to configure CruiseKube Frontend
   env: {}
