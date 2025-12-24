@@ -1,4 +1,3 @@
 Abhishek Choudhary <abhishek@truefoundry.com> @innoavator
 Shubham Rai <shubham@truefoundry.com> @shubhamrai1993
 Raman Tehlan <raman@truefoundry.com> @ramantehlan
-Maanas Singh  @maanas-23
