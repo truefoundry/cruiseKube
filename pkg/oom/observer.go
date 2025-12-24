@@ -18,7 +18,7 @@ import (
 type Info struct {
 	ContainerID string
 	Timestamp   time.Time
-	Memory      int64 // Memory at OOM (limit if set, otherwise calculated)
+	Memory      int64
 }
 
 type Observer struct {
@@ -73,13 +73,14 @@ func (o *Observer) OnAdd(_ any, _ bool) {}
 func (o *Observer) OnDelete(_ any)      {}
 
 func (o *Observer) checkContainersForOOM(oldPod, newPod *apiv1.Pod) {
-	allContainerStatuses := append(newPod.Status.ContainerStatuses, newPod.Status.InitContainerStatuses...)
+	var allContainerStatuses []apiv1.ContainerStatus
+	allContainerStatuses = append(allContainerStatuses, newPod.Status.ContainerStatuses...)
+	allContainerStatuses = append(allContainerStatuses, newPod.Status.InitContainerStatuses...)
 
 	for _, containerStatus := range allContainerStatuses {
 		if containerStatus.RestartCount > 0 &&
 			containerStatus.LastTerminationState.Terminated != nil &&
 			containerStatus.LastTerminationState.Terminated.Reason == "OOMKilled" {
-
 			oldStatus := findStatus(containerStatus.Name, append(oldPod.Status.ContainerStatuses, oldPod.Status.InitContainerStatuses...))
 			if oldStatus != nil && containerStatus.RestartCount > oldStatus.RestartCount {
 				workloadInfo := utils.GetWorkloadInfoFromPod(newPod)

@@ -255,7 +255,6 @@ func (w *WorkloadStat) GetOriginalContainerResource(containerName string) (*Orig
 	return nil, fmt.Errorf("container %s not found in workload %s", containerName, w.WorkloadIdentifier)
 }
 
-// OOMEvent represents an Out Of Memory event for a container
 type OOMEvent struct {
 	ID          uint      `json:"id"`
 	ClusterID   string    `json:"cluster_id"`
