@@ -119,12 +119,9 @@ nav:
   - Home: index.md
   - Getting started:
       - Introduction: src/gs-introduction.md
+      - Concepts: src/concepts-tasks.md
       - Installation: src/installation.md
       - Configuration: src/config.md
-      # - Concepts:
-      #     - Tasks: src/concepts-tasks.md
-      #     - Metrics Provider: src/concepts-metrics.md
-      #     - Database: src/concepts-database.md
   - Architecture:
       - Architecture: src/arch-overview.md
   - Development:

@@ -18,7 +18,7 @@ hide:
     </div>
   </div>
    <div class="hero-image">
-    <img src="images/hero-2.png" alt="Illustration of CruiseKube">
+    <img src="images/hero.png" alt="Illustration of CruiseKube">
   </div>
 </div>
 

@@ -32,9 +32,6 @@ controller:
     nodeLoadMonitoring:
       enabled: false
       schedule: "60s"
-    evictionForce:
-      enabled: false
-      schedule: "1m"
     fetchMetrics:
       enabled: false
       schedule: "1m"
