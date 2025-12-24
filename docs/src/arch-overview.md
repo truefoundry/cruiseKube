@@ -1,6 +1,49 @@
 # Overview
 
-![Architecture Overview](../images/architecture-overview.png)
+```mermaid
+flowchart LR
+    %% Actor
+    Human((Human))
+
+    %% Kubernetes Cluster Boundary
+    subgraph K8s[Kubernetes Cluster]
+        direction LR
+
+        %% Frontend
+        Frontend[Frontend]
+
+        %% Controller
+        subgraph Controller
+            direction TB
+            Stats[Statistics Engine]
+            Runtime[Runtime Optimizer]
+        end
+
+        %% API Server
+        APIServer[kube-api-server]
+
+        %% Webhook
+        subgraph Webhook
+            Admission[Admission Optimizer]
+        end
+
+        %% Data & Metrics
+        Database[(Database)]
+        Prometheus[Prometheus]
+    end
+
+    %% User Flow
+    Human --> Frontend
+    Frontend --> Controller
+
+    %% Control Plane Flow
+    Controller --> APIServer
+    APIServer <--> Webhook
+
+    %% Data Flow
+    Controller --> Database
+    Webhook --> Database
+    Controller --> Prometheus
 
 By default, the **CruiseKube Helm chart** deploys:
 
