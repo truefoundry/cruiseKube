@@ -124,14 +124,14 @@ func (o *Observer) checkContainersForOOM(oldPod, newPod *apiv1.Pod) {
 }
 
 func (o *Observer) onEvictionEvent(ctx context.Context, event *apiv1.Event) {
-	for _, oomInfo := range o.parseEvictionEvent(event) {
+	for _, oomInfo := range o.parseEvictionEvent(ctx, event) {
 		logging.Infof(ctx, "OOM event observed: containerID=%s, limit=%d bytes, request=%d bytes", oomInfo.ContainerID, oomInfo.MemoryLimit, oomInfo.MemoryRequest)
 		// TODO: Confirm if handling Eviction events separately is necessary
-		//o.observedOomsChannel <- oomInfo
+		// o.observedOomsChannel <- oomInfo
 	}
 }
 
-func (o *Observer) parseEvictionEvent(event *apiv1.Event) []Info {
+func (o *Observer) parseEvictionEvent(_ context.Context, event *apiv1.Event) []Info {
 	if event.Reason != "Evicted" || event.InvolvedObject.Kind != "Pod" {
 		return nil
 	}
