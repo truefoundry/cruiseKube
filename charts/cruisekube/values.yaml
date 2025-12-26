@@ -34,7 +34,7 @@ cruisekubeController:
   fullnameOverride: ""
   controller:
     ## @param cruisekubeController.controller.mode Controller mode (inCluster or external)
-    mode: "inCluster"
+    mode: "in-cluster"
   serviceAccount:
     ## @param cruisekubeController.serviceAccount.create Specifies whether a ServiceAccount should be created
     create: true
@@ -99,7 +99,6 @@ cruisekubeController:
   volumeMounts: []
   ## @param cruisekubeController.env [object] Environment variables to configure CruiseKube Controller. It is used to update the default values in the config file.
   env:
-    CRUISEKUBE_CONTROLLERMODE: "inCluster"
     CRUISEKUBE_DEPENDENCIES_LOCAL_KUBECONFIGPATH: ""
     CRUISEKUBE_DEPENDENCIES_LOCAL_PROMETHEUSURL: "http://localhost:9090"
     CRUISEKUBE_DEPENDENCIES_INCLUSTER_PROMETHEUSURL: ""
