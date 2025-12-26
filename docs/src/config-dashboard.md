@@ -8,7 +8,7 @@ The dashboard is exposed as a Kubernetes Service and can be accessed in several 
 
 ### **Using kubectl port-forward**
 ```bash
-kubectl port-forward -n cruisekube svc/cruisekube-dashboard 8080:80
+kubectl port-forward -n cruisekube-system svc/cruisekube-frontend 3000:3000
 ```
 
 ### **Using ingress (if configured)**
