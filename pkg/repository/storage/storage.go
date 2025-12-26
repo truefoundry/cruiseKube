@@ -85,3 +85,19 @@ func (s *Storage) GetAllStatsForCluster(clusterID string) ([]types.WorkloadStat,
 	}
 	return stats, nil
 }
+
+// OOM Event Methods
+func (s *Storage) InsertOOMEvent(event *types.OOMEvent) error {
+	if err := s.DB.InsertOOMEvent(event); err != nil {
+		return fmt.Errorf("failed to insert OOM event: %w", err)
+	}
+	return nil
+}
+
+func (s *Storage) GetOOMEventsByWorkload(clusterID, workloadID string, since time.Time) ([]types.OOMEvent, error) {
+	events, err := s.DB.GetOOMEventsByWorkload(clusterID, workloadID, since)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get OOM events for workload: %w", err)
+	}
+	return events, nil
+}

@@ -13,6 +13,7 @@ import (
 	"github.com/truefoundry/cruisekube/pkg/config"
 	"github.com/truefoundry/cruisekube/pkg/contextutils"
 	"github.com/truefoundry/cruisekube/pkg/middleware"
+	"github.com/truefoundry/cruisekube/pkg/oom"
 	"github.com/truefoundry/cruisekube/pkg/repository/storage"
 	"github.com/truefoundry/cruisekube/pkg/server"
 	"github.com/truefoundry/cruisekube/pkg/task"
@@ -248,6 +249,28 @@ func setupControllerMode(ctx context.Context, cfg *config.Config) {
 			logging.Fatalf(ctx, "HTTP server failed: %v", err)
 		}
 	}()
+
+	////////
+	// Start OOM Observer and Processor
+	////////
+	for ID, cluster := range clusterManager.GetAllClusters() {
+		oomObserver := oom.NewObserver(cluster.KubeClient)
+		oomProcessor := oom.NewProcessor(storageRepo, cluster.KubeClient, ID)
+
+		namespace := ""
+		if cfg.Controller.TargetNamespace != "" {
+			namespace = cfg.Controller.TargetNamespace
+		}
+
+		if err := oomObserver.Start(ctx, cluster.KubeClient, namespace); err != nil {
+			logging.Errorf(ctx, "Failed to start OOM observer for cluster %s: %v", ID, err)
+		} else {
+			logging.Infof(ctx, "OOM observer started for cluster %s", ID)
+		}
+
+		oomProcessor.Start(ctx, oomObserver)
+		logging.Infof(ctx, "OOM processor started for cluster %s", ID)
+	}
 
 	////////
 	// Add tasks to cluster manager

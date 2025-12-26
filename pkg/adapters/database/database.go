@@ -10,6 +10,7 @@ import (
 	"github.com/truefoundry/cruisekube/pkg/ports"
 	"github.com/truefoundry/cruisekube/pkg/types"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 // DatabaseConfig holds configuration for database connections
@@ -71,6 +72,9 @@ func (s *GormDB) createTables() error {
 	// Use GORM's AutoMigrate for both new and existing tables
 	if err := s.db.AutoMigrate(&Stats{}); err != nil {
 		return fmt.Errorf("failed to auto-migrate RowStats: %w", err)
+	}
+	if err := s.db.AutoMigrate(&OOMEvent{}); err != nil {
+		return fmt.Errorf("failed to auto-migrate OOMEvent: %w", err)
 	}
 	return nil
 }
@@ -274,4 +278,55 @@ func (s *GormDB) UpdateStatOverridesForWorkload(clusterID, workloadID string, ov
 	}
 
 	return nil
+}
+
+func (s *GormDB) InsertOOMEvent(event *types.OOMEvent) error {
+	dbEvent := OOMEvent{
+		ClusterID:          event.ClusterID,
+		ContainerID:        event.ContainerID,
+		Timestamp:          event.Timestamp,
+		MemoryLimit:        event.MemoryLimit,
+		MemoryRequest:      event.MemoryRequest,
+		LastObservedMemory: event.LastObservedMemory,
+	}
+
+	result := s.db.Clauses(clause.OnConflict{
+		Columns:   []clause.Column{{Name: "cluster_id"}, {Name: "container_id"}, {Name: "timestamp"}},
+		DoNothing: true,
+	}).Create(&dbEvent)
+
+	if result.Error != nil {
+		return fmt.Errorf("failed to insert OOM event: %w", result.Error)
+	}
+
+	return nil
+}
+
+func (s *GormDB) GetOOMEventsByWorkload(clusterID, workloadID string, since time.Time) ([]types.OOMEvent, error) {
+	var dbEvents []OOMEvent
+	likePattern := workloadID + ":%"
+	err := s.db.Where("cluster_id = ? AND container_id LIKE ? AND timestamp >= ?", clusterID, likePattern, since).
+		Order("timestamp DESC").
+		Find(&dbEvents).Error
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to query OOM events: %w", err)
+	}
+
+	events := make([]types.OOMEvent, 0, len(dbEvents))
+	for _, dbEvent := range dbEvents {
+		events = append(events, types.OOMEvent{
+			ID:                 dbEvent.ID,
+			ClusterID:          dbEvent.ClusterID,
+			ContainerID:        dbEvent.ContainerID,
+			Timestamp:          dbEvent.Timestamp,
+			MemoryLimit:        dbEvent.MemoryLimit,
+			MemoryRequest:      dbEvent.MemoryRequest,
+			LastObservedMemory: dbEvent.LastObservedMemory,
+			CreatedAt:          dbEvent.CreatedAt,
+			UpdatedAt:          dbEvent.UpdatedAt,
+		})
+	}
+
+	return events, nil
 }

@@ -29,4 +29,8 @@ type Database interface {
 
 	// Update
 	UpdateStatOverridesForWorkload(clusterID, workloadID string, overrides *types.Overrides) error
+
+	// OOM Events
+	InsertOOMEvent(event *types.OOMEvent) error
+	GetOOMEventsByWorkload(clusterID, workloadID string, since time.Time) ([]types.OOMEvent, error)
 }
