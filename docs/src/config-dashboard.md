@@ -33,9 +33,9 @@ You can configure optimization policies and settings for your workloads through 
 1. **Recomment Mode** (Disabled): No optimization is applied to the workload.
 2. **Cruise Mode** (Enabled): CruiseKube applies optimization to the workload based on the configured policies.
 3. **Priority**: We use a notion of per-workload priority to make sure the lower priority workloads are evicted first if possible. Workloads with single replica or part of a statefulset are kept at a higher priority by default.
-      - **High**: High priority workloads are protected from eviction.
-      - **Medium**: Medium priority workloads are protected from eviction second.
-      - **Low**: Low priority workloads are protected from eviction last.
-      - **No-Eviction**: No-eviction workloads are protected from eviction.
+      - **Low**: Low priority workloads are evicted first. This is the priority for most workloads by default
+      - **Medium**: Medium priority workloads are evicted next. Single replica or statefulset workloads are set to this value by default
+      - **High**: High priority workloads are evicted as a last resort
+      - **No-Eviction**: No-eviction workloads are never evicted at all
 
 <img src="../../images/demo_toggle_explain.png" alt="Workload Toggle Explanation" width="1000"/>
