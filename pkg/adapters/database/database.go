@@ -10,6 +10,7 @@ import (
 	"github.com/truefoundry/cruisekube/pkg/ports"
 	"github.com/truefoundry/cruisekube/pkg/types"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 // DatabaseConfig holds configuration for database connections
@@ -281,13 +282,19 @@ func (s *GormDB) UpdateStatOverridesForWorkload(clusterID, workloadID string, ov
 
 func (s *GormDB) InsertOOMEvent(event *types.OOMEvent) error {
 	dbEvent := OOMEvent{
-		ClusterID:   event.ClusterID,
-		ContainerID: event.ContainerID,
-		Timestamp:   event.Timestamp,
-		Memory:      event.Memory,
+		ClusterID:          event.ClusterID,
+		ContainerID:        event.ContainerID,
+		Timestamp:          event.Timestamp,
+		MemoryLimit:        event.MemoryLimit,
+		MemoryRequest:      event.MemoryRequest,
+		LastObservedMemory: event.LastObservedMemory,
 	}
 
-	result := s.db.Create(&dbEvent)
+	result := s.db.Clauses(clause.OnConflict{
+		Columns:   []clause.Column{{Name: "cluster_id"}, {Name: "container_id"}, {Name: "timestamp"}},
+		DoNothing: true,
+	}).Create(&dbEvent)
+
 	if result.Error != nil {
 		return fmt.Errorf("failed to insert OOM event: %w", result.Error)
 	}
@@ -309,13 +316,15 @@ func (s *GormDB) GetOOMEventsByWorkload(clusterID, workloadID string, since time
 	events := make([]types.OOMEvent, 0, len(dbEvents))
 	for _, dbEvent := range dbEvents {
 		events = append(events, types.OOMEvent{
-			ID:          dbEvent.ID,
-			ClusterID:   dbEvent.ClusterID,
-			ContainerID: dbEvent.ContainerID,
-			Timestamp:   dbEvent.Timestamp,
-			Memory:      dbEvent.Memory,
-			CreatedAt:   dbEvent.CreatedAt,
-			UpdatedAt:   dbEvent.UpdatedAt,
+			ID:                 dbEvent.ID,
+			ClusterID:          dbEvent.ClusterID,
+			ContainerID:        dbEvent.ContainerID,
+			Timestamp:          dbEvent.Timestamp,
+			MemoryLimit:        dbEvent.MemoryLimit,
+			MemoryRequest:      dbEvent.MemoryRequest,
+			LastObservedMemory: dbEvent.LastObservedMemory,
+			CreatedAt:          dbEvent.CreatedAt,
+			UpdatedAt:          dbEvent.UpdatedAt,
 		})
 	}
 

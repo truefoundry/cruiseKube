@@ -256,11 +256,13 @@ func (w *WorkloadStat) GetOriginalContainerResource(containerName string) (*Orig
 }
 
 type OOMEvent struct {
-	ID          uint      `json:"id"`
-	ClusterID   string    `json:"cluster_id"`
-	ContainerID string    `json:"container_id"`
-	Timestamp   time.Time `json:"timestamp"`
-	Memory      int64     `json:"memory"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	ID                 uint      `json:"id"`
+	ClusterID          string    `json:"cluster_id"`
+	ContainerID        string    `json:"container_id"`
+	Timestamp          time.Time `json:"timestamp"`
+	MemoryLimit        int64     `json:"memory_limit"`
+	MemoryRequest      int64     `json:"memory_request"`
+	LastObservedMemory int64     `json:"last_observed_memory"`
+	CreatedAt          time.Time `json:"created_at"`
+	UpdatedAt          time.Time `json:"updated_at"`
 }

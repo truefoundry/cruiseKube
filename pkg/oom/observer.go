@@ -2,6 +2,7 @@ package oom
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"time"
 
@@ -16,9 +17,11 @@ import (
 )
 
 type Info struct {
-	ContainerID string
-	Timestamp   time.Time
-	Memory      int64
+	ContainerID        string
+	Timestamp          time.Time
+	MemoryLimit        int64
+	MemoryRequest      int64
+	LastObservedMemory int64
 }
 
 type Observer struct {
@@ -41,7 +44,10 @@ func (o *Observer) GetObservedOomsChannel() chan Info {
 }
 
 func (o *Observer) Start(ctx context.Context, kubeClient kubernetes.Interface, namespace string) error {
-	podInformer := setupPodInformer(ctx, kubeClient, o, namespace, o.stopCh)
+	podInformer, err := setupPodInformer(ctx, kubeClient, o, namespace, o.stopCh)
+	if err != nil {
+		return fmt.Errorf("failed to setup pod informer: %w", err)
+	}
 	o.podInformer = podInformer
 
 	watchEventsWithRetries(ctx, kubeClient, o.onEvictionEvent, namespace)
@@ -59,11 +65,11 @@ func (o *Observer) Stop() error {
 func (o *Observer) OnUpdate(oldObj, newObj any) {
 	oldPod, ok := oldObj.(*apiv1.Pod)
 	if !ok {
-		return
+		panic("invalid old object type")
 	}
 	newPod, ok := newObj.(*apiv1.Pod)
 	if !ok {
-		return
+		panic("invalid new object type")
 	}
 
 	o.checkContainersForOOM(oldPod, newPod)
@@ -92,17 +98,22 @@ func (o *Observer) checkContainersForOOM(oldPod, newPod *apiv1.Pod) {
 
 				containerSpec := findContainerSpec(containerStatus.Name, newPod.Spec.Containers, newPod.Spec.InitContainers)
 				if containerSpec != nil {
-					var memory int64
+					var memoryLimit int64
+					var memoryRequest int64
+
 					if lim, ok := containerSpec.Resources.Limits[apiv1.ResourceMemory]; ok {
-						memory = lim.Value()
-					} else if req, ok := containerSpec.Resources.Requests[apiv1.ResourceMemory]; ok {
-						memory = req.Value()
+						memoryLimit = lim.Value()
+					}
+					if req, ok := containerSpec.Resources.Requests[apiv1.ResourceMemory]; ok {
+						memoryRequest = req.Value()
 					}
 
 					oomInfo := Info{
-						ContainerID: containerID,
-						Timestamp:   containerStatus.LastTerminationState.Terminated.FinishedAt.Time,
-						Memory:      memory,
+						ContainerID:        containerID,
+						Timestamp:          containerStatus.LastTerminationState.Terminated.FinishedAt.Time,
+						MemoryLimit:        memoryLimit,
+						MemoryRequest:      memoryRequest,
+						LastObservedMemory: memoryLimit,
 					}
 
 					o.observedOomsChannel <- oomInfo
@@ -112,9 +123,11 @@ func (o *Observer) checkContainersForOOM(oldPod, newPod *apiv1.Pod) {
 	}
 }
 
-func (o *Observer) onEvictionEvent(event *apiv1.Event) {
+func (o *Observer) onEvictionEvent(ctx context.Context, event *apiv1.Event) {
 	for _, oomInfo := range o.parseEvictionEvent(event) {
-		o.observedOomsChannel <- oomInfo
+		logging.Infof(ctx, "OOM event observed: containerID=%s, limit=%d bytes, request=%d bytes", oomInfo.ContainerID, oomInfo.MemoryLimit, oomInfo.MemoryRequest)
+		// TODO: Confirm if handling Eviction events separately is necessary
+		//o.observedOomsChannel <- oomInfo
 	}
 }
 
@@ -163,23 +176,29 @@ func (o *Observer) parseEvictionEvent(event *apiv1.Event) []Info {
 
 		containerID := utils.GetWorkloadContainerKey(workloadInfo.Kind, workloadInfo.Namespace, workloadInfo.Name, container)
 
-		var memoryAtOOM int64
+		var memoryLimit int64
+		var memoryRequest int64
 		containerSpec := findContainerSpec(container, pod.Spec.Containers, pod.Spec.InitContainers)
 		if containerSpec != nil {
 			if lim, ok := containerSpec.Resources.Limits[apiv1.ResourceMemory]; ok {
-				memoryAtOOM = lim.Value()
-			} else if req, ok := containerSpec.Resources.Requests[apiv1.ResourceMemory]; ok {
-				memoryAtOOM = req.Value()
+				memoryLimit = lim.Value()
+			}
+			if req, ok := containerSpec.Resources.Requests[apiv1.ResourceMemory]; ok {
+				memoryRequest = req.Value()
 			}
 		}
-		if memoryAtOOM == 0 {
-			memoryAtOOM = memory.Value()
+		if memoryLimit == 0 {
+			memoryLimit = memory.Value()
 		}
 
+		actualMemoryUsage := memory.Value()
+
 		oomInfo := Info{
-			ContainerID: containerID,
-			Timestamp:   event.CreationTimestamp.Time,
-			Memory:      memoryAtOOM,
+			ContainerID:        containerID,
+			Timestamp:          event.CreationTimestamp.Time,
+			MemoryLimit:        memoryLimit,
+			MemoryRequest:      memoryRequest,
+			LastObservedMemory: actualMemoryUsage,
 		}
 		results = append(results, oomInfo)
 	}

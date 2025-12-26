@@ -255,7 +255,7 @@ func setupControllerMode(ctx context.Context, cfg *config.Config) {
 	////////
 	for ID, cluster := range clusterManager.GetAllClusters() {
 		oomObserver := oom.NewObserver(cluster.KubeClient)
-		oomProcessor := oom.NewProcessor(DatabaseAdapter, cluster.KubeClient, ID)
+		oomProcessor := oom.NewProcessor(storageRepo, cluster.KubeClient, ID)
 
 		namespace := ""
 		if cfg.Controller.TargetNamespace != "" {

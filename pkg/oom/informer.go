@@ -2,6 +2,7 @@ package oom
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	apiv1 "k8s.io/api/core/v1"
@@ -26,8 +27,9 @@ func setupPodInformer(
 	resourceEventHandler cache.ResourceEventHandler,
 	namespace string,
 	stopCh <-chan struct{},
-) cache.SharedIndexInformer {
+) (cache.SharedIndexInformer, error) {
 	// Skip watching pending pods (only Running, Unknown, Succeeded, Failed)
+	// Similar logic to https://github.com/kubernetes/autoscaler/blob/f5c59050c1872dee2be33472a8e987f9e1fb1424/vertical-pod-autoscaler/pkg/recommender/input/cluster_feeder.go#L166
 	selector := fields.ParseSelectorOrDie("status.phase!=" + string(apiv1.PodPending))
 	podListWatch := cache.NewListWatchFromClient(
 		kubeClient.CoreV1().RESTClient(),
@@ -45,25 +47,22 @@ func setupPodInformer(
 
 	_, err := informer.AddEventHandler(resourceEventHandler)
 	if err != nil {
-		logging.Errorf(ctx, "Failed to add OOM event handler to pod informer: %v", err)
-		return nil
+		return nil, fmt.Errorf("failed to add oom event handler to pod informer: %w", err)
 	}
 
 	go informer.Run(stopCh)
-
 	if !cache.WaitForCacheSync(stopCh, informer.HasSynced) {
-		logging.Errorf(ctx, "Failed to sync Pod cache for OOM observer")
-	} else {
-		logging.Infof(ctx, "OOM observer pod informer cache synced successfully")
+		return nil, fmt.Errorf("failed to sync pod cache for oom observer")
 	}
 
-	return informer
+	logging.Infof(ctx, "OOM observer pod informer cache synced successfully")
+	return informer, nil
 }
 
 func watchEventsWithRetries(
 	ctx context.Context,
 	kubeClient kubernetes.Interface,
-	handler func(*apiv1.Event),
+	handler func(context.Context, *apiv1.Event),
 	namespace string,
 ) {
 	go func() {
@@ -97,7 +96,7 @@ func watchEventsWithRetries(
 	}()
 }
 
-func watchEvents(ctx context.Context, eventChan <-chan watch.Event, handler func(*apiv1.Event)) {
+func watchEvents(ctx context.Context, eventChan <-chan watch.Event, handler func(context.Context, *apiv1.Event)) {
 	for {
 		select {
 		case <-ctx.Done():
@@ -109,7 +108,7 @@ func watchEvents(ctx context.Context, eventChan <-chan watch.Event, handler func
 			}
 			if watchEvent.Type == watch.Added {
 				if event, ok := watchEvent.Object.(*apiv1.Event); ok {
-					handler(event)
+					handler(ctx, event)
 				}
 			}
 		}
