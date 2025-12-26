@@ -22,25 +22,15 @@ CruiseKube explicitly addresses the **pod-level right-sizing problem**, in a ful
 CruiseKube operates as a closed-loop system through a set of **periodic background tasks**.
 Each task has a clearly defined responsibility and can be enabled or disabled independently.
 
-1. <u>**Create Stats Task:**</u>
-Builds persistent, workload-level CPU and memory statistics from Kubernetes state and Prometheus metrics.
-These stats form the foundation for all optimization decisions and are stored for reuse. Read about the [architecture here](arch-overview.md#statistics-engine).
+1. [**Create Stats Task:**](arch-overview.md#statistics-engine)
+Builds persistent, workload-level CPU and memory statistics from Kubernetes state and Prometheus metrics. These stats form the foundation for all optimization decisions and are stored for reuse.
 
-1. <u>**Fetch Metrics Task:**</u>
-Collects cluster-wide and node-level health signals such as utilization, pressure, OOMs, and scheduling issues.
-Primarily used for observability, dashboards, and safety guardrails.
+2. [**Apply Recommendation Task:**](arch-overview.md#runtime-optimizer-flow)
+Generates and applies CPU and memory recommendations to workloads in a controlled, incremental manner. This is the core task responsible for actually right-sizing workloads.
 
-1. <u>**Apply Recommendation Task:**</u>
-Generates and applies CPU and memory recommendations to workloads in a controlled, incremental manner.
-This is the core task responsible for actually right-sizing workloads. Read about the [architecture here](arch-overview.md#runtime-optimizer-flow).
-
-1. <u>**Modify Equal CPU Resources Task:**</u>
-Fixes containers where CPU request and limit are equal, allowing them to burst and reducing throttling risk.
-Applies minimal, safe corrections at the workload spec level.
-
-1. <u>**Node Load Monitoring Task:**</u>
-Monitors node load and temporarily taints overloaded nodes to prevent further scheduling.
-Acts as a safety mechanism to protect cluster stability during optimization.
+1. **Fetch Metrics Task**
+2. **Modify Equal CPU Resources Task**
+3. **Node Load Monitoring Task**
 
 Together, these tasks allow CruiseKube to continuously optimize resources **without relying on manual tuning or reactive scaling**.
 
@@ -50,5 +40,5 @@ CruiseKube stores its persistent data in a PostgreSQL database. The database sch
 
 ## Configuration Dashboard
 
-CruiseKube provides a web-based configuration dashboard that allows you to view and enable/disable recommendations for different workloads. You can monitor the impact CruiseKube will have when enabled. The dashboard is accessible via a frontend service deployed within the cluster.
+CruiseKube provides a web-based configuration dashboard that allows you to view and enable/disable recommendations for different workloads. You can monitor the impact CruiseKube will have when enabled. The dashboard is accessible via a frontend service deployed within the cluster. Read more about it in the [Configuration Dashboard](config-dashboard.md) section.
 

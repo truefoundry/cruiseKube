@@ -91,6 +91,11 @@ hide:
       </div>
     </div>
   </div>
+  <div class="demo-image">
+
+<img src="./images/demo_recommendation.png" alt="Recommendation Demo"/>
+<img src="./images/demo_workload_toggle.png" alt="Workload Toggle"/>
+</div>
 </div>
 
 

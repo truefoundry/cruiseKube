@@ -1,6 +1,6 @@
 # Site
 site_name: CruiseKube
-site_url: https://truefoundry.github.io/CruiseKube
+site_url: http://localhost:8000
 site_author: TrueFoundry
 site_description: >-
   CruiseKube is an intelligent Kubernetes resource optimization controller that automatically monitors, analyzes, and applies resource recommendations to improve cluster efficiency and reduce costs.
@@ -19,6 +19,7 @@ theme:
   name: material
   logo: images/logo/cruiseKube_White.png
   favicon: images/logo/favicon/favicon.ico
+  custom_dir: docs/overrides
   font:
     text: Roboto
     code: Roboto Mono
@@ -40,7 +41,7 @@ theme:
     # - announce.dismiss
     # - content.action.edit
     # - content.action.view
-    # - content.code.annotate
+    - content.code.annotate
     - content.code.copy
     # - content.code.select
     # - content.footnote.tooltips
@@ -113,15 +114,97 @@ extra:
       link: https://github.com/truefoundry
     - icon: fontawesome/brands/x-twitter
       link: https://x.com/truefoundry
+  structured_data:
+    organization:
+      "@context": "https://schema.org"
+      "@type": "Organization"
+      name: "TrueFoundry"
+      url: "https://truefoundry.com"
+      logo: "https://truefoundry.github.io/cruiseKube/images/logo/cruiseKube_Colour.png"
+      sameAs:
+        - "https://github.com/truefoundry"
+        - "https://discord.gg/Dqek4xJa3N"
+    software:
+      "@context": "https://schema.org"
+      "@type": "SoftwareApplication"
+      name: "CruiseKube"
+      applicationCategory: "DeveloperApplication"
+      operatingSystem: "Kubernetes"
+      description: "CruiseKube is an intelligent Kubernetes resource optimization controller that automatically monitors, analyzes, and applies resource recommendations to improve cluster efficiency and reduce costs."
+      url: "https://cruisekube.dev"
+      downloadUrl: "https://github.com/truefoundry/CruiseKube"
+      author:
+        "@type": "Organization"
+        name: "TrueFoundry"
+        url: "https://truefoundry.com"
+      license: "https://github.com/truefoundry/cruiseKube/blob/main/LICENSE"
+      programmingLanguage: "Go"
+      keywords: 
+        - "Kubernetes"
+        - "Resource Optimization"
+        - "Operator"
+        - "Cloud Native"
+    website:
+      "@context": "https://schema.org"
+      "@type": "WebSite"
+      name: "CruiseKube Documentation"
+      url: "https://truefoundry.github.io/cruiseKube"
+      description: "Official documentation for CruiseKube - Kubernetes resource optimization controller"
+      publisher:
+        "@type": "Organization"
+        name: "TrueFoundry"
+        url: "https://truefoundry.com"
+      potentialAction:
+        "@type": "SearchAction"
+        target: "https://truefoundry.github.io/cruiseKube/search/?q={search_term_string}"
+        "query-input": "required name=search_term_string"
+    breadcrumb:
+      "@context": "https://schema.org"
+      "@type": "BreadcrumbList"
+      itemListElement:
+        - "@type": "ListItem"
+          position: 1
+          name: "Home"
+          item: "https://truefoundry.github.io/cruiseKube"
+    documentation:
+      "@context": "https://schema.org"
+      "@type": "TechArticle"
+      headline: "CruiseKube Documentation"
+      description: "Comprehensive documentation for CruiseKube - Kubernetes resource optimization controller"
+      author:
+        "@type": "Organization"
+        name: "TrueFoundry"
+        url: "https://truefoundry.com"
+      publisher:
+        "@type": "Organization"
+        name: "TrueFoundry"
+        url: "https://truefoundry.com"
+        logo:
+          "@type": "ImageObject"
+          url: "https://truefoundry.github.io/cruiseKube/images/logo/cruiseKube_Colour.png"
+      mainEntityOfPage:
+        "@type": "WebPage"
+        "@id": "https://truefoundry.github.io/cruiseKube"
+      datePublished: "2024-01-01"
+      dateModified: "2025-01-01"
+      articleSection: "Documentation"
+      keywords:
+        - "Kubernetes documentation"
+        - "Resource Optimization"
 
 # Page tree
 nav:
   - Home: index.md
   - Getting started:
       - Introduction: src/gs-introduction.md
-      - Installation: src/installation.md
-      - Configuration: src/config.md
+      - Installation: src/gs-installation.md
+      - Configuration: 
+        - Overview: src/config.md
+        - Dashboard: src/config-dashboard.md
   - Architecture:
       - Architecture: src/arch-overview.md
+  # - Comparison:
+  #     - Comparison: src/comp.md
   - Development:
       - Dev Environment: src/dev-env.md
+      - Contributors: src/dev-contributors.md

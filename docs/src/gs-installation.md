@@ -70,8 +70,8 @@ You will need to manually enable each task based on your requirements. To do thi
     - To enable this task, set the `CRUISEKUBE_CONTROLLER_TASKS_CREATESTATS_ENABLED` environment variable to `true` in your values file.
     - You also need to configure prometheus URL in the env section of the values file. This will be used by the stats creation task to fetch metrics. Set `CRUISEKUBE_DEPENDENCIES_INCLUSTER_PROMETHEUSURL` to the URL of your Prometheus instance.
 
-2. **Enable Recommendation Task**
-    - To enable this task, set the `CRUISEKUBE_CONTROLLER_TASKS_APPLYRECOMMENDATION_ENABLED` environment variable to `true` in your values file.
+2. **Enable Apply Recommendation Task**
+    - To enable this task, set the `CRUISEKUBE_CONTROLLER_TASKS_APPLYRECOMMENDATION_ENABLED` environment variable to `true` in your values file. Note this is currently in dry-run mode by default. So recommendations will only be generated but not applied.
 
 > Similarly, you can enable other tasks by checking the available environment variables in the [value.yaml file](https://github.com/truefoundry/cruiseKube/blob/2d187dbc5ed8275f747e1597b728e40b0d3f0a9e/charts/cruisekube/values.yaml#L101).
 
@@ -89,13 +89,16 @@ Open your browser and navigate to `http://localhost:3000` to view the recommenda
 
 <img src="../../images/demo_recommendation.png" alt="Recommendations Dashboard" width="1000"/>
 
+Read more about configuration in the [Configuration Dashboard](config-dashboard.md) section.
+
 </br>
 
-### 5. Enable/Disable Workloads
+### **5. Apply Recommendations**
 
-You can enable or disable specific workloads by toggling the corresponding flag in the dashboard.
+Once you've reviewed the recommendations in the dashboard, you can disable the dry-run mode to actually apply the recommendations. 
 
-<img src="../../images/demo_workload_toggle.png" alt="Workload Toggle" width="1000"/>
+To enable the apply recommendation task, set the `CRUISEKUBE_CONTROLLER_TASKS_APPLYRECOMMENDATION_DRYRUN` environment variable to `false` in your values file.
+
 
 ## Uninstall
 

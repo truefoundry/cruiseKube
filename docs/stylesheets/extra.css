@@ -657,6 +657,20 @@ body {
 }
 
 
+
+.demo-image {
+  text-align: center;
+  margin: 2rem 0;
+  
+}
+
+.demo-image img {
+  max-width: 100%;
+  border-radius: var(--border-radius);
+  margin: 1rem 0;
+  box-shadow: var(--card-shadow);
+}
+
 /* Community Section */
 .community-section {
   padding: var(--section-padding);
