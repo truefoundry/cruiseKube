@@ -261,13 +261,7 @@ cruisekubeWebhook:
       memory: 128Mi
   ## @param cruisekubeWebhook.env [object] Environment variables to configure CruiseKube Webhook
   env:
-    CRUISEKUBE_EXECUTIONMODE: "webhook"
-    CRUISEKUBE_WEBHOOK_PORT: "8443"
-    CRUISEKUBE_WEBHOOK_CERTSDIR: "/tmp/webhook-certs"
     CRUISEKUBE_WEBHOOK_DRYRUN: "true"
-    CRUISEKUBE_WEBHOOK_STATSURL_HOST: ""
-    CRUISEKUBE_WEBHOOK_STATSURL_TFYCLUSTERTOKEN: "<cluster-token>"
-
 
 ## @section PostgreSQL parameters
 

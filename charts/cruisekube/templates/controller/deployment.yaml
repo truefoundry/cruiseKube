@@ -37,10 +37,10 @@ spec:
             - "--controller-mode={{ .Values.cruisekubeController.controller.mode }}"
           ports:
             - name: http
-              containerPort: 8080
+              containerPort: {{ .Values.cruisekubeController.service.httpPort }}
               protocol: TCP
             - name: metrics
-              containerPort: 8081
+              containerPort: {{ .Values.cruisekubeController.service.metricsPort }}
               protocol: TCP
           resources:
             {{- toYaml .Values.cruisekubeController.resources | nindent 12 }}
