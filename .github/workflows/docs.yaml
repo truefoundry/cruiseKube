@@ -3,9 +3,6 @@ name: deploy-docs
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
 
 # Concurrency protection to prevent multiple workflow runs from executing simultaneously
 concurrency:
