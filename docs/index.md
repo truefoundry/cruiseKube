@@ -70,13 +70,6 @@ hide:
       </div>
     </div> 
     <div class="step">
-      <div class="step-number">02</div>
-      <div class="step-content">
-        <h3>Analyze</h3>
-        <p>Uses machine learning algorithms to identify optimization opportunities</p>
-      </div>
-    </div>
-    <div class="step">
       <div class="step-number">03</div>
       <div class="step-content">
         <h3>Recommend</h3>

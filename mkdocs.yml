@@ -202,7 +202,8 @@ nav:
         - Overview: src/config.md
         - Dashboard: src/config-dashboard.md
   - Architecture:
-      - Architecture: src/arch-overview.md
+      - Overview: src/arch-overview.md
+      - Algorithm: src/arch-algorithm.md
   # - Comparison:
   #     - Comparison: src/comp.md
   - Development:
