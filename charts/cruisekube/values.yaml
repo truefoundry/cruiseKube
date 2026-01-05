@@ -25,7 +25,7 @@ cruisekubeController:
     ## @param cruisekubeController.image.imagePullPolicy CruiseKube Controller image pull policy
     imagePullPolicy: IfNotPresent
     ## @param cruisekubeController.image.tag CruiseKube Controller image tag (immutable tags are recommended)
-    tag: "0.1.8"
+    tag: "1a3af6648025a3c827b6bdac6ee6d9c5876b1b90"
   ## @param cruisekubeController.imagePullSecrets [array] CruiseKube Controller image pull secrets
   imagePullSecrets: []
   ## @param cruisekubeController.nameOverride String to partially override cruisekube.fullname
@@ -142,9 +142,7 @@ cruisekubeController:
     CRUISEKUBE_TELEMETRY_EXPORTEROTLPHEADERS: ""
     CRUISEKUBE_TELEMETRY_SERVICENAME: ""
     CRUISEKUBE_TELEMETRY_TRACERATIO: "0.1"
-
 ## @section CruiseKube Webhook parameters
-
 cruisekubeWebhook:
   ## @param cruisekubeWebhook.enabled Enable CruiseKube Webhook deployment
   enabled: true
@@ -156,7 +154,7 @@ cruisekubeWebhook:
     ## @param cruisekubeWebhook.image.imagePullPolicy CruiseKube Webhook image pull policy
     imagePullPolicy: IfNotPresent
     ## @param cruisekubeWebhook.image.tag CruiseKube Webhook image tag (immutable tags are recommended)
-    tag: "0.1.8"
+    tag: "1a3af6648025a3c827b6bdac6ee6d9c5876b1b90"
   ## @param cruisekubeWebhook.imagePullSecrets [array] CruiseKube Webhook image pull secrets
   imagePullSecrets: []
   ## @param cruisekubeWebhook.nameOverride String to partially override cruisekube.fullname
@@ -261,9 +259,7 @@ cruisekubeWebhook:
   ## @param cruisekubeWebhook.env [object] Environment variables to configure CruiseKube Webhook
   env:
     CRUISEKUBE_WEBHOOK_DRYRUN: "true"
-
 ## @section PostgreSQL parameters
-
 postgresql:
   ## @param postgresql.enabled Switch to enable or disable the PostgreSQL helm chart
   enabled: false
@@ -284,10 +280,7 @@ postgresql:
         cpu: 100m
         ## @param postgresql.primary.resources.requests.memory The requested resources (memory) for the PostgreSQL Primary containers
         memory: 128Mi
-
-
 ## @section CruiseKube Frontend parameters
-
 cruisekubeFrontend:
   ## @param cruisekubeFrontend.enabled Enable CruiseKube Frontend deployment
   enabled: true
