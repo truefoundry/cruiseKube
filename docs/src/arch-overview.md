@@ -184,4 +184,5 @@ sequenceDiagram
 3. Mutate requests before scheduling
 
 ## Next Steps
+
 - Get started with installation [here](./gs-introduction.md)
