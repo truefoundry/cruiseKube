@@ -16,7 +16,7 @@ Get started by following below steps:
 
 ## Prerequisites
 
-- **Kubernetes Cluster:** You should have a running Kubernetes cluster. You can use any cloud-based or on-premises Kubernetes distribution.
+- **Kubernetes Cluster:** You should have a running Kubernetes cluster with at least Kubernetes 1.33. You can use any cloud-based or on-premises Kubernetes distribution.
 - **kubectl:** Installed and configured to interact with your Kubernetes cluster.
 - **Helm:** Installed for managing Kubernetes applications.
 - **Prometheus:** You should have a prometheus installed in your cluster.
