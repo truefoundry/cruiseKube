@@ -18,6 +18,9 @@ import (
 
 type Info struct {
 	ContainerID        string
+	NodeName           string
+	PodName            string
+	Namespace          string
 	Timestamp          time.Time
 	MemoryLimit        int64
 	MemoryRequest      int64
@@ -110,6 +113,9 @@ func (o *Observer) checkContainersForOOM(oldPod, newPod *apiv1.Pod) {
 
 					oomInfo := Info{
 						ContainerID:        containerID,
+						NodeName:           newPod.Spec.NodeName,
+						PodName:            newPod.Name,
+						Namespace:          newPod.Namespace,
 						Timestamp:          containerStatus.LastTerminationState.Terminated.FinishedAt.Time,
 						MemoryLimit:        memoryLimit,
 						MemoryRequest:      memoryRequest,
@@ -195,6 +201,9 @@ func (o *Observer) parseEvictionEvent(ctx context.Context, event *apiv1.Event) [
 
 		oomInfo := Info{
 			ContainerID:        containerID,
+			NodeName:           pod.Spec.NodeName,
+			PodName:            pod.Name,
+			Namespace:          pod.Namespace,
 			Timestamp:          event.CreationTimestamp.Time,
 			MemoryLimit:        memoryLimit,
 			MemoryRequest:      memoryRequest,

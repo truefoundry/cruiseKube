@@ -281,9 +281,15 @@ func (s *GormDB) UpdateStatOverridesForWorkload(clusterID, workloadID string, ov
 }
 
 func (s *GormDB) InsertOOMEvent(event *types.OOMEvent) error {
+	metadataJSON, err := json.Marshal(event.Metadata)
+	if err != nil {
+		return fmt.Errorf("failed to marshal metadata: %w", err)
+	}
+
 	dbEvent := OOMEvent{
 		ClusterID:          event.ClusterID,
 		ContainerID:        event.ContainerID,
+		Metadata:           string(metadataJSON),
 		Timestamp:          event.Timestamp,
 		MemoryLimit:        event.MemoryLimit,
 		MemoryRequest:      event.MemoryRequest,
@@ -315,10 +321,17 @@ func (s *GormDB) GetOOMEventsByWorkload(clusterID, workloadID string, since time
 
 	events := make([]types.OOMEvent, 0, len(dbEvents))
 	for _, dbEvent := range dbEvents {
+		var metadata types.OOMEventMetadata
+		if err := json.Unmarshal([]byte(dbEvent.Metadata), &metadata); err != nil {
+			// If unmarshal fails, use empty metadata
+			metadata = types.OOMEventMetadata{}
+		}
+
 		events = append(events, types.OOMEvent{
 			ID:                 dbEvent.ID,
 			ClusterID:          dbEvent.ClusterID,
 			ContainerID:        dbEvent.ContainerID,
+			Metadata:           metadata,
 			Timestamp:          dbEvent.Timestamp,
 			MemoryLimit:        dbEvent.MemoryLimit,
 			MemoryRequest:      dbEvent.MemoryRequest,
