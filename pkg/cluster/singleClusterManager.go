@@ -67,14 +67,10 @@ func (m *SingleClusterManager) ScheduleAllTasks() error {
 	defer m.mu.RUnlock()
 
 	for taskName, task := range m.registeredTasks {
-		m.scheduler.Register(context.Background(), taskName, task.GetSchedule(), task.Run)
+		m.scheduler.ScheduleTask(context.Background(), taskName, task.GetSchedule(), task.Run)
 	}
+	m.scheduler.Wait(context.Background())
 
-	return nil
-}
-
-func (m *SingleClusterManager) StartTasks() error {
-	m.scheduler.Start(context.Background())
 	return nil
 }
 

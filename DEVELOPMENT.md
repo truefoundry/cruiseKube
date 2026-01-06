@@ -1,3 +1,3 @@
 # Development
 
-TBA - Development guidelines and instructions will be added here.
+Refer to the comprehensive [development guide](./docs/src/dev-env.md).

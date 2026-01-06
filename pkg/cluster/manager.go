@@ -29,7 +29,6 @@ type Manager interface {
 	AddTask(task task.Task)
 	GetTask(taskName string) (task.Task, error)
 	ScheduleAllTasks() error
-	StartTasks() error
 }
 
 type ClusterClients struct {

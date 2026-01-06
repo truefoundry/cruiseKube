@@ -157,7 +157,7 @@ func setupControllerMode(ctx context.Context, cfg *config.Config) {
 	////////
 	// Storage Repo
 	////////
-	DatabaseAdapter, err := database.NewDatabase(database.DatabaseConfig{
+	databaseAdapter, err := database.NewDatabase(database.DatabaseConfig{
 		Type:     cfg.DB.Type,
 		Host:     cfg.DB.Host,
 		Port:     cfg.DB.Port,
@@ -171,7 +171,7 @@ func setupControllerMode(ctx context.Context, cfg *config.Config) {
 	}
 	logging.Infof(ctx, "Database initialized")
 
-	storageRepo, err := storage.NewStorageRepo(DatabaseAdapter)
+	storageRepo, err := storage.NewStorageRepo(databaseAdapter)
 	if err != nil {
 		logging.Fatalf(ctx, "Failed to initialize storage: %v", err)
 	}
@@ -365,9 +365,6 @@ func setupControllerMode(ctx context.Context, cfg *config.Config) {
 
 	if err := clusterManager.ScheduleAllTasks(); err != nil {
 		logging.Fatalf(ctx, "Failed to schedule tasks: %v", err)
-	}
-	if err := clusterManager.StartTasks(); err != nil {
-		logging.Fatalf(ctx, "Failed to start tasks: %v", err)
 	}
 }
 

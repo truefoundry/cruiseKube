@@ -19,7 +19,7 @@ func NewScheduler() *Scheduler {
 	}
 }
 
-func (s *Scheduler) Register(ctx context.Context, name string, schedule string, task func(ctx context.Context) error) {
+func (s *Scheduler) ScheduleTask(ctx context.Context, name string, schedule string, task func(ctx context.Context) error) {
 	duration, err := time.ParseDuration(schedule)
 	if err != nil {
 		logging.Errorf(ctx, "Failed to parse schedule for task %s: %v", name, err)
@@ -50,7 +50,7 @@ func (s *Scheduler) Register(ctx context.Context, name string, schedule string, 
 	}()
 }
 
-func (s *Scheduler) Start(ctx context.Context) {
+func (s *Scheduler) Wait(ctx context.Context) {
 	logging.Info(ctx, "Scheduler started")
 	<-s.quit
 }

@@ -49,15 +49,7 @@ CruiseKube explicitly addresses the **pod-level right-sizing problem**, in a ful
 
 # Getting Started
 
-Details on how to install and configure CruiseKube can be found in the [Getting Started](./docs/src/getting-started.md) guide.
-
-# Configure CruiseKube
-
-Check out the different ways to configure CruiseKube in the [Configuration](./docs/src/configure-cruisekube.md) guide.
-
-# Monitoring
-
-Monitoring details can be found in the [Monitoring](./docs/src/arch-monitoring.md) guide.
+Details on how to install and configure CruiseKube can be found in the [Getting Started](./docs/src/gs-installation.md) guide.
 
 # Development
 
