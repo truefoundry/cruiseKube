@@ -64,4 +64,5 @@ flowchart LR
     Webhook --> Database
     Controller --> Prometheus
 ```
+
 Read more about the architecture in the [Architecture](arch-overview.md) section.
