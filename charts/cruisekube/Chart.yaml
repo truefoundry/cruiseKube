@@ -7,5 +7,5 @@ appVersion: "0.1.8"
 dependencies:
   - name: postgresql
     version: "18.1.14"
-    repository: "https://charts.bitnami.com/bitnami"
+    repository: "oci://tfy.jfrog.io/tfy-mirror/bitnamicharts"
     condition: postgresql.enabled
