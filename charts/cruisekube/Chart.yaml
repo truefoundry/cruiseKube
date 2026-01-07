@@ -2,7 +2,7 @@ apiVersion: v2
 name: cruisekube
 description: A Helm chart for TrueFoundry cruisekube OSS controller and webhook
 type: application
-version: 0.1.9
+version: 0.1.8
 appVersion: "0.1.8"
 dependencies:
   - name: postgresql
