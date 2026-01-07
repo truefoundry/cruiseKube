@@ -15,43 +15,43 @@ CruiseKube is an intelligent Kubernetes resource optimization controller that au
 
 ### CruiseKube Controller parameters
 
-| Name                                                        | Description                                                                                         | Value                                |
-| ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------- | ------------------------------------ |
-| `cruisekubeController.enabled`                              | Enable CruiseKube Controller deployment                                                             | `true`                               |
-| `cruisekubeController.replicas`                             | Number of CruiseKube Controller replicas to deploy                                                  | `1`                                  |
-| `cruisekubeController.image.repository`                     | CruiseKube Controller image repository                                                              | `tfy.jfrog.io/tfy-images/cruisekube` |
-| `cruisekubeController.image.imagePullPolicy`                | CruiseKube Controller image pull policy                                                             | `IfNotPresent`                       |
-| `cruisekubeController.image.tag`                            | CruiseKube Controller image tag (immutable tags are recommended)                                    | `0.1.8`                              |
-| `cruisekubeController.imagePullSecrets`                     | CruiseKube Controller image pull secrets                                                            | `[]`                                 |
-| `cruisekubeController.nameOverride`                         | String to partially override cruisekube.fullname                                                    | `""`                                 |
-| `cruisekubeController.fullnameOverride`                     | String to fully override cruisekube.fullname                                                        | `""`                                 |
-| `cruisekubeController.controller.mode`                      | Controller mode (inCluster or external)                                                             | `inCluster`                          |
-| `cruisekubeController.serviceAccount.create`                | Specifies whether a ServiceAccount should be created                                                | `true`                               |
-| `cruisekubeController.serviceAccount.name`                  | The name of the ServiceAccount to use                                                               | `""`                                 |
-| `cruisekubeController.rbac.create`                          | Specifies whether RBAC resources should be created                                                  | `true`                               |
-| `cruisekubeController.persistence.enabled`                  | Enable persistence using Persistent Volume Claims                                                   | `true`                               |
-| `cruisekubeController.persistence.size`                     | Persistent Volume size                                                                              | `5Gi`                                |
-| `cruisekubeController.persistence.storageClass`             | Persistent Volume storage class                                                                     | `""`                                 |
-| `cruisekubeController.persistence.accessMode`               | Persistent Volume access mode                                                                       | `ReadWriteOnce`                      |
-| `cruisekubeController.persistence.mountPath`                | Persistent Volume mount path                                                                        | `/app/stats-data`                    |
-| `cruisekubeController.persistence.annotations`              | Additional custom annotations for the PVC                                                           | `{}`                                 |
-| `cruisekubeController.podAnnotations`                       | Annotations for CruiseKube Controller pods                                                          | `{}`                                 |
-| `cruisekubeController.podLabels`                            | Extra labels for CruiseKube Controller pods                                                         | `{}`                                 |
-| `cruisekubeController.service.type`                         | CruiseKube Controller service type                                                                  | `ClusterIP`                          |
-| `cruisekubeController.service.httpPort`                     | CruiseKube Controller service HTTP port                                                             | `8080`                               |
-| `cruisekubeController.service.metricsPort`                  | CruiseKube Controller service metrics port                                                          | `8081`                               |
-| `cruisekubeController.service.annotations`                  | Additional custom annotations for the service                                                       | `{}`                                 |
-| `cruisekubeController.serviceMonitor.enabled`               | Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator                     | `true`                               |
-| `cruisekubeController.serviceMonitor.jobLabel`              | The name of the label on the target service to use as the job name in Prometheus                    | `cruisekube-controller`              |
-| `cruisekubeController.serviceMonitor.additionalLabels`      | Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus    | `{}`                                 |
-| `cruisekubeController.serviceMonitor.additionalAnnotations` | Additional annotations for the ServiceMonitor resource(s)                                           | `{}`                                 |
-| `cruisekubeController.serviceMonitor.endpoints`             | ServiceMonitor endpoints configuration                                                              | `[]`                                 |
-| `cruisekubeController.resources.limits.cpu`                 | The resources limits (CPU) for the CruiseKube Controller containers                                 | `500m`                               |
-| `cruisekubeController.resources.limits.memory`              | The resources limits (memory) for the CruiseKube Controller containers                              | `512Mi`                              |
-| `cruisekubeController.resources.requests.cpu`               | The requested resources (CPU) for the CruiseKube Controller containers                              | `100m`                               |
-| `cruisekubeController.resources.requests.memory`            | The requested resources (memory) for the CruiseKube Controller containers                           | `128Mi`                              |
-| `cruisekubeController.volumeMounts`                         | Optionally specify extra list of additional volumeMounts for the CruiseKube Controller container(s) | `[]`                                 |
-| `cruisekubeController.env`                                  | Environment variables to configure CruiseKube Controller                                            | `{}`                                 |
+| Name                                                        | Description                                                                                                           | Value                                |
+| ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
+| `cruisekubeController.enabled`                              | Enable CruiseKube Controller deployment                                                                               | `true`                               |
+| `cruisekubeController.replicas`                             | Number of CruiseKube Controller replicas to deploy                                                                    | `1`                                  |
+| `cruisekubeController.image.repository`                     | CruiseKube Controller image repository                                                                                | `tfy.jfrog.io/tfy-images/cruisekube` |
+| `cruisekubeController.image.imagePullPolicy`                | CruiseKube Controller image pull policy                                                                               | `IfNotPresent`                       |
+| `cruisekubeController.image.tag`                            | CruiseKube Controller image tag (immutable tags are recommended)                                                      | `0.1.8`                              |
+| `cruisekubeController.imagePullSecrets`                     | CruiseKube Controller image pull secrets                                                                              | `[]`                                 |
+| `cruisekubeController.nameOverride`                         | String to partially override cruisekube.fullname                                                                      | `""`                                 |
+| `cruisekubeController.fullnameOverride`                     | String to fully override cruisekube.fullname                                                                          | `""`                                 |
+| `cruisekubeController.controller.mode`                      | Controller mode (inCluster or external)                                                                               | `in-cluster`                         |
+| `cruisekubeController.serviceAccount.create`                | Specifies whether a ServiceAccount should be created                                                                  | `true`                               |
+| `cruisekubeController.serviceAccount.name`                  | The name of the ServiceAccount to use                                                                                 | `""`                                 |
+| `cruisekubeController.rbac.create`                          | Specifies whether RBAC resources should be created                                                                    | `true`                               |
+| `cruisekubeController.persistence.enabled`                  | Enable persistence using Persistent Volume Claims                                                                     | `true`                               |
+| `cruisekubeController.persistence.size`                     | Persistent Volume size                                                                                                | `5Gi`                                |
+| `cruisekubeController.persistence.storageClass`             | Persistent Volume storage class                                                                                       | `""`                                 |
+| `cruisekubeController.persistence.accessMode`               | Persistent Volume access mode                                                                                         | `ReadWriteOnce`                      |
+| `cruisekubeController.persistence.mountPath`                | Persistent Volume mount path                                                                                          | `/app/stats-data`                    |
+| `cruisekubeController.persistence.annotations`              | Additional custom annotations for the PVC                                                                             | `{}`                                 |
+| `cruisekubeController.podAnnotations`                       | Annotations for CruiseKube Controller pods                                                                            | `{}`                                 |
+| `cruisekubeController.podLabels`                            | Extra labels for CruiseKube Controller pods                                                                           | `{}`                                 |
+| `cruisekubeController.service.type`                         | CruiseKube Controller service type                                                                                    | `ClusterIP`                          |
+| `cruisekubeController.service.httpPort`                     | CruiseKube Controller service HTTP port                                                                               | `8080`                               |
+| `cruisekubeController.service.metricsPort`                  | CruiseKube Controller service metrics port                                                                            | `8081`                               |
+| `cruisekubeController.service.annotations`                  | Additional custom annotations for the service                                                                         | `{}`                                 |
+| `cruisekubeController.serviceMonitor.enabled`               | Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator                                       | `true`                               |
+| `cruisekubeController.serviceMonitor.jobLabel`              | The name of the label on the target service to use as the job name in Prometheus                                      | `cruisekube-controller`              |
+| `cruisekubeController.serviceMonitor.additionalLabels`      | Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus                      | `{}`                                 |
+| `cruisekubeController.serviceMonitor.additionalAnnotations` | Additional annotations for the ServiceMonitor resource(s)                                                             | `{}`                                 |
+| `cruisekubeController.serviceMonitor.endpoints`             | ServiceMonitor endpoints configuration                                                                                | `[]`                                 |
+| `cruisekubeController.resources.limits.cpu`                 | The resources limits (CPU) for the CruiseKube Controller containers                                                   | `500m`                               |
+| `cruisekubeController.resources.limits.memory`              | The resources limits (memory) for the CruiseKube Controller containers                                                | `512Mi`                              |
+| `cruisekubeController.resources.requests.cpu`               | The requested resources (CPU) for the CruiseKube Controller containers                                                | `100m`                               |
+| `cruisekubeController.resources.requests.memory`            | The requested resources (memory) for the CruiseKube Controller containers                                             | `128Mi`                              |
+| `cruisekubeController.volumeMounts`                         | Optionally specify extra list of additional volumeMounts for the CruiseKube Controller container(s)                   | `[]`                                 |
+| `cruisekubeController.env`                                  | Environment variables to configure CruiseKube Controller. It is used to update the default values in the config file. | `{}`                                 |
 
 ### CruiseKube Webhook parameters
 

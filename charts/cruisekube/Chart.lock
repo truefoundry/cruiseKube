@@ -1,6 +1,6 @@
 dependencies:
 - name: postgresql
-  repository: https://charts.bitnami.com/bitnami
+  repository: oci://tfy.jfrog.io/tfy-mirror/bitnamicharts
   version: 18.1.14
-digest: sha256:841fa486ac816525d930913a01cfc924be9666f99e502b4f63125d6af3c22185
-generated: "2025-12-19T17:48:12.188157+05:30"
+digest: sha256:40702c5282a6a98e8f28d5ffc5736b1bdc0a88a48368a6adee4ae0aef69e3746
+generated: "2026-01-07T14:07:04.990442+05:30"

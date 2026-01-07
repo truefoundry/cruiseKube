@@ -2,10 +2,10 @@ apiVersion: v2
 name: cruisekube
 description: A Helm chart for TrueFoundry cruisekube OSS controller and webhook
 type: application
-version: 0.1.8
+version: 0.1.9
 appVersion: "0.1.8"
 dependencies:
   - name: postgresql
     version: "18.1.14"
-    repository: "https://charts.bitnami.com/bitnami"
+    repository: "oci://tfy.jfrog.io/tfy-mirror/bitnamicharts"
     condition: postgresql.enabled
