@@ -232,7 +232,7 @@ func PredictSimpleStatsFromTimeSeriesModel(ctx context.Context, namespaces []str
 		if resourceType == "memory" {
 			matrix, err = fetchMemoryMatrix(ctx, promClient, namespace, r)
 			if err != nil {
-				logging.Errorf(ctx, "Error fetching memory with OOM for namespace %s: %v", namespace, err)
+				logging.Errorf(ctx, "Error fetching memory matrix for namespace %s: %v", namespace, err)
 				return nil, err
 			}
 		} else {
