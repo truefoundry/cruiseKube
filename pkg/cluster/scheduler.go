@@ -2,7 +2,6 @@ package cluster
 
 import (
 	"context"
-	"sync"
 	"time"
 
 	"github.com/truefoundry/cruisekube/pkg/logging"
@@ -14,7 +13,6 @@ type taskEntry struct {
 }
 
 type Scheduler struct {
-	mu    sync.Mutex
 	tasks map[string]*taskEntry
 	quit  chan struct{}
 }
@@ -43,14 +41,11 @@ func (s *Scheduler) ScheduleTask(
 		lock:   make(chan struct{}, 1), // semaphore
 	}
 
-	s.mu.Lock()
 	if _, exists := s.tasks[name]; exists {
-		s.mu.Unlock()
 		logging.Errorf(ctx, "Task %s already exists", name)
 		return
 	}
 	s.tasks[name] = entry
-	s.mu.Unlock()
 
 	go func() {
 		// Run once immediately
