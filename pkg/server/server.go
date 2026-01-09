@@ -29,6 +29,7 @@ func SetupServerEngine(mgr cluster.Manager, authAPI gin.HandlerFunc, authWebhook
 		clusterGroup.GET("/workload-analysis", handlers.WorkloadAnalysisHandlerForCluster)
 		clusterGroup.GET("/recommendation-analysis", handlers.RecommendationAnalysisHandlerForCluster)
 		clusterGroup.Any("/prometheus-proxy/*proxyPath", handlers.HandlePrometheusProxy)
+		clusterGroup.GET("/prometheus-query", handlers.HandlePrometheusQuery)
 		clusterGroup.GET("/prometheus-config", handlers.GetPrometheusConfigHandler)
 		clusterGroup.POST("/killswitch", handlers.KillswitchHandler)
 		clusterGroup.GET("/workloads", handlers.ListWorkloadsHandler)

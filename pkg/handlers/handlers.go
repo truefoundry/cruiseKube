@@ -8,8 +8,10 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/truefoundry/cruisekube/pkg/adapters/metricsProvider/prometheus"
 	"github.com/truefoundry/cruisekube/pkg/cluster"
 	"github.com/truefoundry/cruisekube/pkg/logging"
 	"github.com/truefoundry/cruisekube/pkg/repository/storage"
@@ -216,4 +218,74 @@ func HandlePrometheusProxy(c *gin.Context) {
 	if err != nil {
 		logging.Infof(ctx, "Failed to copy response body for cluster %s: %v", clusterID, err)
 	}
+}
+
+func HandlePrometheusQuery(c *gin.Context) {
+	ctx := c.Request.Context()
+	mgr := c.MustGet("clusterManager").(cluster.Manager)
+	clusterID := c.Param("clusterID")
+
+	span := oteltrace.SpanFromContext(ctx)
+	span.SetAttributes(attribute.String("cluster.id", clusterID))
+
+	query := c.Query("query")
+	if query == "" {
+		logging.Errorf(ctx, "Missing query parameter for cluster %s", clusterID)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":    "error",
+			"errorType": "bad_data",
+			"error":     "Missing query parameter",
+		})
+		return
+	}
+
+	logging.Infof(ctx, "Executing Prometheus query for cluster %s from %s", clusterID, c.ClientIP())
+
+	clients, err := mgr.GetClusterClients(clusterID)
+	if err != nil {
+		logging.Errorf(ctx, "Failed to get cluster clients for %s: %v", clusterID, err)
+		c.JSON(http.StatusNotFound, gin.H{
+			"status":    "error",
+			"errorType": "not_found",
+			"error":     fmt.Sprintf("Cluster %s not found: %v", clusterID, err),
+		})
+		return
+	}
+
+	if clients.PrometheusClient == nil {
+		logging.Errorf(ctx, "Prometheus client not available for cluster %s", clusterID)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":    "error",
+			"errorType": "internal",
+			"error":     fmt.Sprintf("Prometheus client not available for cluster %s", clusterID),
+		})
+		return
+	}
+
+	result, warnings, err := clients.PrometheusClient.Query(ctx, query, time.Now())
+	if err != nil {
+		logging.Errorf(ctx, "Failed to execute Prometheus query for cluster %s: %v", clusterID, err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":    "error",
+			"errorType": "execution",
+			"error":     fmt.Sprintf("Query execution failed: %v", err),
+		})
+		return
+	}
+
+	warningsList := make([]string, len(warnings))
+	copy(warningsList, warnings)
+
+	response, err := prometheus.ConvertModelValueToPrometheusJSON(result, warningsList)
+	if err != nil {
+		logging.Errorf(ctx, "Failed to convert Prometheus result for cluster %s: %v", clusterID, err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":    "error",
+			"errorType": "internal",
+			"error":     fmt.Sprintf("Failed to convert result: %v", err),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, response)
 }
