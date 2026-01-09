@@ -274,9 +274,7 @@ func HandlePrometheusQuery(c *gin.Context) {
 	}
 
 	warningsList := make([]string, len(warnings))
-	for i, w := range warnings {
-		warningsList[i] = string(w)
-	}
+	copy(warningsList, warnings)
 
 	response, err := prometheus.ConvertModelValueToPrometheusJSON(result, warningsList)
 	if err != nil {
