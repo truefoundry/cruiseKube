@@ -525,6 +525,127 @@ func (a *ApplyRecommendationTask) segregateOptimizableNonOptimizablePods(ctx con
 	return optimizablePods, nonOptimizablePods
 }
 
+func (a *ApplyRecommendationTask) RunForNode(ctx context.Context, nodeName string) error {
+	logging.Infof(ctx, "Apply recommendation triggered for node: %s", nodeName)
+
+	applyChanges := !a.config.Metadata.DryRun
+
+	if !a.config.IsClusterWriteAuthorized {
+		logging.Infof(ctx, "Cluster %s is not write authorized, skipping reactive ApplyRecommendation", a.config.ClusterID)
+		return nil
+	}
+
+	if !utils.CheckIfClusterAbove133(ctx, a.kubeClient) {
+		applyChanges = false
+		logging.Infof(ctx, "Cluster version is not above 1.33, running in dry run mode")
+	}
+
+	nodeInfo, err := a.GenerateNodeStatsForNode(ctx, nodeName)
+	if err != nil {
+		logging.Errorf(ctx, "Error generating node stats for node %s: %v", nodeName, err)
+		return err
+	}
+
+	// Get workload overrides
+	recommenderClient := client.NewRecommenderServiceClientWithBasicAuth(
+		a.config.Metadata.NodeStatsURL.Host,
+		a.config.BasicAuth.Username,
+		a.config.BasicAuth.Password,
+	)
+	workloadOverrides, err := recommenderClient.ListWorkloads(ctx, a.config.ClusterID)
+	if err != nil {
+		logging.Errorf(ctx, "Error loading workload overrides from client: %v", err)
+		return fmt.Errorf("failed to list workloads from recommender service: %w", err)
+	}
+
+	overridesMap := make(map[string]*types.WorkloadOverrideInfo)
+	for _, override := range workloadOverrides {
+		overridesMap[override.WorkloadID] = &override
+	}
+
+	// map with only the target node
+	nodeMap := map[string]utils.NodeResourceInfo{
+		nodeName: nodeInfo,
+	}
+
+	_, err = a.ApplyRecommendationsWithStrategy(
+		ctx,
+		nodeMap,
+		overridesMap,
+		applystrategies.NewAdjustAmongstPodsDistributedStrategy(ctx),
+		applyChanges,
+		false,
+	)
+	if err != nil {
+		logging.Errorf(ctx, "Error applying recommendations for node %s: %v", nodeName, err)
+		return err
+	}
+
+	logging.Infof(ctx, "Successfully applied reactive recommendations for node: %s", nodeName)
+	return nil
+}
+
+func (a *ApplyRecommendationTask) GenerateNodeStatsForNode(ctx context.Context, nodeName string) (utils.NodeResourceInfo, error) {
+	defer utils.TimeIt(ctx, fmt.Sprintf("Generating node stats for node: %s", nodeName))
+
+	podsOnNode, err := a.kubeClient.CoreV1().Pods("").List(ctx, metav1.ListOptions{
+		FieldSelector: fmt.Sprintf("spec.nodeName=%s", nodeName),
+	})
+	if err != nil {
+		return utils.NodeResourceInfo{}, fmt.Errorf("failed to get pods on node %s: %w", nodeName, err)
+	}
+
+	allPods := make([]*corev1.Pod, 0, len(podsOnNode.Items))
+	for i := range podsOnNode.Items {
+		allPods = append(allPods, &podsOnNode.Items[i])
+	}
+
+	targetNamespace := ""
+	podToWorkloadMap, _, err := utils.BuildPodToWorkloadMapping(ctx, a.kubeClient, targetNamespace)
+	if err != nil {
+		return utils.NodeResourceInfo{}, fmt.Errorf("failed to build pod-to-workload mapping: %w", err)
+	}
+
+	var statsFile *types.StatsResponse
+	if a.config.Metadata.NodeStatsURL.Host != "" {
+		recommenderClient := client.NewRecommenderServiceClientWithBasicAuth(
+			a.config.Metadata.NodeStatsURL.Host,
+			a.config.BasicAuth.Username,
+			a.config.BasicAuth.Password,
+		)
+		statsFile, err = recommenderClient.GetClusterStats(ctx, a.config.ClusterID)
+		if err != nil {
+			return utils.NodeResourceInfo{}, fmt.Errorf("failed to load stats from client: %w", err)
+		}
+	} else {
+		statsFile, err = utils.LoadStatsFromClusterStorage(a.config.ClusterID)
+		if err != nil {
+			return utils.NodeResourceInfo{}, fmt.Errorf("failed to load stats from storage: %w", err)
+		}
+	}
+
+	statsMap := make(map[string]*utils.WorkloadStat)
+	for i := range statsFile.Stats {
+		rec := &statsFile.Stats[i]
+		statsMap[rec.WorkloadIdentifier] = rec
+	}
+
+	podStats := utils.CreatePodToStatsMapping(ctx, podToWorkloadMap, statsMap)
+
+	nodeMap, err := utils.CreateNodeStatsMapping(ctx, a.kubeClient, podStats, podToWorkloadMap, allPods)
+	if err != nil {
+		return utils.NodeResourceInfo{}, fmt.Errorf("failed to create node stats mapping: %w", err)
+	}
+
+	nodeInfo, exists := nodeMap[nodeName]
+	if !exists {
+		return utils.NodeResourceInfo{}, fmt.Errorf("node %s not found after generating stats", nodeName)
+	}
+
+	logging.Infof(ctx, "Generated node stats for node %s", nodeName)
+	return nodeInfo, nil
+}
+
 // GenerateNodeStatsForCluster builds the node -> pods/resources map using cluster state and stored stats.
 func (a *ApplyRecommendationTask) GenerateNodeStatsForCluster(ctx context.Context) (map[string]utils.NodeResourceInfo, error) {
 	defer utils.TimeIt(ctx, "Generating node stats for cluster")

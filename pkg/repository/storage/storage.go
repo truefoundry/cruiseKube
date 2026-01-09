@@ -101,3 +101,36 @@ func (s *Storage) GetOOMEventsByWorkload(clusterID, workloadID string, since tim
 	}
 	return events, nil
 }
+
+func (s *Storage) UpdateOOMMemoryForContainer(clusterID, workloadID, containerName string, oomMemoryBytes int64) error {
+	stat, err := s.DB.GetStatForWorkload(clusterID, workloadID)
+	if err != nil {
+		return fmt.Errorf("failed to get stat for workload: %w", err)
+	}
+	if stat == nil {
+		return fmt.Errorf("no stat found for workload %s", workloadID)
+	}
+
+	containerFound := false
+	for i := range stat.ContainerStats {
+		if stat.ContainerStats[i].ContainerName != containerName {
+			continue
+		}
+		if stat.ContainerStats[i].MemoryStats == nil {
+			stat.ContainerStats[i].MemoryStats = &types.MemoryStats{}
+		}
+		stat.ContainerStats[i].MemoryStats.OOMMemory = float64(oomMemoryBytes) / (1024 * 1024)
+		containerFound = true
+		break
+	}
+
+	if !containerFound {
+		return fmt.Errorf("container %s not found in workload %s stats", containerName, workloadID)
+	}
+
+	if err := s.DB.UpsertStat(clusterID, workloadID, *stat, time.Now()); err != nil {
+		return fmt.Errorf("failed to update stat with OOM memory: %w", err)
+	}
+
+	return nil
+}

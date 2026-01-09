@@ -23,6 +23,7 @@ type OOMEvent struct {
 	ID                 uint      `gorm:"column:id;primaryKey;autoIncrement"`
 	ClusterID          string    `gorm:"column:cluster_id;index;uniqueIndex:idx_oom_unique"`
 	ContainerID        string    `gorm:"column:container_id;index;uniqueIndex:idx_oom_unique"`
+	Metadata           string    `gorm:"column:metadata;type:text"`
 	Timestamp          time.Time `gorm:"column:timestamp;index;uniqueIndex:idx_oom_unique"`
 	MemoryLimit        int64     `gorm:"column:memory_limit;"`
 	MemoryRequest      int64     `gorm:"column:memory_request;"`
