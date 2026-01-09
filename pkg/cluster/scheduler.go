@@ -15,7 +15,7 @@ type taskEntry struct {
 }
 
 type Scheduler struct {
-	mu     sync.Mutex
+	mu    sync.Mutex
 	tasks map[string]*taskEntry
 	quit  chan struct{}
 }
