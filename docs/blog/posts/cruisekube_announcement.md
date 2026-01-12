@@ -57,7 +57,7 @@ CruiseKube is different from other resource optimization tools in the following 
 
 ## Getting Started
 
-Getting started with CruiseKube is as simple as installing the `cruisekube` helm chart with appropriate values. Please follow the [installation guide](https://cruisekube.com/docs/src/gs-installation) to get started.
+Getting started with CruiseKube is as simple as installing the `cruisekube` helm chart with appropriate values. Please follow the [installation guide](../../src/gs-installation.md) to get started.
 
 ## What's next?
 
