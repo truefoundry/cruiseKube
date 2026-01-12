@@ -13,7 +13,7 @@ author:
     - Shubham Rai
 ---
 
-# Introducing CruiseKube: Runtime Resource Optimization for Kubernetes
+# Introducing CruiseKube - Runtime Resource Optimization for Kubernetes
 
 <img src="../../images/logo/cruiseKube_Colour.png" alt="CruiseKube Logo" width="200">
 
