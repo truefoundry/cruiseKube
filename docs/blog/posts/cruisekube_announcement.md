@@ -19,6 +19,8 @@ author:
 
 Today, we’re excited to announce the release of **CruiseKube** - a runtime resource optimization engine for Kubernetes that continuously right-sizes pods *without restarts*, unlocking significant cost efficiency gains while preserving reliability.
 
+<!-- more -->
+
 # What is CruiseKube?
 
 CruiseKube is a Kubernetes-native, continuous resource optimization system that autonomously right-sizes CPU and memory for workloads at runtime and admission time. It focuses on eliminating persistent over-provisioning while preserving workload reliability and scheduling constraints.
