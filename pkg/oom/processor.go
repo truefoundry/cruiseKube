@@ -16,22 +16,20 @@ import (
 )
 
 type Processor struct {
-	storage            *storage.Storage
-	kubeClient         kubernetes.Interface
-	clusterID          string
-	stopCh             chan struct{}
-	oomCooldownMinutes int
-	cfg                *config.Config
+	storage    *storage.Storage
+	kubeClient kubernetes.Interface
+	clusterID  string
+	stopCh     chan struct{}
+	cfg        *config.Config
 }
 
-func NewProcessor(storageRepo *storage.Storage, kubeClient kubernetes.Interface, clusterID string, oomCooldownMinutes int, cfg *config.Config) *Processor {
+func NewProcessor(storageRepo *storage.Storage, kubeClient kubernetes.Interface, clusterID string, cfg *config.Config) *Processor {
 	return &Processor{
-		storage:            storageRepo,
-		kubeClient:         kubeClient,
-		clusterID:          clusterID,
-		oomCooldownMinutes: oomCooldownMinutes,
-		cfg:                cfg,
-		stopCh:             make(chan struct{}),
+		storage:    storageRepo,
+		kubeClient: kubeClient,
+		clusterID:  clusterID,
+		cfg:        cfg,
+		stopCh:     make(chan struct{}),
 	}
 }
 
@@ -78,7 +76,7 @@ func (p *Processor) processOOMEvent(ctx context.Context, oomInfo Info) {
 		logging.Warnf(ctx, "Failed to check latest OOM event: %v", err)
 	} else if latestEvent != nil {
 		timeSinceLastOOM := time.Since(latestEvent.Timestamp)
-		cooldownDuration := time.Duration(p.oomCooldownMinutes) * time.Minute
+		cooldownDuration := time.Duration(p.cfg.RecommendationSettings.OOMCooldownMinutes) * time.Minute
 
 		if timeSinceLastOOM < cooldownDuration {
 			remainingCooldown := cooldownDuration - timeSinceLastOOM
