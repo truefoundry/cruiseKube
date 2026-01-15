@@ -254,28 +254,8 @@ func setupControllerMode(ctx context.Context, cfg *config.Config) {
 	// Start OOM Observer and Processor
 	////////
 	for ID, cluster := range clusterManager.GetAllClusters() {
-		applyRecommendationTaskConfig := cfg.GetTaskConfig(config.ApplyRecommendationKey)
-		applyRecommendationTask := task.NewApplyRecommendationTask(
-			ctx,
-			cluster.KubeClient,
-			cluster.DynamicClient,
-			promClient,
-			&task.ApplyRecommendationTaskConfig{
-				Name:                     ID + "_" + config.ApplyRecommendationKey + "_oom",
-				Enabled:                  false,
-				Schedule:                 "",
-				ClusterID:                ID,
-				TargetClusterID:          cfg.Controller.TargetClusterID,
-				TargetNamespace:          cfg.Controller.TargetNamespace,
-				IsClusterWriteAuthorized: cfg.IsClusterWriteAuthorized(ID),
-				BasicAuth:                cfg.Server.BasicAuth,
-				RecommendationSettings:   cfg.RecommendationSettings,
-			},
-			applyRecommendationTaskConfig,
-		)
-
 		oomObserver := oom.NewObserver(cluster.KubeClient)
-		oomProcessor := oom.NewProcessor(storageRepo, cluster.KubeClient, ID, applyRecommendationTask, cfg.RecommendationSettings.OOMCooldownMinutes)
+		oomProcessor := oom.NewProcessor(storageRepo, cluster.KubeClient, ID, cfg)
 
 		namespace := ""
 		if cfg.Controller.TargetNamespace != "" {
