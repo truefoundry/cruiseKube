@@ -101,7 +101,7 @@ func UpdatePodMemoryResources(
 	)
 }
 
-func EvictPod(ctx context.Context, kubeClient *kubernetes.Clientset, pod *corev1.Pod) (bool, string) {
+func EvictPod(ctx context.Context, kubeClient kubernetes.Interface, pod *corev1.Pod) (bool, string) {
 	eviction := &policyv1.Eviction{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      pod.Name,
