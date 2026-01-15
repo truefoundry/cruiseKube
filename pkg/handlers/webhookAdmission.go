@@ -206,22 +206,6 @@ func adjustResources(ctx context.Context, pod *corev1.Pod, clusterID string, cfg
 	containers = append(containers, pod.Spec.Containers...)
 	containers = append(containers, pod.Spec.InitContainers...)
 	var patches []map[string]any
-	if len(pod.Spec.TopologySpreadConstraints) > 0 {
-		logging.Infof(ctx, "Removing %d topologySpreadConstraints from pod %s/%s", len(pod.Spec.TopologySpreadConstraints), pod.Namespace, getPodName(pod))
-		patches = append(patches, map[string]any{
-			"op":   "remove",
-			"path": "/spec/topologySpreadConstraints",
-		})
-	}
-
-	if pod.Spec.Affinity != nil && pod.Spec.Affinity.PodAntiAffinity != nil {
-		logging.Infof(ctx, "Removing podAntiAffinity from pod %s/%s", pod.Namespace, getPodName(pod))
-		patches = append(patches, map[string]any{
-			"op":   "remove",
-			"path": "/spec/affinity/podAntiAffinity",
-		})
-	}
-
 	for i, container := range containers {
 		containerPath := fmt.Sprintf("/spec/containers/%d", i)
 		if i >= len(pod.Spec.Containers) {
