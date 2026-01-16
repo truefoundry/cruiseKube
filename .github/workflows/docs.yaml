@@ -1,8 +1,11 @@
 name: deploy-docs
-"on":
+on:
   push:
     branches:
       - main
+    paths:
+      - 'docs/**'
+      - 'mkdocs.yml'
 
 # Concurrency protection to prevent multiple workflow runs from executing simultaneously
 concurrency:

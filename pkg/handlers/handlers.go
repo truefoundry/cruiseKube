@@ -83,6 +83,7 @@ func HandleRoot(c *gin.Context) {
 				"/clusters/{clusterId}/prometheus-proxy": "Proxies requests to cluster's Prometheus instance",
 				"/clusters/{clusterId}/killswitch": "Deletes MutatingWebhookConfiguration objects and kills pods with resource differences (POST only)",
 				"/clusters/{clusterId}/webhook/mutate": "Mutating admission webhook for pod resource adjustment",
+				"/clusters/{clusterId}/tasks/{taskName}/trigger": "Manually triggers a specific task (POST)",
 				"/health": "Health check endpoint"
 			}
 		}`),

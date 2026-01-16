@@ -7,6 +7,14 @@ on:
   pull_request:
     branches:
       - main
+    paths:
+      - 'cmd/**'
+      - 'pkg/**'
+      - '*.go'
+      - 'go.mod'
+      - 'go.sum'
+      - 'go.work'
+      - 'go.work.sum'
 
 env:
   GO_VERSION: 1.25.5

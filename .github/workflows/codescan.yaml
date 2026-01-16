@@ -18,6 +18,12 @@ on:
   pull_request:
     branches:
       - main
+    paths:
+      - 'cmd/**'
+      - 'pkg/**'
+      - '*.go'
+      - 'go.mod'
+      - 'go.sum'
   schedule:
     - cron: "18 19 * * 5"
 

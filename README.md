@@ -23,8 +23,6 @@ CruiseKube is an intelligent Kubernetes resource optimization controller that au
   - [What is CruiseKube?](#what-is-cruisekube)
   - [When do you need CruiseKube?](#when-do-you-need-cruisekube)
 - [Getting Started](#getting-started)
-- [Configure CruiseKube](#configure-cruisekube)
-- [Monitoring](#monitoring)
 - [Development](#development)
 - [Contribution](#contribution)
   - [Star History](#star-history)

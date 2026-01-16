@@ -1,11 +1,32 @@
 apiVersion: v2
 name: cruisekube
-description: A Helm chart for TrueFoundry cruisekube OSS controller and webhook
+description: CruiseKube is an intelligent Kubernetes resource optimization controller that automatically monitors, analyzes, and applies resource recommendations to improve cluster efficiency and reduce costs.
 type: application
 version: 0.1.9
 appVersion: "0.1.9"
+icon: https://raw.githubusercontent.com/truefoundry/CruiseKube/refs/heads/main/docs/images/logo/favicon/android-chrome-192x192.png
+# kubeVersion: ">=1.25.0-0"
+home: https://cruisekube.com
+sources:
+  - https://github.com/truefoundry/CruiseKube
+keywords:
+  - Kubernetes
+  - operator
+  - resource optimization
+  - cost optimization
+  - Kubernetes scaling
 dependencies:
   - name: postgresql
     version: "18.1.14"
     repository: "oci://tfy.jfrog.io/tfy-mirror/bitnamicharts"
     condition: postgresql.enabled
+annotations:
+  "artifacthub.io/license": MIT
+  "artifacthub.io/operator": "true"
+  "artifacthub.io/links": |
+    - name: Homepage
+      url: https://cruisekube.com
+    - name: Source
+      url: https://github.com/truefoundry/CruiseKube
+    - name: Discord
+      url: https://discord.gg/Dqek4xJa3N
