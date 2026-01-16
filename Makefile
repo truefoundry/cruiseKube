@@ -86,6 +86,7 @@ uninstall-prom: ## Delete prometheus
 
 .PHONY: index-helm
 index-helm: ## Index helm chart
+	helm dependency update ./charts/cruisekube
 	helm package charts/cruisekube -d docs/
-	helm repo index docs/ --url https://cruisekube.com --merge ./docs/index.yaml 
+	helm repo index docs/ --url https://github.com/truefoundry/CruiseKube/releases/download/$(RELEASE-NAME)/ --merge ./docs/index.yaml 
 	rm -rf docs/cruisekube-*.tgz

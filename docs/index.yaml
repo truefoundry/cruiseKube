@@ -13,7 +13,7 @@ entries:
       artifacthub.io/operator: "true"
     apiVersion: v2
     appVersion: 0.1.9
-    created: "2026-01-16T09:56:02.932691+05:30"
+    created: "2026-01-16T14:52:28.338623+05:30"
     dependencies:
     - condition: postgresql.enabled
       name: postgresql
@@ -36,6 +36,6 @@ entries:
     - https://github.com/truefoundry/CruiseKube
     type: application
     urls:
-    - https://cruisekube.com/cruisekube-0.1.9.tgz
+    - https://github.com/truefoundry/CruiseKube/releases/download/cruisekube-v0.1.9/cruisekube-0.1.9.tgz
     version: 0.1.9
-generated: "2026-01-16T09:56:02.928893+05:30"
+generated: "2026-01-16T14:52:28.334356+05:30"

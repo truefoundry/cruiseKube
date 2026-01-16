@@ -32,7 +32,7 @@ jobs:
       
       - name: Generate Helm index
         run: |
-          make index-helm RELEASE-NAME=v${{ steps.chart-version.outputs.version }}
+          make index-helm RELEASE-NAME=cruisekube-${{ steps.chart-version.outputs.version }}
       
       - name: Configure Git and push changes
         if: github.event.pull_request.head.repo.full_name == github.repository
