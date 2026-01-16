@@ -4,6 +4,8 @@
 <a>
   <img src="https://img.shields.io/badge/go-1.24-green.svg" align="center">
 </a>
+<a href="https://artifacthub.io/packages/helm/cruisekube/cruisekube">
+<img src="https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/cruisekube" align="center" alt="Artifact Hub">
  <a href="./LICENSE">
     <img src="https://img.shields.io/badge/license-MIT-blue.svg" align="center">
  </a>

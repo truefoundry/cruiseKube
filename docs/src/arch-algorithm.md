@@ -1,3 +1,16 @@
+---
+title: "CruiseKube Algorithm"
+description: "Learn about CruiseKube's two-phase optimization algorithm that uses PSI metrics and pod-level resource updates to automatically right-size Kubernetes workloads."
+keywords:
+  - CruiseKube algorithm
+  - Kubernetes resource optimization
+  - PSI metrics
+  - pod-level resource updates
+  - CPU optimization
+  - memory optimization
+  - Kubernetes autoscaling
+---
+
 ## Introduction
 
 Resource optimization in Kubernetes can be broken down into two fundamental problems:

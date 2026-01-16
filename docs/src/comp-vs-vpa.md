@@ -1,4 +1,13 @@
-# Comp
+---
+title: "CruiseKube vs VPA Comparison"
+description: "Compare CruiseKube Autopilot with Kubernetes Vertical Pod Autoscaler (VPA). Understand the key differences in optimization approach, runtime behavior, and use cases."
+keywords:
+  - CruiseKube vs VPA
+  - Kubernetes VPA comparison
+  - resource optimization comparison
+  - VPA alternative
+  - Kubernetes autoscaling
+---
 
 ## CruiseKube vs Kubernetes Vertical Pod Autoscaler (VPA)
 

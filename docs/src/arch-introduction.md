@@ -1,3 +1,14 @@
+---
+title: "CruiseKube Introduction"
+description: "Get started with CruiseKube - a Kubernetes-native resource optimization system that automatically right-sizes CPU and memory for workloads at runtime."
+keywords:
+  - CruiseKube introduction
+  - Kubernetes resource optimization
+  - getting started
+  - resource right-sizing
+  - Kubernetes autoscaling
+---
+
 # Introduction
 
 ## What is CruiseKube?

@@ -1,3 +1,14 @@
+---
+title: "CruiseKube Configuration Dashboard"
+description: "Learn how to access and use the CruiseKube dashboard to monitor recommendations, configure optimization policies, and manage workload settings."
+keywords:
+  - CruiseKube dashboard
+  - configuration dashboard
+  - workload management
+  - optimization policies
+  - resource recommendations
+---
+
 # Configuration Dashboard
 
 The CruiseKube dashboard provides a web interface for monitoring and managing your resource optimization settings.

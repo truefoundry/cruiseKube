@@ -196,18 +196,20 @@ extra:
 nav:
   - Home: index.md
   - Getting started:
-      - Introduction: src/gs-introduction.md
+
       - Installation: src/gs-installation.md
       - Configuration: 
         - Overview: src/config.md
         - Dashboard: src/config-dashboard.md
   - Architecture:
+      - Introduction: src/arch-introduction.md
       - Overview: src/arch-overview.md
       - Algorithm: src/arch-algorithm.md
-  # - Comparison:
-  #     - Comparison: src/comp.md
+      - Limitations: src/arch-limitations.md
   - Development:
       - Dev Environment: src/dev-env.md
       - Contributors: src/dev-contributors.md
+  - Comparison:
+      - CruiseKube vs VPA: src/comp-vs-vpa.md
   - Blog:
       - CruiseKube Announcement: blog/index.md

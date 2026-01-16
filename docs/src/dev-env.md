@@ -1,3 +1,14 @@
+---
+title: "CruiseKube Development Environment"
+description: "Set up your development environment for CruiseKube. Learn how to build, test, and contribute to the project with local Kubernetes clusters."
+keywords:
+  - CruiseKube development
+  - development environment setup
+  - local development
+  - Kubernetes development
+  - contributing to CruiseKube
+---
+
 # Development Environment
 
 This page describes how to set up and work with the CruiseKube development environment.

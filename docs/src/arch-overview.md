@@ -1,3 +1,15 @@
+---
+title: "CruiseKube Architecture Overview"
+description: "Learn about CruiseKube's architecture, components, and control flows. Understand how the Statistics Engine, Runtime Optimizer, and Admission Optimizer work together."
+keywords:
+  - CruiseKube architecture
+  - Kubernetes resource optimization
+  - Statistics Engine
+  - Runtime Optimizer
+  - Admission Optimizer
+  - Kubernetes components
+---
+
 ## Overview
 
 CruiseKube operates as a closed-loop system through a set of **periodic background tasks**.
@@ -185,4 +197,4 @@ sequenceDiagram
 
 ## Next Steps
 
-- Get started with installation [here](./gs-introduction.md)
+- Get started with installation [here](./gs-installation.md)
