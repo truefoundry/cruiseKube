@@ -1,0 +1,8 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: populate-db
+  namespace: cruisekube-system
+status:
+  succeeded: 1

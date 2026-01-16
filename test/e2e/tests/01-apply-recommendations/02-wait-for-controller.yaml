@@ -1,0 +1,12 @@
+apiVersion: kuttl.dev/v1beta1
+kind: TestStep
+commands:
+  - command: echo "=== Manually triggering ApplyRecommendation task via API ==="
+  - command: |
+      kubectl run curl-trigger --rm -i --restart=Never --image=curlimages/curl:latest -n cruisekube-system -- \
+        curl -X POST -s \
+        -H "Content-Type: application/json" \
+        -w "\nHTTP Status: %{http_code}\n" \
+        http://cruisekube-controller.cruisekube-system.svc.cluster.local:8080/api/v1/clusters/default/tasks/default_applyrecommendation/trigger
+  - command: echo ""
+  - command: echo "=== Task triggered successfully ==="

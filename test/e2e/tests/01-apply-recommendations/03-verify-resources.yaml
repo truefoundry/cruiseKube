@@ -1,0 +1,12 @@
+---
+apiVersion: kuttl.dev/v1beta1
+kind: TestStep
+commands:
+  - command: echo "=== NGINX POD RESOURCES ==="
+  - command: kubectl get pod -n test-workloads -l app=nginx -o jsonpath='{range .items[*]}{.metadata.name}{" CPU:"}{.spec.containers[0].resources.requests.cpu}{" Memory:"}{.spec.containers[0].resources.requests.memory}{"\n"}{end}'
+  - command: echo ""
+  - command: echo "=== BUSYBOX POD RESOURCES ==="
+  - command: kubectl get pod -n test-workloads -l app=busybox -o jsonpath='{range .items[*]}{.metadata.name}{" CPU:"}{.spec.containers[0].resources.requests.cpu}{" Memory:"}{.spec.containers[0].resources.requests.memory}{"\n"}{end}'
+  - command: echo ""
+  - command: echo "=== CONTROLLER LOGS ==="
+  - command: kubectl logs -n cruisekube-system deploy/cruisekube-controller --tail=100

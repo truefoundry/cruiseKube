@@ -1,0 +1,196 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: populate-db-script
+  namespace: cruisekube-system
+data:
+  populate.sql: |
+    CREATE TABLE IF NOT EXISTS stats (
+        id SERIAL PRIMARY KEY,
+        cluster_id VARCHAR(255) NOT NULL,
+        workload_id VARCHAR(255) NOT NULL,
+        stats TEXT NOT NULL,
+        generated_at TIMESTAMP NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        overrides TEXT DEFAULT '{}'
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_stats_cluster_id ON stats(cluster_id);
+    CREATE INDEX IF NOT EXISTS idx_stats_workload_id ON stats(workload_id);
+    CREATE INDEX IF NOT EXISTS idx_stats_generated_at ON stats(generated_at);
+    CREATE INDEX IF NOT EXISTS idx_stats_updated_at ON stats(updated_at);
+
+    INSERT INTO stats (cluster_id, workload_id, stats, generated_at, overrides)
+    VALUES (
+        'default',
+        'Deployment:test-workloads:nginx-deployment',
+        '{
+          "workload": "Deployment:test-workloads:nginx-deployment",
+          "kind": "Deployment",
+          "namespace": "test-workloads",
+          "name": "nginx-deployment",
+          "creation_time": "2024-01-01T00:00:00Z",
+          "continuous_optimization": true,
+          "is_horizontally_autoscaled_on_cpu": false,
+          "eviction_ranking": 2,
+          "replicas": 2,
+          "container_stats": [
+            {
+              "container_name": "nginx",
+              "container_type": 3,
+              "cpu_stats": {
+                "max": 0.8,
+                "p50": 0.15,
+                "p75": 0.25
+              },
+              "memory_stats": {
+                "max": 80.0,
+                "p75": 60.0,
+                "oom_memory": 0.0
+              },
+              "memory_7day": {
+                "max": 85.0
+              },
+              "cpu_7day": {
+                "max": 0.9,
+                "p50": 0.15,
+                "p75": 0.25,
+                "p90": 0.4,
+                "p99": 0.7
+              },
+              "simple_predictions_cpu": {
+                "weekly_prediction": 0.3,
+                "hourly_prediction": 0.25,
+                "current_prediction": 0.2,
+                "max_value": 0.8
+              },
+              "simple_predictions_memory": {
+                "weekly_prediction": 70.0,
+                "hourly_prediction": 65.0,
+                "current_prediction": 60.0,
+                "max_value": 80.0
+              }
+            }
+          ],
+          "original_container_resources": [
+            {
+              "name": "nginx",
+              "type": 3,
+              "cpu_request": 0.5,
+              "cpu_limit": 1.0,
+              "memory_request": 128.0,
+              "memory_limit": 256.0
+            }
+          ]
+        }',
+        NOW() - INTERVAL '1 hour',
+        '{}'
+    )
+    ON CONFLICT DO NOTHING;
+
+    INSERT INTO stats (cluster_id, workload_id, stats, generated_at, overrides)
+    VALUES (
+        'default',
+        'Deployment:test-workloads:busybox-deployment',
+        '{
+          "workload": "Deployment:test-workloads:busybox-deployment",
+          "kind": "Deployment",
+          "namespace": "test-workloads",
+          "name": "busybox-deployment",
+          "creation_time": "2024-01-01T00:00:00Z",
+          "continuous_optimization": true,
+          "is_horizontally_autoscaled_on_cpu": false,
+          "eviction_ranking": 2,
+          "replicas": 1,
+          "container_stats": [
+            {
+              "container_name": "busybox",
+              "container_type": 3,
+              "cpu_stats": {
+                "max": 0.15,
+                "p50": 0.05,
+                "p75": 0.08
+              },
+              "memory_stats": {
+                "max": 40.0,
+                "p75": 30.0,
+                "oom_memory": 0.0
+              },
+              "memory_7day": {
+                "max": 45.0
+              },
+              "cpu_7day": {
+                "max": 0.18,
+                "p50": 0.05,
+                "p75": 0.08,
+                "p90": 0.12,
+                "p99": 0.15
+              },
+              "simple_predictions_cpu": {
+                "weekly_prediction": 0.1,
+                "hourly_prediction": 0.08,
+                "current_prediction": 0.06,
+                "max_value": 0.15
+              },
+              "simple_predictions_memory": {
+                "weekly_prediction": 35.0,
+                "hourly_prediction": 32.0,
+                "current_prediction": 30.0,
+                "max_value": 40.0
+              }
+            }
+          ],
+          "original_container_resources": [
+            {
+              "name": "busybox",
+              "type": 3,
+              "cpu_request": 0.2,
+              "cpu_limit": 0.5,
+              "memory_request": 64.0,
+              "memory_limit": 128.0
+            }
+          ]
+        }',
+        NOW() - INTERVAL '1 hour',
+        '{}'
+    )
+    ON CONFLICT DO NOTHING;
+
+    SELECT cluster_id, workload_id, generated_at FROM stats;
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: populate-db
+  namespace: cruisekube-system
+spec:
+  ttlSecondsAfterFinished: 300
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: populate-db
+        image: postgres:15-alpine
+        command:
+        - sh
+        - -c
+        - |
+          echo "Waiting for postgres to be ready..."
+          until pg_isready -h postgres.cruisekube-system.svc.cluster.local -U cruisekube; do
+            sleep 2
+          done
+          echo "Postgres is ready. Populating database..."
+          psql -h postgres.cruisekube-system.svc.cluster.local -U cruisekube -d cruisekube -f /scripts/populate.sql
+          echo "Database populated successfully!"
+        env:
+        - name: PGPASSWORD
+          value: cruisekube
+        volumeMounts:
+        - name: scripts
+          mountPath: /scripts
+      volumes:
+      - name: scripts
+        configMap:
+          name: populate-db-script

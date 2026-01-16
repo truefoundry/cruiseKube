@@ -1,0 +1,7 @@
+# KUTTL test artifacts
+artifacts/
+*.log
+
+# Kind cluster artifacts
+kind-logs-*/
+kubeconfig

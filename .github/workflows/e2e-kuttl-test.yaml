@@ -1,0 +1,73 @@
+name: E2E Tests with Kuttl
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  kuttl-tests:
+    name: Run Kuttl E2E Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+          cache: true
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Install Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: 'v3.12.3'
+
+      - name: Build and push images
+        working-directory: ./test/e2e
+        run: |
+          make build-images
+
+      - name: Install Kind
+        uses: helm/kind-action@v1.12.0
+        with:
+          install_only: true
+
+      - name: Setup environment
+        working-directory: ./test/e2e
+        run: |
+          make setup
+
+      - name: Install Kuttl
+        run: |
+          echo "Downloading Kuttl 0.24.0..."
+          curl -Lo kuttl.tar.gz "https://github.com/kudobuilder/kuttl/releases/download/v0.24.0/kuttl_0.24.0_linux_x86_64.tar.gz"
+          
+          echo "Verifying checksum..."
+
+          EXPECTED_CHECKSUM="9451186fd17517a58ac5c498c1b7761fd117e91db3c7543d437554fab7452294"
+          ACTUAL_CHECKSUM=$(sha256sum kuttl.tar.gz | awk '{print $1}')
+          if [ "$ACTUAL_CHECKSUM" != "$EXPECTED_CHECKSUM" ]; then
+            echo "ERROR: Checksum verification failed!"
+            echo "Expected: $EXPECTED_CHECKSUM"
+            echo "Actual:   $ACTUAL_CHECKSUM"
+            exit 1
+          fi
+
+          echo "Checksum verified successfully!"
+          
+          tar -xvf kuttl.tar.gz
+          sudo mv kubectl-kuttl /usr/local/bin/
+          kubectl kuttl version
+
+      - name: Run E2E Tests
+        working-directory: ./test/e2e
+        run: |
+          make test

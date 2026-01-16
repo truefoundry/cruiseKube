@@ -1,0 +1,86 @@
+---
+apiVersion: kuttl.dev/v1beta1
+kind: TestAssert
+timeout: 60
+---
+# Original resources:
+#  - cpu: request = 500m, limit = 1000m
+#  - memory: request = 128MB, limit = 256MB
+# 
+# Stats (per container):
+#  - cpu: p75 = 250m, max = 800m, rest = 800m - 250m =  550m
+#  - memory: p75 = 60MB, max = 80MB, rest = 80 - 60 = 20MB
+#
+# CPU calc:
+#  base = 250m
+#  total_rest = 2 * 550m (nginx) + 70m (busybox) = 1170m
+#  max_rest = 550m
+#  additional = 550 * (550/1170) = 259m
+#  final = 250 + 259 = 509m
+#
+# Memory calc:
+#  base = 60MB
+#  total_rest = 2 * 20MB (nginx) + 10MB (busybox) = 50MB
+#  max_rest = 20MB
+#  additional = 20 * (20/50) = 8MB
+#  final = 60 + 8 = 68MB
+#
+apiVersion: v1
+kind: Pod
+metadata:
+  namespace: test-workloads
+  labels:
+    app: nginx
+spec:
+  containers:
+  - name: nginx
+    resources:
+      requests:
+        cpu: "509m"
+        memory: "68M"
+      limits:
+        memory: "271M"
+status:
+  phase: Running
+---
+# Original resources:
+#  - cpu: request = 200m, limit = 500m
+#  - memory: request = 64MB, limit = 128MB
+#
+# Stats (per container):
+#  - cpu: p75 = 80m, max = 150m, rest = 70m
+#  - memory: p75 = 30MB, max = 40MB, rest = 10MB
+#
+# Same node, same 3 total pods
+#
+# CPU calc:
+#  base = 80m
+#  total_rest = 2 * 550m (nginx) + 70m (busybox) = 1170m
+#  max_rest = 550m
+#  additional = 550 * (70/1170) = 33m
+#  final = 80 + 33 = 113m
+#
+# Memory calc:
+#  base = 30MB
+#  total_rest = 2 * 20MB (nginx) + 10MB (busybox) = 50MB
+#  max_rest = 20MB
+#  additional = 20 * (10/50) = 4MB
+#  final = 30 + 4 = 34MB
+
+apiVersion: v1
+kind: Pod
+metadata:
+  namespace: test-workloads
+  labels:
+    app: busybox
+spec:
+  containers:
+  - name: busybox
+    resources:
+      requests:
+        cpu: "113m"
+        memory: "34M"
+      limits:
+        memory: "137M"
+status:
+  phase: Running

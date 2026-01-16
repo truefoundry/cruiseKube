@@ -1,0 +1,39 @@
+global:
+  postgresql:
+    auth:
+      host: "postgres"
+      port: 5432
+      username: "cruisekube"
+      password: "cruisekube"
+      database: "cruisekube"
+
+cruisekubeController:
+  enabled: true
+  serviceMonitor:
+    enabled: false
+  image:
+    repository: cruisekube
+    tag: latest
+    pullPolicy: IfNotPresent
+    imagePullPolicy: IfNotPresent
+  env:
+    CRUISEKUBE_DEPENDENCIES_INCLUSTER_PROMETHEUSURL: "http://localhost:9090"
+    CRUISEKUBE_CONTROLLER_TARGETCLUSTERID: "default"
+    CRUISEKUBE_CONTROLLER_WRITEAUTHORIZEDCLUSTERS: "default"
+    CRUISEKUBE_CONTROLLER_TASKS_APPLYRECOMMENDATION_ENABLED: "true"
+    CRUISEKUBE_CONTROLLER_TASKS_APPLYRECOMMENDATION_SCHEDULE: "30s"
+    CRUISEKUBE_CONTROLLER_TASKS_APPLYRECOMMENDATION_METADATA_DRYRUN: "false"
+    CRUISEKUBE_CONTROLLER_TASKS_APPLYRECOMMENDATION_METADATA_SKIPMEMORY: "false"
+    CRUISEKUBE_CONTROLLER_TASKS_APPLYRECOMMENDATION_METADATA_NODESTATSURL_HOST: "http://localhost:8080"
+    CRUISEKUBE_CONTROLLER_TASKS_APPLYRECOMMENDATION_METADATA_OVERRIDESURL_HOST: "http://localhost:8080"
+    CRUISEKUBE_RECOMMENDATIONSETTINGS_NEWWORKLOADTHRESHOLDHOURS: "0"
+    CRUISEKUBE_RECOMMENDATIONSETTINGS_DISABLEMEMORYAPPLICATION: "false"
+
+postgresql:
+  enabled: false
+
+cruisekubeFrontend:
+  enabled: false
+
+cruisekubeWebhook:
+  enabled: false
