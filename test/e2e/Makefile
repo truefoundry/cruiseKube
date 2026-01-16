@@ -43,7 +43,7 @@ kind-up: ## Create Kind cluster and load images
 	@kubectl wait --for=condition=Ready nodes --all --timeout=120s
 	kubectl scale --replicas=1 deployment/coredns -n kube-system
 	@echo "Loading controller image into kind cluster..."
-	@docker save $(CONTROLLER_IMAGE) | docker exec -i $(CLUSTER_NAME)-control-plane ctr -n k8s.io images import -
+	@kind load docker-image $(CONTROLLER_IMAGE) --name $(CLUSTER_NAME)
 	@echo "Image loaded successfully"
 
 .PHONY: kind-down

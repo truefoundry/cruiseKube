@@ -194,4 +194,3 @@ spec:
       - name: scripts
         configMap:
           name: populate-db-script
-

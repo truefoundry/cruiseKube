@@ -5,4 +5,3 @@ testDirs:
   - ./tests/
 timeout: 600
 parallel: 1
-

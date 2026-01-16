@@ -1,4 +1,8 @@
 ---
+apiVersion: kuttl.dev/v1beta1
+kind: TestAssert
+timeout: 120
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -32,4 +36,3 @@ metadata:
     app: busybox
 status:
   phase: Running
-

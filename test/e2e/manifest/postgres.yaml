@@ -85,8 +85,7 @@ spec:
   - metadata:
       name: postgres-storage
     spec:
-      accessModes: [ "ReadWriteOnce" ]
+      accessModes: ["ReadWriteOnce"]
       resources:
         requests:
           storage: 1Gi
-

@@ -20,4 +20,3 @@ metadata:
     app: busybox
 status:
   phase: Running
-

@@ -47,7 +47,22 @@ jobs:
 
       - name: Install Kuttl
         run: |
-          curl -Lo kuttl.tar.gz https://github.com/kudobuilder/kuttl/releases/download/v0.22.0/kuttl_0.22.0_linux_x86_64.tar.gz
+          echo "Downloading Kuttl 0.24.0..."
+          curl -Lo kuttl.tar.gz "https://github.com/kudobuilder/kuttl/releases/download/v0.24.0/kuttl_0.24.0_linux_x86_64.tar.gz"
+          
+          echo "Verifying checksum..."
+
+          EXPECTED_CHECKSUM="c31c6abceb87e9d18c17cc4cfef22ae7ed53d3f73ad3c03f5fec93bbc4b8f62c"
+          ACTUAL_CHECKSUM=$(sha256sum kuttl.tar.gz | awk '{print $1}')
+          if [ "$ACTUAL_CHECKSUM" != "$EXPECTED_CHECKSUM" ]; then
+            echo "ERROR: Checksum verification failed!"
+            echo "Expected: $EXPECTED_CHECKSUM"
+            echo "Actual:   $ACTUAL_CHECKSUM"
+            exit 1
+          fi
+
+          echo "Checksum verified successfully!"
+          
           tar -xvf kuttl.tar.gz
           sudo mv kubectl-kuttl /usr/local/bin/
           kubectl kuttl version

@@ -6,4 +6,3 @@ metadata:
   namespace: cruisekube-system
 status:
   succeeded: 1
-

@@ -10,4 +10,3 @@ commands:
   - command: echo ""
   - command: echo "=== CONTROLLER LOGS ==="
   - command: kubectl logs -n cruisekube-system deploy/cruisekube-controller --tail=100
-
