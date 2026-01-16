@@ -209,3 +209,5 @@ nav:
   - Development:
       - Dev Environment: src/dev-env.md
       - Contributors: src/dev-contributors.md
+  - Blog:
+      - CruiseKube Announcement: blog/index.md

@@ -2,11 +2,13 @@ package oom
 
 import (
 	"context"
+	"strings"
 	"time"
 
-	"github.com/truefoundry/cruisekube/pkg/task"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 
+	"github.com/truefoundry/cruisekube/pkg/config"
 	"github.com/truefoundry/cruisekube/pkg/logging"
 	"github.com/truefoundry/cruisekube/pkg/repository/storage"
 	"github.com/truefoundry/cruisekube/pkg/task/utils"
@@ -14,22 +16,20 @@ import (
 )
 
 type Processor struct {
-	storage                 *storage.Storage
-	kubeClient              kubernetes.Interface
-	clusterID               string
-	stopCh                  chan struct{}
-	applyRecommendationTask *task.ApplyRecommendationTask
-	oomCooldownMinutes      int
+	storage    *storage.Storage
+	kubeClient kubernetes.Interface
+	clusterID  string
+	stopCh     chan struct{}
+	cfg        *config.Config
 }
 
-func NewProcessor(storageRepo *storage.Storage, kubeClient kubernetes.Interface, clusterID string, applyRecommendationTask *task.ApplyRecommendationTask, oomCooldownMinutes int) *Processor {
+func NewProcessor(storageRepo *storage.Storage, kubeClient kubernetes.Interface, clusterID string, cfg *config.Config) *Processor {
 	return &Processor{
-		storage:                 storageRepo,
-		kubeClient:              kubeClient,
-		clusterID:               clusterID,
-		applyRecommendationTask: applyRecommendationTask,
-		oomCooldownMinutes:      oomCooldownMinutes,
-		stopCh:                  make(chan struct{}),
+		storage:    storageRepo,
+		kubeClient: kubeClient,
+		clusterID:  clusterID,
+		cfg:        cfg,
+		stopCh:     make(chan struct{}),
 	}
 }
 
@@ -73,14 +73,14 @@ func (p *Processor) processOOMEvent(ctx context.Context, oomInfo Info) {
 
 	latestEvent, err := p.storage.GetLatestOOMEventForContainer(p.clusterID, oomInfo.ContainerID, oomInfo.PodName)
 	if err != nil {
-		logging.Warnf(ctx, "Failed to check latest OOM event for cooldown: %v", err)
+		logging.Warnf(ctx, "Failed to check latest OOM event: %v", err)
 	} else if latestEvent != nil {
 		timeSinceLastOOM := time.Since(latestEvent.Timestamp)
-		cooldownDuration := time.Duration(p.oomCooldownMinutes) * time.Minute
+		cooldownDuration := time.Duration(p.cfg.RecommendationSettings.OOMCooldownMinutes) * time.Minute
 
 		if timeSinceLastOOM < cooldownDuration {
 			remainingCooldown := cooldownDuration - timeSinceLastOOM
-			logging.Infof(ctx, "OOM cooldown active for pod %s/%s (container %s): last OOM was %.1f minutes ago, skipping (%.1f minutes remaining)",
+			logging.Infof(ctx, "OOM cooldown active for pod %s/%s (container %s): last OOM was %.1f minutes ago, skipping eviction (%.1f minutes remaining)",
 				oomInfo.Namespace, oomInfo.PodName, oomInfo.ContainerID, timeSinceLastOOM.Minutes(), remainingCooldown.Minutes())
 			return
 		}
@@ -107,22 +107,47 @@ func (p *Processor) processOOMEvent(ctx context.Context, oomInfo Info) {
 		oomInfo.ContainerID, oomInfo.Namespace, oomInfo.PodName, oomInfo.NodeName, oomInfo.MemoryLimit, oomInfo.MemoryRequest, oomInfo.LastObservedMemory)
 
 	if err := p.storage.UpdateOOMMemoryForContainer(p.clusterID, workloadID, containerName, oomInfo.LastObservedMemory); err != nil {
-		logging.Warnf(ctx, "Failed to update OOM memory in stats for %s: %v", oomInfo.ContainerID, err)
-	} else {
-		logging.Infof(ctx, "Updated OOM memory in stats for workload=%s, container=%s: %d bytes",
-			workloadID, containerName, oomInfo.LastObservedMemory)
+		logging.Warnf(ctx, "Failed to update OOM memory in stats for %s: %v, skipping eviction", oomInfo.ContainerID, err)
+		return
 	}
+	logging.Infof(ctx, "Updated OOM memory in stats for workload=%s, container=%s: %d bytes",
+		workloadID, containerName, oomInfo.LastObservedMemory)
 
-	if p.applyRecommendationTask == nil {
-		logging.Warnf(ctx, "Skipping reactive apply recommendation for node %s: apply recommendation task is not initialized", oomInfo.NodeName)
+	if p.cfg.RecommendationSettings.DisableMemoryApplication {
+		logging.Infof(ctx, "Memory application is disabled in configuration, skipping eviction for pod %s/%s", oomInfo.Namespace, oomInfo.PodName)
 		return
 	}
 
-	logging.Infof(ctx, "Triggering reactive apply recommendation for node %s (cooldown: %d minutes)", oomInfo.NodeName, p.oomCooldownMinutes)
-	go func(prevCtx context.Context) {
-		ctx := context.WithoutCancel(prevCtx)
-		if err := p.applyRecommendationTask.RunForNode(ctx, oomInfo.NodeName); err != nil {
-			logging.Errorf(ctx, "Failed to apply reactive recommendation for node %s: %v", oomInfo.NodeName, err)
+	pod, err := p.kubeClient.CoreV1().Pods(oomInfo.Namespace).Get(ctx, oomInfo.PodName, metav1.GetOptions{})
+	if err != nil {
+		logging.Errorf(ctx, "Failed to get pod %s/%s for eviction: %v", oomInfo.Namespace, oomInfo.PodName, err)
+		return
+	}
+
+	if pod.Annotations[utils.ExcludedAnnotation] == "true" {
+		logging.Infof(ctx, "Pod %s/%s has cruisekube excluded annotation, skipping eviction", oomInfo.Namespace, oomInfo.PodName)
+		return
+	}
+
+	workloadInfo := utils.GetWorkloadInfoFromPod(pod)
+	if workloadInfo != nil {
+		workloadID := strings.ReplaceAll(utils.GetWorkloadKey(workloadInfo.Kind, workloadInfo.Namespace, workloadInfo.Name), "/", ":")
+
+		workloadOverrides, err := p.storage.GetWorkloadOverrides(p.clusterID, workloadID)
+		if err != nil {
+			logging.Warnf(ctx, "Failed to fetch workload overrides for %s, proceeding with eviction: %v", workloadID, err)
+		} else if workloadOverrides.Enabled != nil && !*workloadOverrides.Enabled {
+			logging.Infof(ctx, "Workload %s is disabled via overrides, skipping eviction", workloadID)
+			return
 		}
-	}(ctx)
+	}
+
+	logging.Infof(ctx, "Evicting pod %s/%s after OOM", oomInfo.Namespace, oomInfo.PodName)
+	evicted, errStr := utils.EvictPod(ctx, p.kubeClient, pod)
+	if !evicted || errStr != "" {
+		logging.Errorf(ctx, "Failed to evict pod %s/%s: %v", oomInfo.Namespace, oomInfo.PodName, errStr)
+		return
+	}
+
+	logging.Infof(ctx, "Successfully evicted pod %s/%s after OOM. New pod will be created with updated memory recommendations via webhook", oomInfo.Namespace, oomInfo.PodName)
 }

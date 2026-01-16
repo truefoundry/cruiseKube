@@ -15,9 +15,11 @@ author:
 
 # Introducing CruiseKube - Runtime Resource Optimization for Kubernetes
 
-<img src="../../images/logo/cruiseKube_Colour.png" alt="CruiseKube Logo" width="200">
+<img src="../../../../../images/logo/cruiseKube_Colour.png" alt="CruiseKube Logo" width="200">
 
 Today, we’re excited to announce the release of **CruiseKube** - a runtime resource optimization engine for Kubernetes that continuously right-sizes pods *without restarts*, unlocking significant cost efficiency gains while preserving reliability.
+
+<!-- more -->
 
 # What is CruiseKube?
 
@@ -37,7 +39,7 @@ CruiseKube explicitly addresses the pod-level right-sizing problem, in a fully h
 
 ## How does it work?
 
-<img src="../../images/cruisekube_arch.png" alt="CruiseKube Architecture" width="800">
+<img src="../../../../../images/cruisekube_arch.png" alt="CruiseKube Architecture" width="800">
 
 At a high level, CruiseKube has the following components -
 
